@@ -1,0 +1,43 @@
+version = "1.0.0-SNAPSHOT"
+group = "io.pivotal.services"
+
+apply plugin: 'java'
+apply plugin: 'maven'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+
+jar {
+    baseName = 'cf-push-gradle-plugin'
+    version = '1.0.0-SNAPSHOT'
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    maven { url "https://repo.spring.io/snapshot" }
+    maven { url "https://repo.spring.io/milestone" }
+}
+
+dependencies {
+    compile gradleApi()
+    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8', version: '2.4.3'
+    compile("org.cloudfoundry:cloudfoundry-client-spring:$cfClientVersion") {
+        exclude group: "com.fasterxml.jackson.core", module: "jackson-databind"
+        exclude group: "com.fasterxml.jackson.datatype", module: "jackson-datatype-jdk8"
+    }
+    compile("org.cloudfoundry:cloudfoundry-operations:$cfClientVersion"){
+        exclude group: "com.fasterxml.jackson.core", module: "jackson-databind"
+        exclude group: "com.fasterxml.jackson.datatype", module: "jackson-datatype-jdk8"
+    }
+    compile("ch.qos.logback:logback-classic:1.1.7")
+    compile("ch.qos.logback:logback-core:1.1.7")
+    compile("io.projectreactor:reactor-core:$reactorVersion")
+    compile("io.projectreactor:reactor-netty:$reactorVersion")
+    testCompile('org.assertj:assertj-core:3.4.1')
+}

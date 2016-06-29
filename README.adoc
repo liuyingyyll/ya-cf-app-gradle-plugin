@@ -1,0 +1,55 @@
+A Gradle plugin to push an application to Cloud Foundry. 
+
+== Using the Plugin
+
+* Add a buildscript dependency:
+
+[source]
+----
+buildscript {
+	ext {
+		cfPushVersion = '1.0.0-SNAPSHOT'
+	}
+	repositories {
+		mavenLocal()
+		mavenCentral()
+		maven {
+			url 'https://repo.spring.io/libs-milestone'
+		}
+	}
+	dependencies {
+		classpath("io.pivotal.services:cf-push-gradle-plugin:${cfPushVersion}")
+	}
+}
+----
+
+* Apply the plugin and provide the Cloud Foundry details:
+
+[source]
+----
+apply plugin: 'cf-push'
+
+cfPushConfig {
+	name = "cf-show-env"
+	path = "build/libs/cf-first-sample-0.1.2-SNAPSHOT.jar"
+	host = "api.local.pcfdev.io"
+	user = "admin"
+	password = "admin"
+	org = "pcfdev-org"
+	space = "pcfdev-space"
+	buildpack = "https://github.com/cloudfoundry/java-buildpack.git"
+}
+
+----
+
+* Run the task:
+
+[source]
+----
+./gradlew cfpush
+----
+
+
+
+
+

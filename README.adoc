@@ -54,11 +54,11 @@ cfConfig {
 ./gradlew cf-push
 ----
 
-* Override the values using explicit gradle properties:
+* Override the values using explicit gradle properties, they follow a `cf.*` pattern:
 
 [source]
 ----
-./gradlew cf-push -Pcf.applicationName=Green -Pcf.applicationHostName=demo-time-temp
+./gradlew cf-push -Pcf.name=Green -Pcf.hostName=demo-time-temp
 ----
 
 
@@ -69,29 +69,35 @@ cfConfig {
 * Push the `Blue` app mapping to `demo-time.domain`:
 [source]
 ----
-./gradlew cf-push -Pcf.applicationName=Blue -Pcf.applicationHostName=demo-time
+./gradlew cf-push -Pcf.name=Blue -Pcf.hostName=demo-time
 ----
 
 * Push the `Green` app mapping to `demo-time-temp.domain`:
 [source]
 ----
- ./gradlew cf-push -Pcf.applicationName=Green -Pcf.applicationHostName=demo-time-temp
+./gradlew cf-push -Pcf.name=Green -Pcf.hostName=demo-time-temp
 ----
 
-* Once Green is verified, remap the route for `Green`:
+* Once `Green` is verified, remap the route for `Green`:
 [source]
 ----
- ./gradlew cf-map-route -Pcf.applicationName=Green -Pcf.applicationHostName=demo-time
+./gradlew cf-map-route -Pcf.name=Green -Pcf.hostName=demo-time
 ----
 
 * Unmap the temporary route for Green:
 [source]
 ----
-./gradlew cf-unmap-route -Pcf.applicationName=Green -Pcf.applicationHostName=demo-time-temp
+./gradlew cf-unmap-route -Pcf.name=Green -Pcf.hostName=demo-time-temp
 ----
 
 * Delete the Blue app:
 [source]
 ----
-./gradlew cf-delete-app -Pcf.applicationName=Blue
+./gradlew cf-delete-app -Pcf.name=Blue
+----
+
+* Delete the temporary route:
+[source]
+----
+./gradlew cf-delete-route -Pcf.hostName=demo-time-temp
 ----

@@ -2,38 +2,112 @@ package io.pivotal.services.plugin.tasks;
 
 import io.pivotal.services.plugin.CfPushPluginExtension;
 import io.pivotal.services.plugin.PropertyNameConstants;
+import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.operations.CloudFoundryOperations;
+import org.cloudfoundry.operations.DefaultCloudFoundryOperations;
+import org.cloudfoundry.spring.client.SpringCloudFoundryClient;
 import org.gradle.api.DefaultTask;
+
+import java.util.Optional;
 
 /**
  * Base class for all Concrete CF tasks
  */
 public class AbstractCfTask extends DefaultTask {
 
+	protected CloudFoundryOperations getCfOperations() {
+		CloudFoundryClient cfClient = SpringCloudFoundryClient.builder()
+				.host(getCcHost())
+				.username(getCcUser())
+				.password(getCcPassword())
+				.skipSslValidation(true)
+				.build();
+
+
+		CloudFoundryOperations cfOperations = DefaultCloudFoundryOperations.builder()
+				.cloudFoundryClient(cfClient)
+				.organization(getOrg())
+				.space(getSpace())
+				.build();
+
+		return cfOperations;
+	}
+
 	protected CfPushPluginExtension getExtension() {
 		return getProject().getExtensions().findByType(CfPushPluginExtension.class);
 	}
 
 	protected String getCfApplicationName() {
-		if (getProject().hasProperty(PropertyNameConstants.CF_APPLICATION_NAME)) {
-			return (String) getProject().property(PropertyNameConstants.CF_APPLICATION_NAME);
-		}
-		return this.getExtension().getName();
+		return getStringPropertyFromProject(PropertyNameConstants.CF_APPLICATION_NAME)
+				.orElse(this.getExtension().getName());
 	}
 
 	protected String getAppHostName() {
-		if (getProject().hasProperty(PropertyNameConstants.CF_APPLICATION_HOST_NAME)) {
-			return (String) getProject().property(PropertyNameConstants.CF_APPLICATION_HOST_NAME);
-		}
-
-		return this.getExtension().getHostName();
+		return getStringPropertyFromProject(PropertyNameConstants.CF_APPLICATION_HOST_NAME)
+				.orElse(this.getExtension().getHostName());
 	}
 
 	protected String getAppDomain() {
-		if (getProject().hasProperty(PropertyNameConstants.CF_APPLICATION_DOMAIN)) {
-			return (String) getProject().property(PropertyNameConstants.CF_APPLICATION_DOMAIN);
+		return getStringPropertyFromProject(PropertyNameConstants.CF_APPLICATION_DOMAIN)
+				.orElse(this.getExtension().getDomain());
+	}
+
+	protected String getFilePath() {
+		return getStringPropertyFromProject(PropertyNameConstants.CF_FILE_PATH)
+				.orElse(this.getExtension().getFilePath());
+	}
+
+	protected String getCcHost() {
+		return getStringPropertyFromProject(PropertyNameConstants.CC_HOST)
+				.orElse(this.getExtension().getCcHost());
+	}
+
+	protected String getCcUser() {
+		return getStringPropertyFromProject(PropertyNameConstants.CC_USER)
+				.orElse(this.getExtension().getCcUser());
+	}
+
+	protected String getCcPassword() {
+		return getStringPropertyFromProject(PropertyNameConstants.CC_PASSWORD)
+				.orElse(this.getExtension().getCcPassword());
+	}
+
+	protected String getBuildpack() {
+		return getStringPropertyFromProject(PropertyNameConstants.CF_BUILDPACK)
+				.orElse(this.getExtension().getBuildpack());
+	}
+
+	protected String getOrg() {
+		return getStringPropertyFromProject(PropertyNameConstants.CF_ORG)
+				.orElse(this.getExtension().getOrg());
+	}
+
+	protected String getSpace() {
+		return getStringPropertyFromProject(PropertyNameConstants.CF_SPACE)
+				.orElse(this.getExtension().getSpace());
+	}
+
+	protected Integer getInstances() {
+		return getIntegerProperty(PropertyNameConstants.CF_INSTANCES)
+				.orElse(this.getExtension().getInstances());
+	}
+
+	protected Integer getMemory() {
+		return getIntegerProperty(PropertyNameConstants.CF_MEMORY)
+				.orElse(this.getExtension().getMemory());
+	}
+
+	private Optional<String> getStringPropertyFromProject(String propertyName) {
+		if (getProject().hasProperty(propertyName)) {
+			return Optional.of((String) getProject().property(propertyName));
 		}
+		return Optional.empty();
+	}
 
-		return this.getExtension().getDomain();
-
+	private Optional<Integer> getIntegerProperty(String propertyName) {
+		if (getProject().hasProperty(propertyName)) {
+			return Optional.of((Integer) getProject().property(propertyName));
+		}
+		return Optional.empty();
 	}
 }

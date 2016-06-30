@@ -1,31 +1,31 @@
 package io.pivotal.services.plugin.tasks;
 
 import org.cloudfoundry.operations.CloudFoundryOperations;
-import org.cloudfoundry.operations.routes.UnmapRouteRequest;
+import org.cloudfoundry.operations.routes.DeleteRouteRequest;
 import org.gradle.api.tasks.TaskAction;
 import reactor.core.publisher.Mono;
 
 /**
- * Responsible for handling unmap route task.
+ * Responsible for Deleting a route
  *
  * @author Biju Kunjummen
  */
-public class CfUnMapRouteTask extends AbstractCfTask {
+public class CfDeleteRouteTask extends AbstractCfTask {
 
 	@TaskAction
-	public void unmapRoute() {
+	public void deleteRoute() {
 
 		CloudFoundryOperations cfOperations = getCfOperations();
 
-		Mono<Void> resp = cfOperations.routes()
-				.unmap(UnmapRouteRequest
+		Mono<Void> resp = cfOperations.routes().delete(
+				DeleteRouteRequest
 						.builder()
-						.applicationName(getCfApplicationName())
 						.domain(getAppDomain())
-						.host(getAppHostName()).build());
+						.host(getAppHostName())
+						.build());
 
 		resp.block(600_000L);
-
 	}
+
 
 }

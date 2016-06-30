@@ -14,7 +14,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 
 @Category(IntegrationTest.class)
-public class CfPushTest {
+public class CfPushIntegrationTest {
 
     @Test
     public void testCfPush() throws Exception{

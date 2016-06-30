@@ -1,15 +1,11 @@
 package io.pivotal.services.plugin.tasks;
 
 import io.pivotal.services.plugin.CfPushPluginExtension;
-import io.pivotal.services.plugin.tasks.AbstractCfTask;
-import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.operations.CloudFoundryOperations;
-import org.cloudfoundry.operations.DefaultCloudFoundryOperations;
 import org.cloudfoundry.operations.applications.PushApplicationRequest;
 import org.cloudfoundry.operations.applications.RestartApplicationRequest;
 import org.cloudfoundry.operations.applications.SetEnvironmentVariableApplicationRequest;
 import org.cloudfoundry.operations.services.BindServiceInstanceRequest;
-import org.cloudfoundry.spring.client.SpringCloudFoundryClient;
 import org.gradle.api.tasks.TaskAction;
 import reactor.core.publisher.Mono;
 
@@ -29,35 +25,22 @@ public class CfPushTask extends AbstractCfTask {
 	public void push() {
 		CfPushPluginExtension extension = getExtension();
 
-		CloudFoundryClient cfClient = SpringCloudFoundryClient.builder()
-				.host(extension.getCcHost())
-				.username(extension.getCcUser())
-				.password(extension.getCcPassword())
-				.skipSslValidation(true)
-				.build();
+		CloudFoundryOperations cfOperations = getCfOperations();
 
-
-		CloudFoundryOperations cfOperations = DefaultCloudFoundryOperations.builder()
-				.cloudFoundryClient(cfClient)
-				.organization(extension.getOrg())
-				.space(extension.getSpace())
-				.build();
-
-
-		File file = new File(extension.getFilePath());
+		File file = new File(getFilePath());
 		try {
 			try (InputStream ios = new FileInputStream(file)) {
 				Mono<Void> resp = cfOperations.applications()
 						.push(PushApplicationRequest.builder()
 								.name(getCfApplicationName())
 								.application(ios)
-								.buildpack(extension.getBuildpack())
+								.buildpack(getBuildpack())
 								.command(extension.getCommand())
 								.diskQuota(extension.getDiskQuota())
-								.instances(extension.getInstances())
-								.memory(extension.getMemory())
+								.instances(getInstances())
+								.memory(getMemory())
 								.timeout(extension.getHealthCheckTimeout())
-								.domain(extension.getDomain())
+								.domain(getAppDomain())
 								.host(getAppHostName())
 								.noStart(true)
 								.build());

@@ -1,9 +1,6 @@
 package io.pivotal.services.plugin;
 
-import io.pivotal.services.plugin.tasks.CfDeleteAppTask;
-import io.pivotal.services.plugin.tasks.CfMapRouteTask;
-import io.pivotal.services.plugin.tasks.CfPushTask;
-import io.pivotal.services.plugin.tasks.CfUnMapRouteTask;
+import io.pivotal.services.plugin.tasks.*;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 
@@ -19,6 +16,7 @@ public class CfClientPlugin implements Plugin<Project> {
 		project.getTasks().create("cf-map-route", CfMapRouteTask.class);
 		project.getTasks().create("cf-unmap-route", CfUnMapRouteTask.class);
 		project.getTasks().create("cf-delete-app", CfDeleteAppTask.class);
+		project.getTasks().create("cf-delete-route", CfDeleteRouteTask.class);
 		project.getExtensions().create("cfConfig", CfPushPluginExtension.class);
 	}
 }

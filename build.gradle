@@ -40,4 +40,11 @@ dependencies {
     compile("io.projectreactor:reactor-core:$reactorVersion")
     compile("io.projectreactor:reactor-netty:$reactorVersion")
     testCompile('org.assertj:assertj-core:3.4.1')
+    compileOnly "org.projectlombok:lombok:1.16.8"
+}
+
+test {
+    useJUnit {
+        excludeCategories 'io.pivotal.services.plugin.IntegrationTest'
+    }
 }

@@ -1,5 +1,9 @@
 package io.pivotal.services.plugin;
 
+import io.pivotal.services.plugin.tasks.CfDeleteAppTask;
+import io.pivotal.services.plugin.tasks.CfMapRouteTask;
+import io.pivotal.services.plugin.tasks.CfPushTask;
+import io.pivotal.services.plugin.tasks.CfUnMapRouteTask;
 import org.gradle.api.Project;
 import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.Test;
@@ -11,6 +15,9 @@ public class CfPushClientPluginTests {
     public void checkCfPushPlugin() {
         Project project = ProjectBuilder.builder().build();
         project.getPluginManager().apply("cf-push");
-        assertThat(project.getTasks().getAt("cfpush") instanceof CfPushTask).isTrue();
+        assertThat(project.getTasks().getAt("cf-push") instanceof CfPushTask).isTrue();
+        assertThat(project.getTasks().getAt("cf-map-route") instanceof CfMapRouteTask).isTrue();
+        assertThat(project.getTasks().getAt("cf-unmap-route") instanceof CfUnMapRouteTask).isTrue();
+        assertThat(project.getTasks().getAt("cf-delete-app") instanceof CfDeleteAppTask).isTrue();
     }
 }

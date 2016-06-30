@@ -1,5 +1,7 @@
-package io.pivotal.services.plugin;
+package io.pivotal.services.plugin.tasks;
 
+import io.pivotal.services.plugin.CfPushPluginExtension;
+import io.pivotal.services.plugin.tasks.AbstractCfTask;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.DefaultCloudFoundryOperations;
@@ -8,7 +10,6 @@ import org.cloudfoundry.operations.applications.RestartApplicationRequest;
 import org.cloudfoundry.operations.applications.SetEnvironmentVariableApplicationRequest;
 import org.cloudfoundry.operations.services.BindServiceInstanceRequest;
 import org.cloudfoundry.spring.client.SpringCloudFoundryClient;
-import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
 import reactor.core.publisher.Mono;
 
@@ -19,16 +20,19 @@ import java.util.Map;
 
 /**
  * Responsible for cf push.
+ *
+ * @author Biju Kunjummen
  */
-public class CfPushTask extends DefaultTask {
+public class CfPushTask extends AbstractCfTask {
 
 	@TaskAction
 	public void push() {
-		CfPushPluginExtension extension = getProject().getExtensions().findByType(CfPushPluginExtension.class);
+		CfPushPluginExtension extension = getExtension();
+
 		CloudFoundryClient cfClient = SpringCloudFoundryClient.builder()
-				.host(extension.getHost())
-				.username(extension.getUser())
-				.password(extension.getPassword())
+				.host(extension.getCcHost())
+				.username(extension.getCcUser())
+				.password(extension.getCcPassword())
 				.skipSslValidation(true)
 				.build();
 
@@ -40,12 +44,12 @@ public class CfPushTask extends DefaultTask {
 				.build();
 
 
-		File file = new File(extension.getPath());
+		File file = new File(extension.getFilePath());
 		try {
 			try (InputStream ios = new FileInputStream(file)) {
 				Mono<Void> resp = cfOperations.applications()
 						.push(PushApplicationRequest.builder()
-								.name(extension.getName())
+								.name(getCfApplicationName())
 								.application(ios)
 								.buildpack(extension.getBuildpack())
 								.command(extension.getCommand())
@@ -53,6 +57,8 @@ public class CfPushTask extends DefaultTask {
 								.instances(extension.getInstances())
 								.memory(extension.getMemory())
 								.timeout(extension.getHealthCheckTimeout())
+								.domain(extension.getDomain())
+								.host(getAppHostName())
 								.noStart(true)
 								.build());
 
@@ -60,7 +66,7 @@ public class CfPushTask extends DefaultTask {
 					for (Map.Entry<String, String> entry : extension.getEnvironment().entrySet()) {
 						resp = resp.then(cfOperations.applications().setEnvironmentVariable(SetEnvironmentVariableApplicationRequest
 								.builder()
-								.name(extension.getName())
+								.name(getCfApplicationName())
 								.variableName(entry.getKey())
 								.variableValue(entry.getValue())
 								.build()));
@@ -72,14 +78,14 @@ public class CfPushTask extends DefaultTask {
 						resp = resp.then(cfOperations.services()
 								.bind(BindServiceInstanceRequest.builder()
 										.serviceInstanceName(serviceName)
-										.applicationName(extension.getName())
+										.applicationName(getCfApplicationName())
 										.build()));
 					}
 				}
 
 				resp.then(cfOperations.applications().restart(RestartApplicationRequest
 						.builder()
-						.name(extension.getName()).build())).block(300_000L);
+						.name(getCfApplicationName()).build())).block(600_000L);
 
 			}
 

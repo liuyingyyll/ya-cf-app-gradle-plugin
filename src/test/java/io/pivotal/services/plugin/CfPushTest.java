@@ -6,12 +6,14 @@ import org.cloudfoundry.operations.DefaultCloudFoundryOperations;
 import org.cloudfoundry.operations.applications.PushApplicationRequest;
 import org.cloudfoundry.spring.client.SpringCloudFoundryClient;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import reactor.core.publisher.Mono;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
+@Category(IntegrationTest.class)
 public class CfPushTest {
 
     @Test

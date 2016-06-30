@@ -29,29 +29,69 @@ buildscript {
 ----
 apply plugin: 'cf-push'
 
-cfPushConfig {
-	name = "cf-show-env"
-	path = "build/libs/cf-show-env-0.1.2-SNAPSHOT.jar"
-	host = "api.local.pcfdev.io"
-	user = "admin"
-	password = "admin"
+cfConfig {
+	name = "Blue"
+	hostName = "demo-time"
+	filePath = "build/libs/cf-show-env-0.1.2-SNAPSHOT.jar"
+
+	ccHost = "api.local.pcfdev.io"
+	ccUser = "admin"
+	ccPassword = "admin"
 	org = "pcfdev-org"
 	space = "pcfdev-space"
+	domain = "local.pcfdev.io"
+
 	buildpack = "https://github.com/cloudfoundry/java-buildpack.git"
 	environment = ["JAVA_OPTS": "-Djava.security.egd=file:/dev/./urandom", "SPRING_PROFILES_ACTIVE": "cloud"]
 	services  = ["mydb"]
 }
-
 ----
 
 * Run the task:
 
 [source]
 ----
-./gradlew cfpush
+./gradlew cf-push
+----
+
+* Override the values using explicit gradle properties:
+
+[source]
+----
+./gradlew cf-push -Pcf.applicationName=Green -Pcf.applicationHostName=demo-time-temp
 ----
 
 
+== Using the Plugin for a Blue-Green Application Deployment
 
+* Provide a default set of configuration along the lines described above
 
+* Push the `Blue` app mapping to `demo-time.domain`:
+[source]
+----
+./gradlew cf-push -Pcf.applicationName=Blue -Pcf.applicationHostName=demo-time
+----
 
+* Push the `Green` app mapping to `demo-time-temp.domain`:
+[source]
+----
+ ./gradlew cf-push -Pcf.applicationName=Green -Pcf.applicationHostName=demo-time-temp
+----
+
+* Once Green is verified, remap the route for `Green`:
+[source]
+----
+ ./gradlew cf-map-route -Pcf.applicationName=Green -Pcf.applicationHostName=demo-time
+----
+
+* Unmap the temporary route for Green:
+[source]
+----
+./gradlew cf-unmap-route -Pcf.applicationName=Green -Pcf.applicationHostName=demo-time-temp
+----
+
+* Delete the Blue app:
+[source]
+----
+./gradlew cf-delete-app -Pcf.applicationName=Blue
+----

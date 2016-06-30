@@ -9,194 +9,202 @@ import java.util.Map;
  * Holds configuration related to cf-push
  */
 public class CfPushPluginExtension {
-    private String name;
-    private String path;
-    private String host;
-    private String user;
-    private String password;
+	private String name;
+	private String path;
+	private String host;
+	private String user;
+	private String password;
+	private String org;
+	private String space;
+	private String state;
+	private String buildpack;
+	private String command;
+	private Boolean console;
+	private Boolean debug;
+	private String detectedStartCommand;
+	private Integer diskQuota;
+	private Boolean enableSsh;
+	private Map<String, String> environment;
+	private Integer healthCheckTimeout;
+	private String healthCheckType;
+	private Integer instances;
+	private Integer memory;
+	private List<Integer> ports;
+	private List<String> services;
 
-    public String getUser() {
-        return user;
-    }
+	public String getUser() {
+		return user;
+	}
 
-    public void setUser(String user) {
-        this.user = user;
-    }
+	public void setUser(String user) {
+		this.user = user;
+	}
 
-    public String getPassword() {
-        return password;
-    }
+	public String getPassword() {
+		return password;
+	}
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+	public void setPassword(String password) {
+		this.password = password;
+	}
 
-    private String org;
-    private String space;
-    private String state;
-    private String buildpack;
-    private String command;
-    private Boolean console;
-    private Boolean debug;
-    private String detectedStartCommand;
-    private Integer diskQuota;
-    private Boolean enableSsh;
-    private Map<String, String> environment;
-    private Integer healthCheckTimeout;
-    private String healthCheckType;
-    private Integer instances;
-    private Integer memory;
-    private List<Integer> ports;
+	public String getHost() {
+		return host;
+	}
 
-    public String getHost() {
-        return host;
-    }
+	public void setHost(String host) {
+		this.host = host;
+	}
 
-    public void setHost(String host) {
-        this.host = host;
-    }
+	public String getBuildpack() {
+		return buildpack;
+	}
 
-    public String getBuildpack() {
-        return buildpack;
-    }
+	public void setBuildpack(String buildpack) {
+		this.buildpack = buildpack;
+	}
 
-    public void setBuildpack(String buildpack) {
-        this.buildpack = buildpack;
-    }
+	public String getCommand() {
+		return command;
+	}
 
-    public String getCommand() {
-        return command;
-    }
+	public void setCommand(String command) {
+		this.command = command;
+	}
 
-    public void setCommand(String command) {
-        this.command = command;
-    }
+	public Boolean getConsole() {
+		return console;
+	}
 
-    public Boolean getConsole() {
-        return console;
-    }
+	public void setConsole(Boolean console) {
+		this.console = console;
+	}
 
-    public void setConsole(Boolean console) {
-        this.console = console;
-    }
+	public Boolean getDebug() {
+		return debug;
+	}
 
-    public Boolean getDebug() {
-        return debug;
-    }
+	public void setDebug(Boolean debug) {
+		this.debug = debug;
+	}
 
-    public void setDebug(Boolean debug) {
-        this.debug = debug;
-    }
+	public String getDetectedStartCommand() {
+		return detectedStartCommand;
+	}
 
-    public String getDetectedStartCommand() {
-        return detectedStartCommand;
-    }
+	public void setDetectedStartCommand(String detectedStartCommand) {
+		this.detectedStartCommand = detectedStartCommand;
+	}
 
-    public void setDetectedStartCommand(String detectedStartCommand) {
-        this.detectedStartCommand = detectedStartCommand;
-    }
+	public Integer getDiskQuota() {
+		return diskQuota;
+	}
 
-    public Integer getDiskQuota() {
-        return diskQuota;
-    }
+	public void setDiskQuota(Integer diskQuota) {
+		this.diskQuota = diskQuota;
+	}
 
-    public void setDiskQuota(Integer diskQuota) {
-        this.diskQuota = diskQuota;
-    }
+	public Boolean getEnableSsh() {
+		return enableSsh;
+	}
 
-    public Boolean getEnableSsh() {
-        return enableSsh;
-    }
+	public void setEnableSsh(Boolean enableSsh) {
+		this.enableSsh = enableSsh;
+	}
 
-    public void setEnableSsh(Boolean enableSsh) {
-        this.enableSsh = enableSsh;
-    }
+	public Map<String, String> getEnvironment() {
+		return environment;
+	}
 
-    public Map<String, String> getEnvironment() {
-        return environment;
-    }
+	public void setEnvironment(Map<String, String> environment) {
+		this.environment = environment;
+	}
 
-    public void setEnvironment(Map<String, String> environment) {
-        this.environment = environment;
-    }
+	public Integer getHealthCheckTimeout() {
+		return healthCheckTimeout;
+	}
 
-    public Integer getHealthCheckTimeout() {
-        return healthCheckTimeout;
-    }
+	public void setHealthCheckTimeout(Integer healthCheckTimeout) {
+		this.healthCheckTimeout = healthCheckTimeout;
+	}
 
-    public void setHealthCheckTimeout(Integer healthCheckTimeout) {
-        this.healthCheckTimeout = healthCheckTimeout;
-    }
+	public String getHealthCheckType() {
+		return healthCheckType;
+	}
 
-    public String getHealthCheckType() {
-        return healthCheckType;
-    }
+	public void setHealthCheckType(String healthCheckType) {
+		this.healthCheckType = healthCheckType;
+	}
 
-    public void setHealthCheckType(String healthCheckType) {
-        this.healthCheckType = healthCheckType;
-    }
+	public Integer getInstances() {
+		return instances;
+	}
 
-    public Integer getInstances() {
-        return instances;
-    }
+	public void setInstances(Integer instances) {
+		this.instances = instances;
+	}
 
-    public void setInstances(Integer instances) {
-        this.instances = instances;
-    }
+	public Integer getMemory() {
+		return memory;
+	}
 
-    public Integer getMemory() {
-        return memory;
-    }
+	public void setMemory(Integer memory) {
+		this.memory = memory;
+	}
 
-    public void setMemory(Integer memory) {
-        this.memory = memory;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public List<Integer> getPorts() {
+		return ports;
+	}
 
-    public List<Integer> getPorts() {
-        return ports;
-    }
+	public void setPorts(List<Integer> ports) {
+		this.ports = ports;
+	}
 
-    public void setPorts(List<Integer> ports) {
-        this.ports = ports;
-    }
+	public String getSpace() {
+		return space;
+	}
 
-    public String getSpace() {
-        return space;
-    }
+	public void setSpace(String space) {
+		this.space = space;
+	}
 
-    public void setSpace(String space) {
-        this.space = space;
-    }
+	public String getOrg() {
+		return org;
+	}
 
-    public String getOrg() {
-        return org;
-    }
+	public void setOrg(String org) {
+		this.org = org;
+	}
 
-    public void setOrg(String org) {
-        this.org = org;
-    }
+	public String getState() {
+		return state;
+	}
 
-    public String getState() {
-        return state;
-    }
+	public void setState(String state) {
+		this.state = state;
+	}
 
-    public void setState(String state) {
-        this.state = state;
-    }
+	public String getPath() {
+		return path;
+	}
 
-    public String getPath() {
-        return path;
-    }
+	public void setPath(String path) {
+		this.path = path;
+	}
 
-    public void setPath(String path) {
-        this.path = path;
-    }
+	public List<String> getServices() {
+		return services;
+	}
+
+	public void setServices(List<String> services) {
+		this.services = services;
+	}
 }

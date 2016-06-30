@@ -101,3 +101,23 @@ cfConfig {
 ----
 ./gradlew cf-delete-route -Pcf.hostName=demo-time-temp
 ----
+
+== Using the Plugin for a https://github.com/concourse/autopilot[Autopilot] equivalent deployment
+
+* Rename the application to something else
+[source]
+----
+./gradlew cf-rename-app -Pcf.newName=old-app-venerable
+----
+
+* Push the application, the source of truth is anything specified in cfConfig closure as described above.
+[source]
+----
+./gradlew cf-push
+----
+
+* Delete the old app
+[source]
+----
+./gradlew cf-delete-app -Pcf.name=old-app-venerable
+----

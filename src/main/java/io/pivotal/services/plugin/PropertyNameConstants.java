@@ -17,4 +17,5 @@ public interface PropertyNameConstants {
 	String CF_BUILDPACK = "cf.buildpack";
 	String CF_MEMORY = "cf.memory";
 	String CF_INSTANCES = "cf.instances";
+	String CF_APPLICATION_NEW_NAME = "cf.newName";
 }

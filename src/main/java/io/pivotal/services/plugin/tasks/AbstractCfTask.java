@@ -97,14 +97,14 @@ public class AbstractCfTask extends DefaultTask {
 				.orElse(this.getExtension().getMemory());
 	}
 
-	private Optional<String> getStringPropertyFromProject(String propertyName) {
+	protected Optional<String> getStringPropertyFromProject(String propertyName) {
 		if (getProject().hasProperty(propertyName)) {
 			return Optional.of((String) getProject().property(propertyName));
 		}
 		return Optional.empty();
 	}
 
-	private Optional<Integer> getIntegerProperty(String propertyName) {
+	protected Optional<Integer> getIntegerProperty(String propertyName) {
 		if (getProject().hasProperty(propertyName)) {
 			return Optional.of((Integer) getProject().property(propertyName));
 		}

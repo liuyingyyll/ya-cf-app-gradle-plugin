@@ -26,5 +26,8 @@ public class CfDeleteAppTask extends AbstractCfTask {
 		resp.block(600_000L);
 	}
 
-
+	@Override
+	public String getDescription() {
+		return "Delete an application from Cloud Foundry";
+	}
 }

@@ -77,5 +77,8 @@ public class CfPushTask extends AbstractCfTask {
 		}
 	}
 
-
+	@Override
+	public String getDescription() {
+		return "Pushes an Application to Cloud Foundry";
+	}
 }

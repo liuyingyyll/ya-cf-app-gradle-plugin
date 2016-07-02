@@ -28,4 +28,8 @@ public class CfDeleteRouteTask extends AbstractCfTask {
 	}
 
 
+	@Override
+	public String getDescription() {
+		return "Delete a route from Cloud Foundry";
+	}
 }

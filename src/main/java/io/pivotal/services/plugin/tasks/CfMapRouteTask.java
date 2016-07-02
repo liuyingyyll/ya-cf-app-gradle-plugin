@@ -28,4 +28,9 @@ public class CfMapRouteTask extends AbstractCfTask {
 
 	}
 
+	@Override
+	public String getDescription() {
+		return "Add a route for an application";
+	}
+
 }

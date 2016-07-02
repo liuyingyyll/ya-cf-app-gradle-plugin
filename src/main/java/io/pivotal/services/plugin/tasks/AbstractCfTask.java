@@ -110,4 +110,9 @@ public class AbstractCfTask extends DefaultTask {
 		}
 		return Optional.empty();
 	}
+
+	@Override
+	public String getGroup() {
+		return "Cloud Foundry";
+	}
 }

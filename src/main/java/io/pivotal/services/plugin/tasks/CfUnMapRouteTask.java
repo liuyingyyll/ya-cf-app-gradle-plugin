@@ -28,4 +28,9 @@ public class CfUnMapRouteTask extends AbstractCfTask {
 
 	}
 
+	@Override
+	public String getDescription() {
+		return "Remove an existing route for an application";
+	}
+
 }

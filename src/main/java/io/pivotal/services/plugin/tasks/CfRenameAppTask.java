@@ -28,7 +28,10 @@ public class CfRenameAppTask extends AbstractCfTask {
 				.build());
 
 		resp.block(600_000L);
-
 	}
 
+	@Override
+	public String getDescription() {
+		return "Rename an Application";
+	}
 }

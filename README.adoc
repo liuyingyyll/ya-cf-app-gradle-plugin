@@ -1,6 +1,9 @@
-A Gradle plugin to push an application to Cloud Foundry. 
+== A Gradle plugin to push an application to Cloud Foundry.
 
-== Using the Plugin
+image:https://travis-ci.org/pivotalservices/cf-push-gradle-plugin.svg?branch=master["Build Status", link="https://travis-ci.org/pivotalservices/cf-push-gradle-plugin"]
+
+
+=== Using the Plugin
 
 * Add a buildscript dependency:
 
@@ -62,7 +65,7 @@ cfConfig {
 ----
 
 
-== Using the Plugin for a Blue-Green Application Deployment
+=== Using the Plugin for a Blue-Green Application Deployment
 
 * Provide a default set of configuration along the lines described above
 
@@ -102,7 +105,7 @@ cfConfig {
 ./gradlew cf-delete-route -Pcf.hostName=demo-time-temp
 ----
 
-== Using the Plugin for a https://github.com/concourse/autopilot[Autopilot] equivalent deployment
+=== Using the Plugin for a https://github.com/concourse/autopilot[Autopilot] equivalent deployment
 
 * Rename the application to something else
 [source]

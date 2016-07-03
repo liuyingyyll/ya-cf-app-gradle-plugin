@@ -1,7 +1,8 @@
-== A Gradle plugin to push an application to Cloud Foundry.
+== Yet another Gradle plugin to deploy an application to Cloud Foundry.
 
 image:https://travis-ci.org/pivotalservices/cf-push-gradle-plugin.svg?branch=master["Build Status", link="https://travis-ci.org/pivotalservices/cf-push-gradle-plugin"]
 
+"Yet another" because the authoritative source of Cloud Foundry Gradle plugin is https://github.com/cloudfoundry/cf-java-client/tree/master/cloudfoundry-gradle-plugin[here]
 
 === Using the Plugin
 

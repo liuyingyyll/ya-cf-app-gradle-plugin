@@ -4,6 +4,6 @@ jdk:
   - oraclejdk8
 
 script:
-  - ./gradlew clean build
+  - ./gradlew test
 
 install: echo "skip 'gradle assemble' step"

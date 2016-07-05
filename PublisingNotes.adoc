@@ -1,4 +1,4 @@
-## Publishing to Maven Central
+== Publishing to Maven Central
 
 The released artifacts are published to Maven central via Sonatype repository, the details of how the priveleges were obtained is http://central.sonatype.org/pages/ossrh-guide.html[here]
 
@@ -25,8 +25,9 @@ If all of the above is cleanly set, the artifact can be published using the comm
 It takes about 10 mins before the artifacts are visible via maven and 2 hours before it is searchable.
 
 
-Additionally for versioned releases:
+== For versioned releases:
+
 * go https://oss.sonatype.org/#stagingRepositories[here]
 * search for comgithubpivotalservices
-* Close the release
+* "Close" the release
 * Then click on "Release"

@@ -12,7 +12,7 @@ image:https://travis-ci.org/pivotalservices/cf-push-gradle-plugin.svg?branch=mas
 ----
 buildscript {
 	ext {
-		cfAppVersion = '1.0.0-RC2'
+		cfAppVersion = '1.0.0.RC3'
 	}
 	repositories {
 		mavenCentral()

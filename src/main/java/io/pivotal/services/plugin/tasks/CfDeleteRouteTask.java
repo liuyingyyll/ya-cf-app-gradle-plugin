@@ -24,7 +24,7 @@ public class CfDeleteRouteTask extends AbstractCfTask {
 						.host(getAppHostName())
 						.build());
 
-		resp.block(600_000L);
+		resp.block(defaultWaitTimeout);
 	}
 
 

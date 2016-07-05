@@ -15,12 +15,12 @@ public class CfPushClientPluginTests {
 	@Before
 	public void before() {
 		this.project = ProjectBuilder.builder().build();
-		this.project.getPluginManager().apply("cf-push");
+		this.project.getPluginManager().apply("cf-app");
 	}
 
 	@Test
-	public void testThatThereAre6Tasks() {
-		assertThat(this.project.getTasks().size()).isEqualTo(6);
+	public void testThatThereAre7Tasks() {
+		assertThat(this.project.getTasks().size()).isEqualTo(7);
 		assertThat(this.project.getTasks().getAt("cf-push").getGroup()).isEqualTo("Cloud Foundry");
 	}
 

@@ -2,6 +2,7 @@ package io.pivotal.services.plugin;
 
 import lombok.Data;
 import org.cloudfoundry.Nullable;
+import org.cloudfoundry.operations.applications.ApplicationManifest;
 
 import java.util.List;
 import java.util.Map;
@@ -40,4 +41,7 @@ public class CfPushPluginExtension {
 	private Integer memory;
 	private List<Integer> ports;
 	private List<String> services;
+
+
+	private ApplicationManifest applicationManifest;
 }

@@ -12,7 +12,7 @@ image:https://travis-ci.org/pivotalservices/cf-push-gradle-plugin.svg?branch=mas
 ----
 buildscript {
 	ext {
-		cfPushVersion = '1.0.0-SNAPSHOT'
+		cfAppVersion = '1.0.0-SNAPSHOT'
 	}
 	repositories {
 		mavenLocal()
@@ -22,7 +22,7 @@ buildscript {
 		}
 	}
 	dependencies {
-		classpath("io.pivotal.services:cf-push-gradle-plugin:${cfPushVersion}")
+		classpath("com.github.pivotalservices:ya-cf-app-gradle-plugin:${cfAppVersion}")
 	}
 }
 ----
@@ -31,7 +31,7 @@ buildscript {
 
 [source]
 ----
-apply plugin: 'cf-push'
+apply plugin: 'cf-app'
 
 cfConfig {
 	name = "Blue"

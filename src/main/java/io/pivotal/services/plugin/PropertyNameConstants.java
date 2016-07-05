@@ -2,6 +2,7 @@ package io.pivotal.services.plugin;
 
 /**
  * Property name related constants
+ *
  * @author Biju Kunjummen
  */
 public interface PropertyNameConstants {
@@ -18,4 +19,6 @@ public interface PropertyNameConstants {
 	String CF_MEMORY = "cf.memory";
 	String CF_INSTANCES = "cf.instances";
 	String CF_APPLICATION_NEW_NAME = "cf.newName";
+	String CF_HEALTH_CHECK_TIMEOUT = "cf.healthCheckTimeout";
+	String CF_DISK_QUOTA = "cf.diskQuota";
 }

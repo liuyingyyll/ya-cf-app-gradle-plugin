@@ -23,7 +23,7 @@ public class CfDeleteAppTask extends AbstractCfTask {
 						.name(getCfApplicationName())
 						.build());
 
-		resp.block(600_000L);
+		resp.block(defaultWaitTimeout);
 	}
 
 	@Override

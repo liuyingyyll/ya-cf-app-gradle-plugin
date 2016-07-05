@@ -3,6 +3,8 @@ group = "com.github.pivotalservices"
 
 apply plugin: 'java'
 apply plugin: 'maven'
+apply plugin: 'signing'
+
 
 buildscript {
     repositories {
@@ -26,7 +28,7 @@ dependencies {
         exclude group: "com.fasterxml.jackson.core", module: "jackson-databind"
         exclude group: "com.fasterxml.jackson.datatype", module: "jackson-datatype-jdk8"
     }
-    compile("org.cloudfoundry:cloudfoundry-operations:$cfClientVersion"){
+    compile("org.cloudfoundry:cloudfoundry-operations:$cfClientVersion") {
         exclude group: "com.fasterxml.jackson.core", module: "jackson-databind"
         exclude group: "com.fasterxml.jackson.datatype", module: "jackson-datatype-jdk8"
     }
@@ -38,8 +40,71 @@ dependencies {
     compileOnly "org.projectlombok:lombok:1.16.8"
 }
 
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+
 test {
     useJUnit {
         excludeCategories 'io.pivotal.services.plugin.IntegrationTest'
+    }
+}
+
+signing {
+    sign configurations.archives
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            pom.project {
+                name project.name
+                packaging 'jar'
+                description ''
+                url 'https://github.com/pivotalservices/ya-cf-app-gradle-plugin'
+
+                scm {
+                    connection 'scm:git:https://github.com/pivotalservices/ya-cf-app-gradle-plugin'
+                    developerConnection 'scm:git:https://github.com/pivotalservices/ya-cf-app-gradle-plugin'
+                    url 'https://github.com/pivotalservices/ya-cf-app-gradle-plugin'
+                }
+
+                licenses {
+                    license {
+                        name 'The Apache License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'bijukunjummen'
+                        name 'Biju Kunjummen'
+                        email 'biju.kunjummen@gmail.com'
+                    }
+                }
+            }
+        }
     }
 }

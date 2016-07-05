@@ -13,7 +13,7 @@ public class PropertyOverridesTest {
 	@Test
 	public void testPropertyOverridesForAppName() {
 		Project project = ProjectBuilder.builder().build();
-		project.getPluginManager().apply("cf-push");
+		project.getPluginManager().apply("cf-app");
 		setPropsInExtension((CfPushPluginExtension)project.getExtensions().getByName("cfConfig"));
 
 		CfPushTask cfPushTask = (CfPushTask)project.getTasks().getAt("cf-push");

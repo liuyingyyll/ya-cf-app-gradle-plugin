@@ -27,7 +27,7 @@ public class CfRenameAppTask extends AbstractCfTask {
 						.orElseThrow(() -> new RuntimeException("New name not provided")))
 				.build());
 
-		resp.block(600_000L);
+		resp.block(defaultWaitTimeout);
 	}
 
 	@Override

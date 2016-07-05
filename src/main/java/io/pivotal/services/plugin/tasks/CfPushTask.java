@@ -36,10 +36,10 @@ public class CfPushTask extends AbstractCfTask {
 								.application(ios)
 								.buildpack(getBuildpack())
 								.command(extension.getCommand())
-								.diskQuota(extension.getDiskQuota())
+								.diskQuota(getDiskQuota())
 								.instances(getInstances())
 								.memory(getMemory())
-								.timeout(extension.getHealthCheckTimeout())
+								.timeout(getHealthCheckTimeout())
 								.domain(getAppDomain())
 								.host(getAppHostName())
 								.noStart(true)
@@ -68,7 +68,7 @@ public class CfPushTask extends AbstractCfTask {
 
 				resp.then(cfOperations.applications().restart(RestartApplicationRequest
 						.builder()
-						.name(getCfApplicationName()).build())).block(600_000L);
+						.name(getCfApplicationName()).build())).block(defaultWaitTimeout);
 
 			}
 

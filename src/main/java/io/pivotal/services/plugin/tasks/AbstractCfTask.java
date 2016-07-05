@@ -13,7 +13,9 @@ import java.util.Optional;
 /**
  * Base class for all Concrete CF tasks
  */
-public class AbstractCfTask extends DefaultTask {
+abstract class AbstractCfTask extends DefaultTask {
+
+	protected long defaultWaitTimeout = 600_000L; // 10 mins
 
 	protected CloudFoundryOperations getCfOperations() {
 		CloudFoundryClient cfClient = SpringCloudFoundryClient.builder()
@@ -97,6 +99,17 @@ public class AbstractCfTask extends DefaultTask {
 				.orElse(this.getExtension().getMemory());
 	}
 
+	protected Integer getHealthCheckTimeout() {
+		return getIntegerProperty(PropertyNameConstants.CF_HEALTH_CHECK_TIMEOUT)
+				.orElse(this.getExtension().getHealthCheckTimeout());
+	}
+
+	protected Integer getDiskQuota() {
+		return getIntegerProperty(PropertyNameConstants.CF_DISK_QUOTA)
+				.orElse(this.getExtension().getDiskQuota());
+
+	}
+
 	protected Optional<String> getStringPropertyFromProject(String propertyName) {
 		if (getProject().hasProperty(propertyName)) {
 			return Optional.of((String) getProject().property(propertyName));
@@ -104,12 +117,14 @@ public class AbstractCfTask extends DefaultTask {
 		return Optional.empty();
 	}
 
+
 	protected Optional<Integer> getIntegerProperty(String propertyName) {
 		if (getProject().hasProperty(propertyName)) {
 			return Optional.of((Integer) getProject().property(propertyName));
 		}
 		return Optional.empty();
 	}
+
 
 	@Override
 	public String getGroup() {

@@ -12,7 +12,7 @@ image:https://travis-ci.org/pivotalservices/cf-push-gradle-plugin.svg?branch=mas
 ----
 buildscript {
 	ext {
-		cfAppVersion = '1.0.0-RC1'
+		cfAppVersion = '1.0.0-RC2'
 	}
 	repositories {
 		mavenCentral()
@@ -30,17 +30,22 @@ buildscript {
 apply plugin: 'cf-app'
 
 cfConfig {
-	name = "Blue"
-	hostName = "demo-time"
-	filePath = "build/libs/cf-show-env-0.1.2-SNAPSHOT.jar"
-
+	//CF Details
 	ccHost = "api.local.pcfdev.io"
 	ccUser = "admin"
 	ccPassword = "admin"
 	org = "pcfdev-org"
 	space = "pcfdev-space"
+
+	//App Details
+	name = "cf-show-env"
+	hostName = "cf-show-env"
+	filePath = "build/libs/cf-show-env-0.1.2-SNAPSHOT.jar"
+	path = ""
 	domain = "local.pcfdev.io"
 
+
+	//Env and services
 	buildpack = "https://github.com/cloudfoundry/java-buildpack.git"
 	environment = ["JAVA_OPTS": "-Djava.security.egd=file:/dev/./urandom", "SPRING_PROFILES_ACTIVE": "cloud"]
 	services  = ["mydb"]
@@ -121,3 +126,20 @@ cfConfig {
 ----
 ./gradlew cf-delete-app -Pcf.name=old-app-venerable
 ----
+
+=== List of all Tasks
+.Tasks
+[width="50%",frame="topbot",options="header,footer"]
+|=============================================================
+|Task                  |Description
+|cf-push               |Pushes an Application to Cloud Foundry
+|cf-delete-app         |Delete an application from Cloud Foundry
+|cf-delete-route       |Delete a route from Cloud Foundry
+|cf-get-app-manifest   |Get the application summary from Cloud Foundry
+|cf-map-route          |Add a route for an application
+|cf-unmap-route        |Remove an existing route for an application
+|cf-rename-app         |Rename an applicaiton
+|cf-start-app          |Start an Application
+|cf-stop-app           |Stop an Application
+|cf-restart-app        |Restart an Application
+|=============================================================

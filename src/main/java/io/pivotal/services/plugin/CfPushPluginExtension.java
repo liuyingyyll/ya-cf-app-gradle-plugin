@@ -24,6 +24,7 @@ public class CfPushPluginExtension {
 	private String filePath;
 	private String hostName;
 	private String domain;
+	private String path;
 
 
 	private String state;

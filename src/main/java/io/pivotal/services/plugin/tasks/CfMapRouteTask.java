@@ -22,7 +22,8 @@ public class CfMapRouteTask extends AbstractCfTask {
 						.builder()
 						.applicationName(getCfApplicationName())
 						.domain(getAppDomain())
-						.host(getAppHostName()).build());
+						.host(getAppHostName())
+						.path(getCfPath()).build());
 
 		resp.block(defaultWaitTimeout);
 

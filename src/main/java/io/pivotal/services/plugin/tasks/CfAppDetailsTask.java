@@ -37,6 +37,6 @@ public class CfAppDetailsTask extends AbstractCfTask {
 
 	@Override
 	public String getDescription() {
-		return "Delete an application from Cloud Foundry";
+		return "Get the application summary from Cloud Foundry";
 	}
 }

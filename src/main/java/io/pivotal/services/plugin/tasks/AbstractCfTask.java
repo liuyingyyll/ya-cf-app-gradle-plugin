@@ -89,6 +89,11 @@ abstract class AbstractCfTask extends DefaultTask {
 				.orElse(this.getExtension().getSpace());
 	}
 
+	protected String getCfPath() {
+		return getStringPropertyFromProject(PropertyNameConstants.CF_PATH)
+				.orElse(this.getExtension().getPath());
+	}
+
 	protected Integer getInstances() {
 		return getIntegerProperty(PropertyNameConstants.CF_INSTANCES)
 				.orElse(this.getExtension().getInstances());

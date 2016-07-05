@@ -19,8 +19,8 @@ public class CfPushClientPluginTests {
 	}
 
 	@Test
-	public void testThatThereAre7Tasks() {
-		assertThat(this.project.getTasks().size()).isEqualTo(7);
+	public void testThatThereAre10Tasks() {
+		assertThat(this.project.getTasks().size()).isEqualTo(10);
 		assertThat(this.project.getTasks().getAt("cf-push").getGroup()).isEqualTo("Cloud Foundry");
 	}
 
@@ -58,5 +58,23 @@ public class CfPushClientPluginTests {
 	public void testCfRenameApp() {
 		assertThat(project.getTasks().getAt("cf-rename-app") instanceof CfRenameAppTask).isTrue();
 		assertThat(project.getTasks().getAt("cf-rename-app").getDescription()).isEqualTo("Rename an Application");
+	}
+
+	@Test
+	public void testCfStopApp() {
+		assertThat(project.getTasks().getAt("cf-stop-app") instanceof CfAppStopTask).isTrue();
+		assertThat(project.getTasks().getAt("cf-stop-app").getDescription()).isEqualTo("Stop an Application");
+	}
+
+	@Test
+	public void testCfStartApp() {
+		assertThat(project.getTasks().getAt("cf-start-app") instanceof CfAppStartTask).isTrue();
+		assertThat(project.getTasks().getAt("cf-start-app").getDescription()).isEqualTo("Start an Application");
+	}
+
+	@Test
+	public void testCfRestartApp() {
+		assertThat(project.getTasks().getAt("cf-restart-app") instanceof CfAppRestartTask).isTrue();
+		assertThat(project.getTasks().getAt("cf-restart-app").getDescription()).isEqualTo("Restart an Application");
 	}
 }

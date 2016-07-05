@@ -42,6 +42,7 @@ public class CfPushTask extends AbstractCfTask {
 								.timeout(getHealthCheckTimeout())
 								.domain(getAppDomain())
 								.host(getAppHostName())
+								.path(getCfPath())
 								.noStart(true)
 								.build());
 

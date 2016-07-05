@@ -21,4 +21,5 @@ public interface PropertyNameConstants {
 	String CF_APPLICATION_NEW_NAME = "cf.newName";
 	String CF_HEALTH_CHECK_TIMEOUT = "cf.healthCheckTimeout";
 	String CF_DISK_QUOTA = "cf.diskQuota";
+	String CF_PATH = "cf.path";
 }

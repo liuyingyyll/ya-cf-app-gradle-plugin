@@ -81,7 +81,7 @@ uploadArchives {
             pom.project {
                 name project.name
                 packaging 'jar'
-                description ''
+                description 'Gradle Plugin to push an application to Cloud Foundry'
                 url 'https://github.com/pivotalservices/ya-cf-app-gradle-plugin'
 
                 scm {

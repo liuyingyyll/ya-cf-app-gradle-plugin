@@ -4,6 +4,9 @@ image:https://travis-ci.org/pivotalservices/cf-push-gradle-plugin.svg?branch=mas
 
 "Yet another" because the authoritative source of Cloud Foundry Gradle plugin is https://github.com/cloudfoundry/cf-java-client/tree/master/cloudfoundry-gradle-plugin[here]
 
+The purpose of this plugin is to provide ways to manage an application in the Cloud Foundry Environment - Be able to deploy, update, start/stop/restart, attach/remote routes. 
+
+
 === Using the Plugin
 
 * Add a buildscript dependency:

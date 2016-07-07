@@ -81,6 +81,20 @@ task showAppUrls(dependsOn: "cf-get-app-detail") << {
 }
 ----
 
+Say if you wanted to deploy an app and use the apps url to run an acceptance test against you can define a task alone these lines:
+
+[source]
+----
+task acceptanceTest(type: Test, dependsOn: "cf-get-app-detail")  {
+	doFirst() {
+		systemProperty "url", "https://${project.cfConfig.applicationDetail.urls[0]}"
+	}
+	useJUnit {
+		includeCategories 'test.AcceptanceTest'
+	}
+}
+----
+
 === Using the Plugin for a Blue-Green Application Deployment
 
 * Provide a default set of configuration along the lines described above

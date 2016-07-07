@@ -24,6 +24,9 @@ public class CfPushTask extends AbstractCfTask {
 	@TaskAction
 	public void push() {
 		CfPushPluginExtension extension = getExtension();
+		LOGGER.info("About to call Push task : {} ",  extension.toString());
+
+
 
 		CloudFoundryOperations cfOperations = getCfOperations();
 

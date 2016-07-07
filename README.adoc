@@ -19,6 +19,9 @@ buildscript {
 	}
 	repositories {
 		mavenCentral()
+		//Some of the dependent libraries are snapshots
+		maven { url "https://repo.spring.io/snapshot" }
+		maven { url "https://repo.spring.io/milestone" }
 	}
 	dependencies {
 		classpath("com.github.pivotalservices:ya-cf-app-gradle-plugin:${cfAppVersion}")
@@ -55,7 +58,7 @@ cfConfig {
 }
 ----
 
-* Run the task:
+* Run the task(s):
 
 [source]
 ----
@@ -69,6 +72,14 @@ cfConfig {
 ./gradlew cf-push -Pcf.name=Green -Pcf.hostName=demo-time-temp
 ----
 
+* There is one task to retrieve the details of an application (cf-get-app-detail). You can use the plugin the following way, say to retrieve the app url's in a gradle task:
+
+[source]
+----
+task showAppUrls(dependsOn: "cf-get-app-detail") << {
+	print "${project.cfConfig.applicationDetail.urls}"
+}
+----
 
 === Using the Plugin for a Blue-Green Application Deployment
 

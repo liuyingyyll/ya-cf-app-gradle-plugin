@@ -1,4 +1,4 @@
-version = "1.0.0.RC3"
+version = "1.0.0.R4"
 group = "com.github.pivotalservices"
 
 apply plugin: 'java'
@@ -32,8 +32,6 @@ dependencies {
         exclude group: "com.fasterxml.jackson.core", module: "jackson-databind"
         exclude group: "com.fasterxml.jackson.datatype", module: "jackson-datatype-jdk8"
     }
-    compile("ch.qos.logback:logback-classic:1.1.7")
-    compile("ch.qos.logback:logback-core:1.1.7")
     compile("io.projectreactor:reactor-core:$reactorVersion")
     compile("io.projectreactor:reactor-netty:$reactorVersion")
     testCompile('org.assertj:assertj-core:3.4.1')

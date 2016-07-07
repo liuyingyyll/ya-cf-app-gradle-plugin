@@ -7,6 +7,8 @@ import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.DefaultCloudFoundryOperations;
 import org.cloudfoundry.spring.client.SpringCloudFoundryClient;
 import org.gradle.api.DefaultTask;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 
@@ -16,6 +18,8 @@ import java.util.Optional;
 abstract class AbstractCfTask extends DefaultTask {
 
 	protected long defaultWaitTimeout = 600_000L; // 10 mins
+
+	static Logger LOGGER = LoggerFactory.getLogger(AbstractCfTask.class);
 
 	protected CloudFoundryOperations getCfOperations() {
 		CloudFoundryClient cfClient = SpringCloudFoundryClient.builder()

@@ -1,7 +1,9 @@
 package io.pivotal.services.plugin;
 
 import lombok.Data;
+import lombok.ToString;
 import org.cloudfoundry.Nullable;
+import org.cloudfoundry.operations.applications.ApplicationDetail;
 import org.cloudfoundry.operations.applications.ApplicationManifest;
 
 import java.util.List;
@@ -12,6 +14,7 @@ import java.util.Map;
  * @author Biju Kunjummen
  */
 @Data
+@ToString(exclude="ccPassword")
 public class CfPushPluginExtension {
 	private String ccHost;
 	private String ccUser;
@@ -44,5 +47,5 @@ public class CfPushPluginExtension {
 	private List<String> services;
 
 
-	private ApplicationManifest applicationManifest;
+	private ApplicationDetail applicationDetail;
 }

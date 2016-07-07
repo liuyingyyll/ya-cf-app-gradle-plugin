@@ -1,9 +1,7 @@
 package io.pivotal.services.plugin.tasks;
 
 import org.cloudfoundry.operations.CloudFoundryOperations;
-import org.cloudfoundry.operations.applications.ApplicationManifest;
-import org.cloudfoundry.operations.applications.DeleteApplicationRequest;
-import org.cloudfoundry.operations.applications.GetApplicationManifestRequest;
+import org.cloudfoundry.operations.applications.*;
 import org.gradle.api.tasks.TaskAction;
 import reactor.core.publisher.Mono;
 
@@ -15,28 +13,28 @@ import reactor.core.publisher.Mono;
 public class CfAppDetailsTask extends AbstractCfTask {
 
 	@TaskAction
-	public void deleteApp() {
+	public void appDetails() {
 
 		CloudFoundryOperations cfOperations = getCfOperations();
 
-		Mono<ApplicationManifest> resp = cfOperations.applications()
-				.getApplicationManifest(
-						GetApplicationManifestRequest.builder()
+		Mono<ApplicationDetail> resp = cfOperations.applications()
+				.get(
+						GetApplicationRequest.builder()
 								.name(getCfApplicationName())
 								.build());
 
 
-		ApplicationManifest applicationManifest = resp.block(defaultWaitTimeout);
+		ApplicationDetail applicationDetail = resp.block(defaultWaitTimeout);
 
-		setApplicationManifest(applicationManifest);
+		setApplicationDetail(applicationDetail);
 	}
 
-	private void setApplicationManifest(ApplicationManifest applicationManifest) {
-		this.getExtension().setApplicationManifest(applicationManifest);
+	private void setApplicationDetail(ApplicationDetail applicationDetail) {
+		this.getExtension().setApplicationDetail(applicationDetail);
 	}
 
 	@Override
 	public String getDescription() {
-		return "Get the application summary from Cloud Foundry";
+		return "Get the application detail from Cloud Foundry";
 	}
 }

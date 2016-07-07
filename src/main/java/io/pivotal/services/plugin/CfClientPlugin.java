@@ -18,7 +18,7 @@ public class CfClientPlugin implements Plugin<Project> {
 		project.getTasks().create("cf-delete-app", CfDeleteAppTask.class);
 		project.getTasks().create("cf-delete-route", CfDeleteRouteTask.class);
 		project.getTasks().create("cf-rename-app", CfRenameAppTask.class);
-		project.getTasks().create("cf-get-app-manifest", CfAppDetailsTask.class);
+		project.getTasks().create("cf-get-app-detail", CfAppDetailsTask.class);
 		project.getTasks().create("cf-start-app", CfAppStartTask.class);
 		project.getTasks().create("cf-stop-app", CfAppStopTask.class);
 		project.getTasks().create("cf-restart-app", CfAppRestartTask.class);

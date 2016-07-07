@@ -149,7 +149,7 @@ task showAppUrls(dependsOn: "cf-get-app-detail") << {
 |cf-push               |Pushes an Application to Cloud Foundry
 |cf-delete-app         |Delete an application from Cloud Foundry
 |cf-delete-route       |Delete a route from Cloud Foundry
-|cf-get-app-manifest   |Get the application summary from Cloud Foundry
+|cf-get-app-detail     |Get the application detail from Cloud Foundry
 |cf-map-route          |Add a route for an application
 |cf-unmap-route        |Remove an existing route for an application
 |cf-rename-app         |Rename an applicaiton

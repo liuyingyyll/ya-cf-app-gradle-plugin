@@ -1,6 +1,6 @@
 == Yet another Gradle plugin to deploy an application to Cloud Foundry.
 
-image:https://travis-ci.org/pivotalservices/cf-push-gradle-plugin.svg?branch=master["Build Status", link="https://travis-ci.org/pivotalservices/cf-push-gradle-plugin"]
+image:https://travis-ci.org/pivotalservices/ya-cf-app-gradle-plugin.svg?branch=master["Build Status", link="https://travis-ci.org/pivotalservices/ya-cf-app-gradle-plugin"]
 
 The purpose of this plugin is to provide ways to manage an application in the Cloud Foundry Environment - Be able to deploy, update, start/stop/restart, attach/remove routes.
 

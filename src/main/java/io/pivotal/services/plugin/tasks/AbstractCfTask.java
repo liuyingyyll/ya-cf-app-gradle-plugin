@@ -119,6 +119,14 @@ abstract class AbstractCfTask extends DefaultTask {
 
 	}
 
+	protected Integer getStagingTimeout() {
+		return 15;
+	}
+
+	protected Integer getStartupTimeout() {
+		return 5;
+	}
+
 	protected Optional<String> getStringPropertyFromProject(String propertyName) {
 		if (getProject().hasProperty(propertyName)) {
 			return Optional.of((String) getProject().property(propertyName));

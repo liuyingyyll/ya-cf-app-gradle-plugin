@@ -6,6 +6,8 @@ import org.gradle.api.Project;
 import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.Test;
 
+import java.time.Duration;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class PropertyOverridesTest {
@@ -25,6 +27,8 @@ public class PropertyOverridesTest {
 		assertThat(cfPushTask.getSpace()).isEqualTo("space-fromplugin");
 		assertThat(cfPushTask.getInstances()).isEqualTo(3);
 		assertThat(cfPushTask.getMemory()).isEqualTo(12);
+		assertThat(cfPushTask.getStagingTimeout()).isEqualTo(15);
+		assertThat(cfPushTask.getStartupTimeout()).isEqualTo(5);
 	}
 
 	private void setPropsInExtension(CfPushPluginExtension ext) {

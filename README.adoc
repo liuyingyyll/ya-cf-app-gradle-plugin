@@ -157,7 +157,7 @@ task acceptanceTest(type: Test, dependsOn: "cf-get-app-detail")  {
 
 === List of all Tasks
 .Tasks
-[width="50%",frame="topbot",options="header,footer"]
+[width="100%",frame="topbot",options="header,footer"]
 |=============================================================
 |Task                  |Description
 |cf-push               |Pushes an Application to Cloud Foundry
@@ -169,5 +169,6 @@ task acceptanceTest(type: Test, dependsOn: "cf-get-app-detail")  {
 |cf-rename-app         |Rename an applicaiton
 |cf-start-app          |Start an Application
 |cf-stop-app           |Stop an Application
+|cf-restage-app        |Restage an Application
 |cf-restart-app        |Restart an Application
 |=============================================================

@@ -6,6 +6,8 @@ import org.cloudfoundry.operations.applications.StopApplicationRequest;
 import org.gradle.api.tasks.TaskAction;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
+
 /**
  * Responsible for stopping an app
  *
@@ -21,7 +23,7 @@ public class CfAppStopTask extends AbstractCfTask {
 		Mono<Void> resp = cfOperations.applications()
 				.stop(StopApplicationRequest.builder().name(getCfApplicationName()).build());
 
-		resp.block(defaultWaitTimeout);
+		resp.block(Duration.ofMillis(defaultWaitTimeout));
 
 	}
 

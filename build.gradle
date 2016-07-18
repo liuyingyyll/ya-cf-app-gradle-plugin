@@ -1,10 +1,9 @@
-version = "1.0.0.BUILD-SNAPSHOT"
+version = "1.0.1.RC1"
 group = "com.github.pivotalservices"
 
 apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'signing'
-
 
 buildscript {
     repositories {

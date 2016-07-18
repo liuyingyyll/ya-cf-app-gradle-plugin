@@ -1,9 +1,12 @@
 package io.pivotal.services.plugin.tasks;
 
 import org.cloudfoundry.operations.CloudFoundryOperations;
-import org.cloudfoundry.operations.applications.*;
+import org.cloudfoundry.operations.applications.ApplicationDetail;
+import org.cloudfoundry.operations.applications.GetApplicationRequest;
 import org.gradle.api.tasks.TaskAction;
 import reactor.core.publisher.Mono;
+
+import java.time.Duration;
 
 /**
  * Responsible for exposing the details of an application
@@ -24,7 +27,7 @@ public class CfAppDetailsTask extends AbstractCfTask {
 								.build());
 
 
-		ApplicationDetail applicationDetail = resp.block(defaultWaitTimeout);
+		ApplicationDetail applicationDetail = resp.block(Duration.ofMillis(defaultWaitTimeout));
 
 		setApplicationDetail(applicationDetail);
 	}

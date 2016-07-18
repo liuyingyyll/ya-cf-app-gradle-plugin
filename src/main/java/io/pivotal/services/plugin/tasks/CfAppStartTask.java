@@ -6,6 +6,8 @@ import org.cloudfoundry.operations.routes.UnmapRouteRequest;
 import org.gradle.api.tasks.TaskAction;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
+
 /**
  * Responsible for starting an app
  *
@@ -21,7 +23,7 @@ public class CfAppStartTask extends AbstractCfTask {
 		Mono<Void> resp = cfOperations.applications()
 				.start(StartApplicationRequest.builder().name(getCfApplicationName()).build());
 
-		resp.block(defaultWaitTimeout);
+		resp.block(Duration.ofMillis(defaultWaitTimeout));
 
 	}
 

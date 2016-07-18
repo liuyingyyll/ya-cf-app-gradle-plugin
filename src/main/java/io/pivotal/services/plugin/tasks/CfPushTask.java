@@ -12,6 +12,7 @@ import reactor.core.publisher.Mono;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.time.Duration;
 import java.util.Map;
 
 /**
@@ -72,7 +73,7 @@ public class CfPushTask extends AbstractCfTask {
 
 				resp.then(cfOperations.applications().restart(RestartApplicationRequest
 						.builder()
-						.name(getCfApplicationName()).build())).block(defaultWaitTimeout);
+						.name(getCfApplicationName()).build())).block(Duration.ofMillis(defaultWaitTimeout));
 
 			}
 

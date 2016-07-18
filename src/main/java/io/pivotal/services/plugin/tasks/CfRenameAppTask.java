@@ -7,6 +7,8 @@ import org.cloudfoundry.operations.routes.MapRouteRequest;
 import org.gradle.api.tasks.TaskAction;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
+
 /**
  * Responsible for handling renaming an app.
  *
@@ -27,7 +29,7 @@ public class CfRenameAppTask extends AbstractCfTask {
 						.orElseThrow(() -> new RuntimeException("New name not provided")))
 				.build());
 
-		resp.block(defaultWaitTimeout);
+		resp.block(Duration.ofMillis(defaultWaitTimeout));
 	}
 
 	@Override

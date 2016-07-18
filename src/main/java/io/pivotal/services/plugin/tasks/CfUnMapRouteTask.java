@@ -5,6 +5,8 @@ import org.cloudfoundry.operations.routes.UnmapRouteRequest;
 import org.gradle.api.tasks.TaskAction;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
+
 /**
  * Responsible for handling unmap route task.
  *
@@ -26,7 +28,7 @@ public class CfUnMapRouteTask extends AbstractCfTask {
 						.path(getCfPath())
 						.build());
 
-		resp.block(defaultWaitTimeout);
+		resp.block(Duration.ofMillis(defaultWaitTimeout));
 
 	}
 

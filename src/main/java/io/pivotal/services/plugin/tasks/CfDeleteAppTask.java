@@ -5,6 +5,8 @@ import org.cloudfoundry.operations.applications.DeleteApplicationRequest;
 import org.gradle.api.tasks.TaskAction;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
+
 /**
  * Responsible for Deleting an app
  *
@@ -23,7 +25,7 @@ public class CfDeleteAppTask extends AbstractCfTask {
 						.name(getCfApplicationName())
 						.build());
 
-		resp.block(defaultWaitTimeout);
+		resp.block(Duration.ofMillis(defaultWaitTimeout));
 	}
 
 	@Override

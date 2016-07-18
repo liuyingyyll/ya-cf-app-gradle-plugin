@@ -5,6 +5,8 @@ import org.cloudfoundry.operations.routes.MapRouteRequest;
 import org.gradle.api.tasks.TaskAction;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
+
 /**
  * Responsible for handling mappnig route task.
  *
@@ -25,7 +27,7 @@ public class CfMapRouteTask extends AbstractCfTask {
 						.host(getAppHostName())
 						.path(getCfPath()).build());
 
-		resp.block(defaultWaitTimeout);
+		resp.block(Duration.ofMillis(defaultWaitTimeout));
 
 	}
 

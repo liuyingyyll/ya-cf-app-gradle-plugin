@@ -5,6 +5,8 @@ import org.cloudfoundry.operations.routes.DeleteRouteRequest;
 import org.gradle.api.tasks.TaskAction;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
+
 /**
  * Responsible for Deleting a route
  *
@@ -25,7 +27,7 @@ public class CfDeleteRouteTask extends AbstractCfTask {
 						.path(getCfPath())
 						.build());
 
-		resp.block(defaultWaitTimeout);
+		resp.block(Duration.ofMillis(defaultWaitTimeout));
 	}
 
 

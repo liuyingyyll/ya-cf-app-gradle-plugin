@@ -27,7 +27,7 @@ public class CfRestageTask extends AbstractCfTask {
 				.startupTimeout(Duration.ofMinutes(getStartupTimeout())).build()
 		);
 
-		resp.block(defaultWaitTimeout);
+		resp.block(Duration.ofMillis(defaultWaitTimeout));
 	}
 
 	@Override

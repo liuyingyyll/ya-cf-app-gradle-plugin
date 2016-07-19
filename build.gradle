@@ -1,4 +1,4 @@
-version = "1.0.1.RC1"
+version = "1.0.1.RC2"
 group = "com.github.pivotalservices"
 
 apply plugin: 'java'
@@ -32,7 +32,7 @@ dependencies {
         exclude group: "com.fasterxml.jackson.datatype", module: "jackson-datatype-jdk8"
     }
     compile("io.projectreactor:reactor-core:$reactorVersion")
-    compile("io.projectreactor:reactor-netty:$reactorVersion")
+//    compile("io.projectreactor:reactor-netty:$reactorVersion")
     testCompile('org.assertj:assertj-core:3.4.1')
     compileOnly "org.projectlombok:lombok:1.16.8"
 }

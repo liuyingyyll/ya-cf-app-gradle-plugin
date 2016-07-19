@@ -15,10 +15,11 @@ The purpose of this plugin is to provide ways to manage an application in the Cl
 ----
 buildscript {
 	ext {
-		cfAppVersion = '1.0.0.RC4'
+		cfAppVersion = '1.0.1.RC2'
 	}
 	repositories {
 		mavenCentral()
+		maven { url "https://oss.sonatype.org/content/repositories/releases" }
 		//Some of the dependent libraries are snapshots
 		maven { url "https://repo.spring.io/snapshot" }
 		maven { url "https://repo.spring.io/milestone" }
@@ -49,7 +50,8 @@ cfConfig {
 	filePath = "build/libs/cf-show-env-0.1.2-SNAPSHOT.jar"
 	path = ""
 	domain = "local.pcfdev.io"
-
+	instances = 2
+	memory = 512
 
 	//Env and services
 	buildpack = "https://github.com/cloudfoundry/java-buildpack.git"

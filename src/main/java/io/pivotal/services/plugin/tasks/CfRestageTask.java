@@ -18,7 +18,7 @@ public class CfRestageTask extends AbstractCfTask {
 	@TaskAction
 	public void restage() {
 		CfPushPluginExtension extension = getExtension();
-		LOGGER.info("About to call Restage task : {} ",  extension.toString());
+		LOGGER.info("About to call Restage task : {} ", extension.toString());
 
 		CloudFoundryOperations cfOperations = getCfOperations();
 

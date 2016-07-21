@@ -108,9 +108,9 @@ abstract class AbstractCfTask extends DefaultTask {
 				.orElse(this.getExtension().getMemory());
 	}
 
-	protected Integer getHealthCheckTimeout() {
+	protected Integer getTimeout() {
 		return getIntegerProperty(PropertyNameConstants.CF_HEALTH_CHECK_TIMEOUT)
-				.orElse(this.getExtension().getHealthCheckTimeout());
+				.orElse(this.getExtension().getTimeout());
 	}
 
 	protected Integer getDiskQuota() {

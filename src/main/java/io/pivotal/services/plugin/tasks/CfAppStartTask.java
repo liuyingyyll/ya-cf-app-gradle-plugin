@@ -24,7 +24,6 @@ public class CfAppStartTask extends AbstractCfTask {
 				.start(StartApplicationRequest.builder().name(getCfApplicationName()).build());
 
 		resp.block(Duration.ofMillis(defaultWaitTimeout));
-
 	}
 
 	@Override

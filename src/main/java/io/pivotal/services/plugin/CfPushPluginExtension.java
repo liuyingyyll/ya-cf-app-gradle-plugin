@@ -4,7 +4,6 @@ import lombok.Data;
 import lombok.ToString;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.operations.applications.ApplicationDetail;
-import org.cloudfoundry.operations.applications.ApplicationManifest;
 
 import java.util.List;
 import java.util.Map;
@@ -39,7 +38,7 @@ public class CfPushPluginExtension {
 	private Integer diskQuota;
 	private Boolean enableSsh;
 	private Map<String, String> environment;
-	private Integer healthCheckTimeout;
+	private Integer timeout;
 	private String healthCheckType;
 	private Integer instances;
 	private Integer memory;

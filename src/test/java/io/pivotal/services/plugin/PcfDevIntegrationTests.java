@@ -11,12 +11,14 @@ import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.ReactorCloudFoundryClient;
 import org.cloudfoundry.reactor.tokenprovider.PasswordGrantTokenProvider;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import reactor.core.publisher.Mono;
 import reactor.test.TestSubscriber;
 
 import java.time.Duration;
 import java.util.Optional;
 
+@Category(IntegrationTest.class)
 public class PcfDevIntegrationTests {
 
 	@Test

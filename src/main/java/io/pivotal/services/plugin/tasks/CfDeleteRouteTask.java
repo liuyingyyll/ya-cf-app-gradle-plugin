@@ -1,5 +1,6 @@
 package io.pivotal.services.plugin.tasks;
 
+import io.pivotal.services.plugin.CfAppProperties;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.routes.DeleteRouteRequest;
 import org.gradle.api.tasks.TaskAction;
@@ -18,13 +19,14 @@ public class CfDeleteRouteTask extends AbstractCfTask {
 	public void deleteRoute() {
 
 		CloudFoundryOperations cfOperations = getCfOperations();
+		CfAppProperties cfAppProperties = getCfAppProperties();
 
 		Mono<Void> resp = cfOperations.routes().delete(
 				DeleteRouteRequest
 						.builder()
-						.domain(getAppDomain())
-						.host(getAppHostName())
-						.path(getCfPath())
+						.domain(cfAppProperties.getDomain())
+						.host(cfAppProperties.getHostName())
+						.path(cfAppProperties.getPath())
 						.build());
 
 		resp.block(Duration.ofMillis(defaultWaitTimeout));

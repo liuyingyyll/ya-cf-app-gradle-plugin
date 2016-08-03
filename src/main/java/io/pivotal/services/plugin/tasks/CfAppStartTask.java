@@ -1,5 +1,6 @@
 package io.pivotal.services.plugin.tasks;
 
+import io.pivotal.services.plugin.CfAppProperties;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.applications.StartApplicationRequest;
 import org.cloudfoundry.operations.routes.UnmapRouteRequest;
@@ -19,9 +20,10 @@ public class CfAppStartTask extends AbstractCfTask {
 	public void startApp() {
 
 		CloudFoundryOperations cfOperations = getCfOperations();
+		CfAppProperties cfAppProperties = getCfAppProperties();
 
 		Mono<Void> resp = cfOperations.applications()
-				.start(StartApplicationRequest.builder().name(getCfApplicationName()).build());
+				.start(StartApplicationRequest.builder().name(cfAppProperties.getName()).build());
 
 		resp.block(Duration.ofMillis(defaultWaitTimeout));
 	}

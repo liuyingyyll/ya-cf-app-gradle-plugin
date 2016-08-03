@@ -23,6 +23,7 @@ public class CfClientPlugin implements Plugin<Project> {
 		project.getTasks().create("cf-stop-app", CfAppStopTask.class);
 		project.getTasks().create("cf-restart-app", CfAppRestartTask.class);
 		project.getTasks().create("cf-restage-app", CfRestageTask.class);
-		project.getExtensions().create("cfConfig", CfPushPluginExtension.class);
+		project.getTasks().create("cf-push-autopilot", CfAutoPilotTask.class);
+		project.getExtensions().create("cfConfig", CfAppPluginExtension.class);
 	}
 }

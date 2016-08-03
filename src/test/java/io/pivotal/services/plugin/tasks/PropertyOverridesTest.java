@@ -1,12 +1,10 @@
 package io.pivotal.services.plugin.tasks;
 
-import io.pivotal.services.plugin.CfPushPluginExtension;
-import io.pivotal.services.plugin.PropertyNameConstants;
+import io.pivotal.services.plugin.CfAppPluginExtension;
+import io.pivotal.services.plugin.CfAppProperties;
 import org.gradle.api.Project;
 import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.Test;
-
-import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -16,22 +14,23 @@ public class PropertyOverridesTest {
 	public void testPropertyOverridesForAppName() {
 		Project project = ProjectBuilder.builder().build();
 		project.getPluginManager().apply("cf-app");
-		setPropsInExtension((CfPushPluginExtension)project.getExtensions().getByName("cfConfig"));
+		setPropsInExtension((CfAppPluginExtension)project.getExtensions().getByName("cfConfig"));
 
 		CfPushTask cfPushTask = (CfPushTask)project.getTasks().getAt("cf-push");
-		assertThat(cfPushTask.getCfApplicationName()).isEqualTo("name-fromplugin");
-		assertThat(cfPushTask.getCcHost()).isEqualTo("cchost-fromplugin");
-		assertThat(cfPushTask.getCcPassword()).isEqualTo("ccpassword-fromplugin");
-		assertThat(cfPushTask.getBuildpack()).isEqualTo("buildpack-fromplugin");
-		assertThat(cfPushTask.getOrg()).isEqualTo("org-fromplugin");
-		assertThat(cfPushTask.getSpace()).isEqualTo("space-fromplugin");
-		assertThat(cfPushTask.getInstances()).isEqualTo(3);
-		assertThat(cfPushTask.getMemory()).isEqualTo(12);
-		assertThat(cfPushTask.getStagingTimeout()).isEqualTo(15);
-		assertThat(cfPushTask.getStartupTimeout()).isEqualTo(5);
+		CfAppProperties props = cfPushTask.getCfAppProperties();
+		assertThat(props.getName()).isEqualTo("name-fromplugin");
+		assertThat(props.getCcHost()).isEqualTo("cchost-fromplugin");
+		assertThat(props.getCcPassword()).isEqualTo("ccpassword-fromplugin");
+		assertThat(props.getBuildpack()).isEqualTo("buildpack-fromplugin");
+		assertThat(props.getOrg()).isEqualTo("org-fromplugin");
+		assertThat(props.getSpace()).isEqualTo("space-fromplugin");
+		assertThat(props.getInstances()).isEqualTo(3);
+		assertThat(props.getMemory()).isEqualTo(12);
+		assertThat(props.getStagingTimeout()).isEqualTo(15);
+		assertThat(props.getStartupTimeout()).isEqualTo(5);
 	}
 
-	private void setPropsInExtension(CfPushPluginExtension ext) {
+	private void setPropsInExtension(CfAppPluginExtension ext) {
 		ext.setName("name-fromplugin");
 		ext.setCcHost("cchost-fromplugin");
 		ext.setCcPassword("ccpassword-fromplugin");

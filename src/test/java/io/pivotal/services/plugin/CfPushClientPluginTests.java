@@ -19,8 +19,8 @@ public class CfPushClientPluginTests {
 	}
 
 	@Test
-	public void testThatThereAre11Tasks() {
-		assertThat(this.project.getTasks().size()).isEqualTo(11);
+	public void testThatThereAre12Tasks() {
+		assertThat(this.project.getTasks().size()).isEqualTo(12);
 		assertThat(this.project.getTasks().getAt("cf-push").getGroup()).isEqualTo("Cloud Foundry");
 	}
 
@@ -82,5 +82,12 @@ public class CfPushClientPluginTests {
 	public void testCfRestageTask() {
 		assertThat(project.getTasks().getAt("cf-restage-app") instanceof CfRestageTask).isTrue();
 		assertThat(project.getTasks().getAt("cf-restage-app").getDescription()).isEqualTo("Restage an Application");
+	}
+
+	@Test
+	public void testCfPushAutopilot() {
+		assertThat(project.getTasks().getAt("cf-push-autopilot") instanceof CfAutoPilotTask).isTrue();
+		assertThat(project.getTasks().getAt("cf-push-autopilot").getDescription())
+				.isEqualTo("Push an Application in a no downtime Autopilot mode");
 	}
 }

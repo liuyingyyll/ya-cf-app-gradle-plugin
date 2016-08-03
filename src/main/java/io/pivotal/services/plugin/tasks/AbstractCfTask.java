@@ -1,16 +1,19 @@
 package io.pivotal.services.plugin.tasks;
 
-import io.pivotal.services.plugin.CfPushPluginExtension;
-import io.pivotal.services.plugin.PropertyNameConstants;
+import io.pivotal.services.plugin.CfAppPluginExtension;
+import io.pivotal.services.plugin.CfAppProperties;
+import io.pivotal.services.plugin.CfAppPropertiesMapper;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.DefaultCloudFoundryOperations;
-import org.cloudfoundry.spring.client.SpringCloudFoundryClient;
+import org.cloudfoundry.reactor.ConnectionContext;
+import org.cloudfoundry.reactor.DefaultConnectionContext;
+import org.cloudfoundry.reactor.TokenProvider;
+import org.cloudfoundry.reactor.client.ReactorCloudFoundryClient;
+import org.cloudfoundry.reactor.tokenprovider.PasswordGrantTokenProvider;
 import org.gradle.api.DefaultTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Optional;
 
 /**
  * Base class for all Concrete CF tasks
@@ -21,127 +24,46 @@ abstract class AbstractCfTask extends DefaultTask {
 
 	static Logger LOGGER = LoggerFactory.getLogger(AbstractCfTask.class);
 
+	protected CfAppPropertiesMapper appPropertiesMapper;
+
+	protected AbstractCfTask() {
+		this.appPropertiesMapper = new CfAppPropertiesMapper(getProject());
+	}
+
 	protected CloudFoundryOperations getCfOperations() {
-		CloudFoundryClient cfClient = SpringCloudFoundryClient.builder()
-				.host(getCcHost())
-				.username(getCcUser())
-				.password(getCcPassword())
+		CfAppProperties cfAppProperties = this.appPropertiesMapper.getProperties();
+
+		ConnectionContext connectionContext = DefaultConnectionContext.builder()
+				.apiHost(cfAppProperties.getCcHost())
 				.skipSslValidation(true)
 				.build();
 
+		TokenProvider tokenProvider = PasswordGrantTokenProvider.builder()
+				.password(cfAppProperties.getCcPassword())
+				.username(cfAppProperties.getCcUser())
+				.build();
+
+		CloudFoundryClient cfClient = ReactorCloudFoundryClient.builder()
+				.connectionContext(connectionContext)
+				.tokenProvider(tokenProvider)
+				.build();
 
 		CloudFoundryOperations cfOperations = DefaultCloudFoundryOperations.builder()
 				.cloudFoundryClient(cfClient)
-				.organization(getOrg())
-				.space(getSpace())
+				.organization(cfAppProperties.getOrg())
+				.space(cfAppProperties.getSpace())
 				.build();
 
 		return cfOperations;
 	}
 
-	protected CfPushPluginExtension getExtension() {
-		return getProject().getExtensions().findByType(CfPushPluginExtension.class);
+	protected CfAppPluginExtension getExtension() {
+		return this.getProject().getExtensions().findByType(CfAppPluginExtension.class);
 	}
 
-	protected String getCfApplicationName() {
-		return getStringPropertyFromProject(PropertyNameConstants.CF_APPLICATION_NAME)
-				.orElse(this.getExtension().getName());
+	protected CfAppProperties getCfAppProperties() {
+		return this.appPropertiesMapper.getProperties();
 	}
-
-	protected String getAppHostName() {
-		return getStringPropertyFromProject(PropertyNameConstants.CF_APPLICATION_HOST_NAME)
-				.orElse(this.getExtension().getHostName());
-	}
-
-	protected String getAppDomain() {
-		return getStringPropertyFromProject(PropertyNameConstants.CF_APPLICATION_DOMAIN)
-				.orElse(this.getExtension().getDomain());
-	}
-
-	protected String getFilePath() {
-		return getStringPropertyFromProject(PropertyNameConstants.CF_FILE_PATH)
-				.orElse(this.getExtension().getFilePath());
-	}
-
-	protected String getCcHost() {
-		return getStringPropertyFromProject(PropertyNameConstants.CC_HOST)
-				.orElse(this.getExtension().getCcHost());
-	}
-
-	protected String getCcUser() {
-		return getStringPropertyFromProject(PropertyNameConstants.CC_USER)
-				.orElse(this.getExtension().getCcUser());
-	}
-
-	protected String getCcPassword() {
-		return getStringPropertyFromProject(PropertyNameConstants.CC_PASSWORD)
-				.orElse(this.getExtension().getCcPassword());
-	}
-
-	protected String getBuildpack() {
-		return getStringPropertyFromProject(PropertyNameConstants.CF_BUILDPACK)
-				.orElse(this.getExtension().getBuildpack());
-	}
-
-	protected String getOrg() {
-		return getStringPropertyFromProject(PropertyNameConstants.CF_ORG)
-				.orElse(this.getExtension().getOrg());
-	}
-
-	protected String getSpace() {
-		return getStringPropertyFromProject(PropertyNameConstants.CF_SPACE)
-				.orElse(this.getExtension().getSpace());
-	}
-
-	protected String getCfPath() {
-		return getStringPropertyFromProject(PropertyNameConstants.CF_PATH)
-				.orElse(this.getExtension().getPath());
-	}
-
-	protected Integer getInstances() {
-		return getIntegerProperty(PropertyNameConstants.CF_INSTANCES)
-				.orElse(this.getExtension().getInstances());
-	}
-
-	protected Integer getMemory() {
-		return getIntegerProperty(PropertyNameConstants.CF_MEMORY)
-				.orElse(this.getExtension().getMemory());
-	}
-
-	protected Integer getTimeout() {
-		return getIntegerProperty(PropertyNameConstants.CF_HEALTH_CHECK_TIMEOUT)
-				.orElse(this.getExtension().getTimeout());
-	}
-
-	protected Integer getDiskQuota() {
-		return getIntegerProperty(PropertyNameConstants.CF_DISK_QUOTA)
-				.orElse(this.getExtension().getDiskQuota());
-
-	}
-
-	protected Integer getStagingTimeout() {
-		return 15;
-	}
-
-	protected Integer getStartupTimeout() {
-		return 5;
-	}
-
-	protected Optional<String> getStringPropertyFromProject(String propertyName) {
-		if (getProject().hasProperty(propertyName)) {
-			return Optional.of((String) getProject().property(propertyName));
-		}
-		return Optional.empty();
-	}
-
-
-	protected Optional<Integer> getIntegerProperty(String propertyName) {
-		if (getProject().hasProperty(propertyName)) {
-			return Optional.of((Integer) getProject().property(propertyName));
-		}
-		return Optional.empty();
-	}
-
 
 	@Override
 	public String getGroup() {

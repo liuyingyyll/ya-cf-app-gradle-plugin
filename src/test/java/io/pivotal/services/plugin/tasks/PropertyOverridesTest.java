@@ -30,6 +30,7 @@ public class PropertyOverridesTest {
 		assertThat(props.getStartupTimeout()).isEqualTo(5);
 	}
 
+
 	private void setPropsInExtension(CfAppPluginExtension ext) {
 		ext.setName("name-fromplugin");
 		ext.setCcHost("cchost-fromplugin");

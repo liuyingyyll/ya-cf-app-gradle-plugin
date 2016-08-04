@@ -20,7 +20,7 @@ public class CfPushClientPluginTests {
 
 	@Test
 	public void testThatThereAre12Tasks() {
-		assertThat(this.project.getTasks().size()).isEqualTo(12);
+		assertThat(this.project.getTasks().size()).isEqualTo(14);
 		assertThat(this.project.getTasks().getAt("cf-push").getGroup()).isEqualTo("Cloud Foundry");
 	}
 
@@ -85,9 +85,28 @@ public class CfPushClientPluginTests {
 	}
 
 	@Test
+	public void testCfBlueGreenStage1Task() {
+		assertThat(project.getTasks().getAt("cf-push-blue-green-1") instanceof CfBlueGreenStage1Task).isTrue();
+		assertThat(project.getTasks().getAt("cf-push-blue-green-1").getDescription()).isEqualTo("Push an Application in a Blue-Green no downtime mode - Stage 1");
+	}
+
+	@Test
+	public void testCfBlueGreenStage2Task() {
+		assertThat(project.getTasks().getAt("cf-push-blue-green-2") instanceof CfBlueGreenStage2Task).isTrue();
+		assertThat(project.getTasks().getAt("cf-push-blue-green-2").getDescription()).isEqualTo("Push an Application in a Blue-Green no downtime mode - Stage 2");
+	}
+
+	@Test
+	public void testCfAutopilotTask() {
+		assertThat(project.getTasks().getAt("cf-push-autopilot") instanceof CfAutoPilotTask).isTrue();
+		assertThat(project.getTasks().getAt("cf-push-autopilot").getDescription()).isEqualTo("Push an Application in a no downtime Autopilot mode");
+	}
+
+	@Test
 	public void testCfPushAutopilot() {
 		assertThat(project.getTasks().getAt("cf-push-autopilot") instanceof CfAutoPilotTask).isTrue();
 		assertThat(project.getTasks().getAt("cf-push-autopilot").getDescription())
 				.isEqualTo("Push an Application in a no downtime Autopilot mode");
 	}
+
 }

@@ -1,7 +1,6 @@
-package io.pivotal.services.plugin.tasks;
+package io.pivotal.services.plugin.tasks.helper;
 
 import io.pivotal.services.plugin.CfAppProperties;
-import io.pivotal.services.plugin.helper.*;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.applications.ApplicationDetail;
 import org.gradle.api.Project;
@@ -23,7 +22,7 @@ public class CfAutoPilotTaskDelegateTest {
 	private CfAutoPilotTaskDelegate cfAutoPilotTask;
 
 	@Mock
-	private CfPushTaskDelegate cfPushTaskDelegate;
+	private CfPushDelegate cfPushDelegate;
 
 	@Mock
 	private CfRenameAppTaskDelegate cfRenameAppTaskDelegate;
@@ -53,7 +52,7 @@ public class CfAutoPilotTaskDelegateTest {
 				any(CfAppProperties.class),
 				any(CfAppProperties.class))).thenReturn(Mono.empty());
 
-		when(cfPushTaskDelegate.push(cfOperations, cfAppProperties)).thenReturn(Mono.empty());
+		when(cfPushDelegate.push(cfOperations, cfAppProperties)).thenReturn(Mono.empty());
 		when(deleteDelegate.deleteApp(any(CloudFoundryOperations.class),
 				any(CfAppProperties.class))).thenReturn(Mono.empty());
 
@@ -64,7 +63,7 @@ public class CfAutoPilotTaskDelegateTest {
 		verify(cfRenameAppTaskDelegate, times(1)).renameApp(any(CloudFoundryOperations.class),
 				any(CfAppProperties.class), any(CfAppProperties.class));
 
-		verify(cfPushTaskDelegate, times(1)).push(any(CloudFoundryOperations.class), any(CfAppProperties.class));
+		verify(cfPushDelegate, times(1)).push(any(CloudFoundryOperations.class), any(CfAppProperties.class));
 
 		verify(deleteDelegate, times(1)).deleteApp(any(CloudFoundryOperations.class), any(CfAppProperties.class));
 	}
@@ -77,7 +76,7 @@ public class CfAutoPilotTaskDelegateTest {
 
 		when(detailsTaskDelegate.getAppDetails(cfOperations, cfAppProperties)).thenReturn(Mono.just(Optional.empty()));
 
-		when(cfPushTaskDelegate.push(cfOperations, cfAppProperties)).thenReturn(Mono.empty());
+		when(cfPushDelegate.push(cfOperations, cfAppProperties)).thenReturn(Mono.empty());
 
 		Mono<Void> resp = this.cfAutoPilotTask.runAutopilot(project, cfOperations, cfAppProperties);
 
@@ -86,7 +85,7 @@ public class CfAutoPilotTaskDelegateTest {
 		verify(cfRenameAppTaskDelegate, times(0)).renameApp(any(CloudFoundryOperations.class),
 				any(CfAppProperties.class), any(CfAppProperties.class));
 
-		verify(cfPushTaskDelegate, times(1)).push(any(CloudFoundryOperations.class), any(CfAppProperties.class));
+		verify(cfPushDelegate, times(1)).push(any(CloudFoundryOperations.class), any(CfAppProperties.class));
 
 		verify(deleteDelegate, times(0)).deleteApp(any(CloudFoundryOperations.class), any(CfAppProperties.class));
 	}

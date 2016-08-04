@@ -1,4 +1,4 @@
-package io.pivotal.services.plugin.helper;
+package io.pivotal.services.plugin.tasks.helper;
 
 import io.pivotal.services.plugin.CfAppProperties;
 import io.pivotal.services.plugin.CfAppPropertiesMapper;
@@ -13,7 +13,7 @@ import java.util.Optional;
  * Responsible for handling Autopilot flow.
  */
 public class CfAutoPilotTaskDelegate {
-	private CfPushTaskDelegate cfPushTaskDelegate = new CfPushTaskDelegate();
+	private CfPushDelegate cfPushDelegate = new CfPushDelegate();
 	private CfRenameAppTaskDelegate cfRenameAppTaskDelegate = new CfRenameAppTaskDelegate();
 	private CfDeleteAppTaskDelegate deleteDelegate = new CfDeleteAppTaskDelegate();
 	private CfAppDetailsTaskDelegate detailsTaskDelegate = new CfAppDetailsTaskDelegate();
@@ -29,10 +29,10 @@ public class CfAutoPilotTaskDelegate {
 		Mono<Void> autopilotResult = appDetailMono.then(appDetail -> {
 			if (appDetail.isPresent()) {
 				Mono<Void> renameResult = cfRenameAppTaskDelegate.renameApp(cfOperations, cfAppProperties, withNameChanged);
-				return renameResult.then(cfPushTaskDelegate.push(cfOperations, cfAppProperties))
+				return renameResult.then(cfPushDelegate.push(cfOperations, cfAppProperties))
 						.then(deleteDelegate.deleteApp(cfOperations, withNameChanged));
 			} else {
-				return cfPushTaskDelegate.push(cfOperations, cfAppProperties);
+				return cfPushDelegate.push(cfOperations, cfAppProperties);
 			}
 		});
 

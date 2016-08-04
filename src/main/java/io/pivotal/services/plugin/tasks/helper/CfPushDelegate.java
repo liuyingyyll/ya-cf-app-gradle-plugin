@@ -1,4 +1,4 @@
-package io.pivotal.services.plugin.helper;
+package io.pivotal.services.plugin.tasks.helper;
 
 import io.pivotal.services.plugin.CfAppPluginExtension;
 import io.pivotal.services.plugin.CfAppProperties;
@@ -24,7 +24,7 @@ import java.util.Map;
  *
  * @author Biju Kunjummen
  */
-public class CfPushTaskDelegate {
+public class CfPushDelegate {
 
 	public Mono<Void> push(CloudFoundryOperations cfOperations, CfAppProperties cfAppProperties) {
 		Path path = Paths.get(cfAppProperties.getFilePath());

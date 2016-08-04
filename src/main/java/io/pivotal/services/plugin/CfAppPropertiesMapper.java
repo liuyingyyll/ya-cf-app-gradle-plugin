@@ -12,12 +12,29 @@ public class CfAppPropertiesMapper {
 		this.project = project;
 	}
 
-	private CfAppPluginExtension getExtension() {
+	CfAppPluginExtension getExtension() {
 		return this.project.getExtensions().findByType(CfAppPluginExtension.class);
 	}
 
+
+
 	public CfAppProperties getProperties() {
-		CfAppProperties cfAppProperties = CfAppProperties.builder()
+		return getArchetypePropertiesBuilder().build();
+	}
+
+	public CfAppProperties copyPropertiesWithNameChange(CfAppProperties original, String newName) {
+		return getBuilderFromExistingProps(original).name(newName).build();
+	}
+
+	public CfAppProperties copyPropertiesWithNameAndRouteChange(CfAppProperties original,
+																String newName, String newHostName) {
+		return getBuilderFromExistingProps(original).name(newName).hostName(newHostName).build();
+
+	}
+
+
+	private CfAppProperties.CfAppPropertiesBuilder getArchetypePropertiesBuilder() {
+		return CfAppProperties.builder()
 				.name(getCfApplicationName())
 				.buildpack(getBuildpack())
 				.ccHost(getCcHost())
@@ -42,40 +59,36 @@ public class CfAppPropertiesMapper {
 				.memory(getMemory())
 				.ports(this.getExtension().getPorts())
 				.state(this.getExtension().getState())
-				.timeout(getTimeout())
-				.build();
-		return cfAppProperties;
+				.timeout(getTimeout());
 	}
 
-	public CfAppProperties copyPropertiesWithNameChange(CfAppProperties original, String newName) {
-		CfAppProperties cfAppProperties = CfAppProperties.builder()
-				.name(newName)
-				.buildpack(original.getBuildpack())
-				.ccHost(original.getCcHost())
-				.ccPassword(original.getCcPassword())
-				.ccUser(original.getCcUser())
-				.ccPassword(original.getCcPassword())
-				.org(original.getOrg())
-				.space(original.getSpace())
-				.domain(original.getDomain())
-				.path(original.getPath())
-				.command(original.getCommand())
-				.console(original.getConsole())
-				.debug(original.getDebug())
-				.detectedStartCommand(original.getDetectedStartCommand())
-				.diskQuota(original.getDiskQuota())
-				.enableSsh(original.getEnableSsh())
-				.environment(original.getEnvironment())
-				.filePath(original.getFilePath())
-				.healthCheckType(original.getHealthCheckType())
-				.hostName(original.getHostName())
-				.instances(original.getInstances())
-				.memory(original.getMemory())
-				.ports(original.getPorts())
-				.state(original.getState())
-				.timeout(original.getTimeout())
-				.build();
-		return cfAppProperties;
+	private CfAppProperties.CfAppPropertiesBuilder getBuilderFromExistingProps(CfAppProperties orig) {
+		return CfAppProperties.builder()
+				.name(orig.getName())
+				.buildpack(orig.getBuildpack())
+				.ccHost(orig.getCcHost())
+				.ccPassword(orig.getCcPassword())
+				.ccUser(orig.getCcUser())
+				.ccPassword(orig.getCcPassword())
+				.org(orig.getOrg())
+				.space(orig.getSpace())
+				.domain(orig.getDomain())
+				.path(orig.getPath())
+				.command(orig.getCommand())
+				.console(orig.getConsole())
+				.debug(orig.getDebug())
+				.detectedStartCommand(orig.getDetectedStartCommand())
+				.diskQuota(orig.getDiskQuota())
+				.enableSsh(orig.getEnableSsh())
+				.environment(orig.getEnvironment())
+				.filePath(orig.getFilePath())
+				.healthCheckType(orig.getHealthCheckType())
+				.hostName(orig.getHostName())
+				.instances(orig.getInstances())
+				.memory(orig.getMemory())
+				.ports(orig.getPorts())
+				.state(orig.getState())
+				.timeout(orig.getTimeout());
 	}
 
 	public String getCfApplicationName() {

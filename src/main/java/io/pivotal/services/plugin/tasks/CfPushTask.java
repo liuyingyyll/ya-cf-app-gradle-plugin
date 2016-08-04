@@ -1,7 +1,7 @@
 package io.pivotal.services.plugin.tasks;
 
 import io.pivotal.services.plugin.CfAppProperties;
-import io.pivotal.services.plugin.helper.CfPushTaskDelegate;
+import io.pivotal.services.plugin.tasks.helper.CfPushDelegate;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.gradle.api.tasks.TaskAction;
 import reactor.core.publisher.Mono;
@@ -15,7 +15,7 @@ import java.time.Duration;
  */
 public class CfPushTask extends AbstractCfTask {
 
-	private CfPushTaskDelegate pushTaskDelegate = new CfPushTaskDelegate();
+	private CfPushDelegate pushTaskDelegate = new CfPushDelegate();
 
 	@TaskAction
 	public void push() {

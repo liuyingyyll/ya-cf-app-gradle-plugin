@@ -1,4 +1,4 @@
-package io.pivotal.services.plugin.helper;
+package io.pivotal.services.plugin.tasks.helper;
 
 import io.pivotal.services.plugin.CfAppProperties;
 import org.cloudfoundry.operations.CloudFoundryOperations;

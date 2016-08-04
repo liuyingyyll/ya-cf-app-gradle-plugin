@@ -1,6 +1,7 @@
 package io.pivotal.services.plugin.tasks;
 
 import io.pivotal.services.plugin.CfAppProperties;
+import io.pivotal.services.plugin.tasks.helper.CfUnMapRouteTaskDelegate;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.routes.UnmapRouteRequest;
 import org.gradle.api.tasks.TaskAction;
@@ -15,20 +16,15 @@ import java.time.Duration;
  */
 public class CfUnMapRouteTask extends AbstractCfTask {
 
+	private CfUnMapRouteTaskDelegate unMapRouteTaskDelegate = new CfUnMapRouteTaskDelegate();
+
 	@TaskAction
 	public void unmapRoute() {
 
 		CloudFoundryOperations cfOperations = getCfOperations();
 		CfAppProperties cfAppProperties = getCfAppProperties();
 
-		Mono<Void> resp = cfOperations.routes()
-				.unmap(UnmapRouteRequest
-						.builder()
-						.applicationName(cfAppProperties.getName())
-						.domain(cfAppProperties.getDomain())
-						.host(cfAppProperties.getHostName())
-						.path(cfAppProperties.getPath())
-						.build());
+		Mono<Void> resp = this.unMapRouteTaskDelegate.unmapRoute(cfOperations, cfAppProperties);
 
 		resp.block(Duration.ofMillis(defaultWaitTimeout));
 

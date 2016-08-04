@@ -1,6 +1,6 @@
 package io.pivotal.services.plugin;
 
-import io.pivotal.services.plugin.helper.CfAppDetailsTaskDelegate;
+import io.pivotal.services.plugin.tasks.helper.CfAppDetailsTaskDelegate;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.DefaultCloudFoundryOperations;
@@ -13,9 +13,7 @@ import org.cloudfoundry.reactor.tokenprovider.PasswordGrantTokenProvider;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import reactor.core.publisher.Mono;
-import reactor.test.TestSubscriber;
 
-import java.time.Duration;
 import java.util.Optional;
 
 @Category(IntegrationTest.class)

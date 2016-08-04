@@ -92,8 +92,8 @@ public class CfPushClientPluginTests {
 
 	@Test
 	public void testCfBlueGreenStage2Task() {
-		assertThat(project.getTasks().getAt("cf-push-blue-green-2") instanceof CfBlueGreenStage2Task).isTrue();
-		assertThat(project.getTasks().getAt("cf-push-blue-green-2").getDescription()).isEqualTo("Push an Application in a Blue-Green no downtime mode - Stage 2");
+		assertThat(project.getTasks().getAt("cf-push-blue-green") instanceof CfBlueGreenStage2Task).isTrue();
+		assertThat(project.getTasks().getAt("cf-push-blue-green").getDescription()).isEqualTo("Push an Application in a Blue-Green no downtime mode - Stage 2");
 	}
 
 	@Test

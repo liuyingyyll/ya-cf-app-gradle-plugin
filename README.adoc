@@ -74,7 +74,8 @@ cfConfig {
 ./gradlew cf-push -Pcf.name=Green -Pcf.hostName=demo-time-temp
 ----
 
-* There is one task to retrieve the details of an application (cf-get-app-detail). You can use the plugin the following way, say to retrieve the app url's in a gradle task:
+* There is one task to retrieve the details of an application (cf-get-app-detail).
+You can use the plugin the following way, say to retrieve the app url's in a gradle task:
 
 [source]
 ----
@@ -97,9 +98,34 @@ task acceptanceTest(type: Test, dependsOn: "cf-get-app-detail")  {
 }
 ----
 
-=== Using the Plugin for a Blue-Green Application Deployment
+=== Using the Plugin for a https://docs.cloudfoundry.org/devguide/deploy-apps/blue-green.html[Blue-Green] Application Deployment
 
-* Provide a default set of configuration along the lines described above
+The plugin natively understands how to perform the steps of a Blue-Green deploy. Just run the following and you should be set for a Blue-Green deploy:
+
+[source]
+----
+./gradlew cf-push-blue-green
+----
+
+You may want to run smoke tests after a new version of the app with a new route is brought up before replacing the existing app,
+if so a smoke test dependency can be added in the `build.gradle` file the following way:
+
+[source]
+----
+"cf-push-blue-green-1"{finalizedBy "test"}
+----
+
+and run
+
+[source]
+----
+./gradlew cf-push-blue-green
+----
+
+
+OR if you prefer writing all the blue-green steps yourself, the following is a rough outline of steps:
+
+* Provide a default set of configuration in your build.gradle file.
 
 * Push the `Blue` app mapping to `demo-time.domain`:
 [source]
@@ -137,7 +163,18 @@ task acceptanceTest(type: Test, dependsOn: "cf-get-app-detail")  {
 ./gradlew cf-delete-route -Pcf.hostName=demo-time-temp
 ----
 
+
+
 === Using the Plugin for a https://github.com/concourse/autopilot[Autopilot] equivalent deployment
+
+The plugin natively understands how to perform the steps of an Autopilot based deploy. Just run the following on the command line:
+
+[source]
+----
+./gradlew cf-push-autopilot
+----
+
+OR if you prefer to write each step of autopilot yourself, these are the rough steps:
 
 * Rename the application to something else
 [source]
@@ -160,17 +197,19 @@ task acceptanceTest(type: Test, dependsOn: "cf-get-app-detail")  {
 === List of all Tasks
 .Tasks
 [width="100%",frame="topbot",options="header,footer"]
-|=============================================================
-|Task                  |Description
-|cf-push               |Pushes an Application to Cloud Foundry
-|cf-delete-app         |Delete an application from Cloud Foundry
-|cf-delete-route       |Delete a route from Cloud Foundry
-|cf-get-app-detail     |Get the application detail from Cloud Foundry
-|cf-map-route          |Add a route for an application
-|cf-unmap-route        |Remove an existing route for an application
-|cf-rename-app         |Rename an applicaiton
-|cf-start-app          |Start an Application
-|cf-stop-app           |Stop an Application
-|cf-restage-app        |Restage an Application
-|cf-restart-app        |Restart an Application
-|=============================================================
+|================================================================================================
+|Task                      |Description
+|cf-push                   |Pushes an Application to Cloud Foundry
+|cf-delete-app             |Delete an application from Cloud Foundry
+|cf-delete-route           |Delete a route from Cloud Foundry
+|cf-get-app-detail         |Get the application detail from Cloud Foundry
+|cf-map-route              |Add a route for an application
+|cf-unmap-route            |Remove an existing route for an application
+|cf-rename-app             |Rename an applicaiton
+|cf-start-app              |Start an Application
+|cf-stop-app               |Stop an Application
+|cf-restage-app            |Restage an Application
+|cf-restart-app            |Restart an Application
+|cf-push-autopilot         |Push with https://github.com/concourse/autopilot[Autopilot] steps
+|cf-push-blue-green        |Push with https://docs.cloudfoundry.org/devguide/deploy-apps/blue-green.html[Blue-Green] steps
+|================================================================================================

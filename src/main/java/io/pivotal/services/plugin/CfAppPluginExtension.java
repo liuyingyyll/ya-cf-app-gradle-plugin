@@ -14,7 +14,7 @@ import java.util.Map;
  */
 @Data
 @ToString(exclude="ccPassword")
-public class CfPushPluginExtension {
+public class CfAppPluginExtension {
 	private String ccHost;
 	private String ccUser;
 	private String ccPassword;
@@ -44,7 +44,6 @@ public class CfPushPluginExtension {
 	private Integer memory;
 	private List<Integer> ports;
 	private List<String> services;
-
 
 	private ApplicationDetail applicationDetail;
 }

@@ -1,7 +1,8 @@
 package io.pivotal.services.plugin.tasks;
 
+import io.pivotal.services.plugin.CfAppProperties;
+import io.pivotal.services.plugin.tasks.helper.CfDeleteRouteTaskDelegate;
 import org.cloudfoundry.operations.CloudFoundryOperations;
-import org.cloudfoundry.operations.routes.DeleteRouteRequest;
 import org.gradle.api.tasks.TaskAction;
 import reactor.core.publisher.Mono;
 
@@ -14,18 +15,14 @@ import java.time.Duration;
  */
 public class CfDeleteRouteTask extends AbstractCfTask {
 
+	private CfDeleteRouteTaskDelegate deleteRouteDelegate;
+
 	@TaskAction
 	public void deleteRoute() {
-
 		CloudFoundryOperations cfOperations = getCfOperations();
+		CfAppProperties cfAppProperties = getCfAppProperties();
 
-		Mono<Void> resp = cfOperations.routes().delete(
-				DeleteRouteRequest
-						.builder()
-						.domain(getAppDomain())
-						.host(getAppHostName())
-						.path(getCfPath())
-						.build());
+		Mono<Void> resp = deleteRouteDelegate.deleteRoute(cfOperations, cfAppProperties);
 
 		resp.block(Duration.ofMillis(defaultWaitTimeout));
 	}

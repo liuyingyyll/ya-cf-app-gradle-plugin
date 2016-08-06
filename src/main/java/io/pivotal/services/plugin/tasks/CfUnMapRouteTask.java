@@ -1,9 +1,8 @@
 package io.pivotal.services.plugin.tasks;
 
 import io.pivotal.services.plugin.CfAppProperties;
-import io.pivotal.services.plugin.tasks.helper.CfUnMapRouteTaskDelegate;
+import io.pivotal.services.plugin.tasks.helper.CfUnMapRouteDelegate;
 import org.cloudfoundry.operations.CloudFoundryOperations;
-import org.cloudfoundry.operations.routes.UnmapRouteRequest;
 import org.gradle.api.tasks.TaskAction;
 import reactor.core.publisher.Mono;
 
@@ -16,7 +15,7 @@ import java.time.Duration;
  */
 public class CfUnMapRouteTask extends AbstractCfTask {
 
-	private CfUnMapRouteTaskDelegate unMapRouteTaskDelegate = new CfUnMapRouteTaskDelegate();
+	private CfUnMapRouteDelegate unMapRouteTaskDelegate = new CfUnMapRouteDelegate();
 
 	@TaskAction
 	public void unmapRoute() {

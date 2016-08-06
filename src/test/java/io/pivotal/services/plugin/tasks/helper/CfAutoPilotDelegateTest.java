@@ -16,22 +16,22 @@ import java.util.Optional;
 
 import static org.mockito.Mockito.*;
 
-public class CfAutoPilotTaskDelegateTest {
+public class CfAutoPilotDelegateTest {
 
 	@InjectMocks
-	private CfAutoPilotTaskDelegate cfAutoPilotTask;
+	private CfAutoPilotDelegate cfAutoPilotTask;
 
 	@Mock
 	private CfPushDelegate cfPushDelegate;
 
 	@Mock
-	private CfRenameAppTaskDelegate cfRenameAppTaskDelegate;
+	private CfRenameAppDelegate cfRenameAppDelegate;
 
 	@Mock
-	private CfDeleteAppTaskDelegate deleteDelegate;
+	private CfDeleteAppDelegate deleteDelegate;
 
 	@Mock
-	private CfAppDetailsTaskDelegate detailsTaskDelegate;
+	private CfAppDetailsDelegate detailsTaskDelegate;
 
 	@Before
 	public void setUp() {
@@ -48,7 +48,7 @@ public class CfAutoPilotTaskDelegateTest {
 		when(detailsTaskDelegate.getAppDetails(cfOperations, cfAppProperties))
 				.thenReturn(Mono.just(Optional.of(appDetail)));
 
-		when(cfRenameAppTaskDelegate.renameApp(any(CloudFoundryOperations.class),
+		when(cfRenameAppDelegate.renameApp(any(CloudFoundryOperations.class),
 				any(CfAppProperties.class),
 				any(CfAppProperties.class))).thenReturn(Mono.empty());
 
@@ -60,7 +60,7 @@ public class CfAutoPilotTaskDelegateTest {
 
 		TestSubscriber.subscribe(resp).assertComplete();
 
-		verify(cfRenameAppTaskDelegate, times(1)).renameApp(any(CloudFoundryOperations.class),
+		verify(cfRenameAppDelegate, times(1)).renameApp(any(CloudFoundryOperations.class),
 				any(CfAppProperties.class), any(CfAppProperties.class));
 
 		verify(cfPushDelegate, times(1)).push(any(CloudFoundryOperations.class), any(CfAppProperties.class));
@@ -82,7 +82,7 @@ public class CfAutoPilotTaskDelegateTest {
 
 		TestSubscriber.subscribe(resp).assertComplete();
 
-		verify(cfRenameAppTaskDelegate, times(0)).renameApp(any(CloudFoundryOperations.class),
+		verify(cfRenameAppDelegate, times(0)).renameApp(any(CloudFoundryOperations.class),
 				any(CfAppProperties.class), any(CfAppProperties.class));
 
 		verify(cfPushDelegate, times(1)).push(any(CloudFoundryOperations.class), any(CfAppProperties.class));

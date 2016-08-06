@@ -10,7 +10,7 @@ import reactor.core.publisher.Mono;
  *
  * @author Biju Kunjummen
  */
-public class CfDeleteRouteTaskDelegate {
+public class CfDeleteRouteDelegate {
 
 	public Mono<Void> deleteRoute(CloudFoundryOperations cfOperations,
 								  CfAppProperties cfAppProperties) {

@@ -1,7 +1,7 @@
 package io.pivotal.services.plugin.tasks;
 
 import io.pivotal.services.plugin.CfAppProperties;
-import io.pivotal.services.plugin.tasks.helper.CfRenameAppTaskDelegate;
+import io.pivotal.services.plugin.tasks.helper.CfRenameAppDelegate;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.gradle.api.tasks.TaskAction;
 import reactor.core.publisher.Mono;
@@ -15,7 +15,7 @@ import java.time.Duration;
  */
 public class CfRenameAppTask extends AbstractCfTask {
 
-	private CfRenameAppTaskDelegate renameDelegate = new CfRenameAppTaskDelegate();
+	private CfRenameAppDelegate renameDelegate = new CfRenameAppDelegate();
 
 	@TaskAction
 	public void renameApp() {

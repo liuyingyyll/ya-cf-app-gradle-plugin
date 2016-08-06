@@ -11,7 +11,7 @@ import reactor.core.publisher.Mono;
  *
  * @author Biju Kunjummen
  */
-public class CfRenameAppTaskDelegate {
+public class CfRenameAppDelegate {
 
 	public Mono<Void> renameApp(CloudFoundryOperations cfOperations,
 						  CfAppProperties cfOldAppProperties, CfAppProperties cfNewAppProperties) {

@@ -1,6 +1,6 @@
 package io.pivotal.services.plugin;
 
-import io.pivotal.services.plugin.tasks.helper.CfAppDetailsTaskDelegate;
+import io.pivotal.services.plugin.tasks.helper.CfAppDetailsDelegate;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.DefaultCloudFoundryOperations;
@@ -42,7 +42,7 @@ public class PcfDevIntegrationTests {
 				.space("pcfdev-space")
 				.build();
 
-		CfAppDetailsTaskDelegate appDetailsTaskDelegate = new CfAppDetailsTaskDelegate();
+		CfAppDetailsDelegate appDetailsTaskDelegate = new CfAppDetailsDelegate();
 		CfAppProperties cfAppProps = CfAppProperties.builder().name("cf-show-env").build();
 		Mono<Optional<ApplicationDetail>> applicationDetailMono = appDetailsTaskDelegate
 				.getAppDetails(cfOperations, cfAppProps);

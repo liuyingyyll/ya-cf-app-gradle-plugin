@@ -3,10 +3,9 @@ package io.pivotal.services.plugin.tasks.helper;
 import io.pivotal.services.plugin.CfAppProperties;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.applications.DeleteApplicationRequest;
-import org.gradle.api.tasks.TaskAction;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 import reactor.core.publisher.Mono;
-
-import java.time.Duration;
 
 /**
  * Responsible for Deleting an app, the logic has been centralized here as it is going to get called from
@@ -14,9 +13,12 @@ import java.time.Duration;
  *
  * @author Biju Kunjummen
  */
-public class CfDeleteAppTaskDelegate{
+public class CfDeleteAppDelegate {
+
+	private static final Logger LOGGER = Logging.getLogger(CfDeleteAppDelegate.class);
 
 	public Mono<Void> deleteApp(CloudFoundryOperations cfOperations, CfAppProperties cfAppProperties) {
+		LOGGER.quiet("About to delete App '{}'", cfAppProperties.getName());
 		return cfOperations.applications().delete(
 				DeleteApplicationRequest
 						.builder()

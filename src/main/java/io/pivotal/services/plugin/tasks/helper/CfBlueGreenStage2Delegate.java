@@ -5,9 +5,13 @@ import io.pivotal.services.plugin.CfAppPropertiesMapper;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.applications.ApplicationDetail;
 import org.gradle.api.Project;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 import reactor.core.publisher.Mono;
 
 import java.util.Optional;
+
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 /**
  * route -&gt; app
@@ -39,15 +43,19 @@ import java.util.Optional;
  */
 public class CfBlueGreenStage2Delegate {
 
-	private CfMapRouteTaskDelegate mapRouteDelegate = new CfMapRouteTaskDelegate();
-	private CfUnMapRouteTaskDelegate unMapRouteDelegate = new CfUnMapRouteTaskDelegate();
-	private CfAppDetailsTaskDelegate detailsTaskDelegate = new CfAppDetailsTaskDelegate();
-	private CfRenameAppTaskDelegate renameAppTaskDelegate = new CfRenameAppTaskDelegate();
-	private CfDeleteAppTaskDelegate deleteAppTaskDelegate = new CfDeleteAppTaskDelegate();
-	private CfAppStopDelegate stopDelegate = new CfAppStopDelegate();
+	private static final Logger LOGGER = Logging.getLogger(CfBlueGreenStage2Delegate.class);
+
+	private CfMapRouteDelegate mapRouteDelegate = new CfMapRouteDelegate();
+	private CfUnMapRouteDelegate unMapRouteDelegate = new CfUnMapRouteDelegate();
+	private CfAppDetailsDelegate appDetailsDelegate = new CfAppDetailsDelegate();
+	private CfRenameAppDelegate renameAppDelegate = new CfRenameAppDelegate();
+	private CfDeleteAppDelegate deleteAppDelegate = new CfDeleteAppDelegate();
+	private CfAppStopDelegate appStopDelegate = new CfAppStopDelegate();
 
 	public Mono<Void> runStage2(Project project, CloudFoundryOperations cfOperations,
 								CfAppProperties cfAppProperties) {
+		LOGGER.quiet("Running Blue Green Deploy - after deploying a 'green' app. App '{}' with route '{}'",
+				cfAppProperties.getName(), cfAppProperties.getHostName());
 
 		CfAppPropertiesMapper cfAppPropertiesMapper = new CfAppPropertiesMapper(project);
 
@@ -61,28 +69,24 @@ public class CfBlueGreenStage2Delegate {
 		CfAppProperties blueName = cfAppPropertiesMapper.copyPropertiesWithNameChange(cfAppProperties,
 				cfAppProperties.getName() + "-blue");
 
-		Mono<Optional<ApplicationDetail>> existingBlueAppDetailMono = detailsTaskDelegate
+		Mono<Optional<ApplicationDetail>> backupAppMono = appDetailsDelegate
 				.getAppDetails(cfOperations, blueName);
 
-		Mono<Void> bgResult = existingBlueAppDetailMono.then(appDetail -> {
-			//if a backup app is already present..
-			if (appDetail.isPresent()) {
-				return deleteAppTaskDelegate.deleteApp(cfOperations, blueName)
+		Mono<Optional<ApplicationDetail>> existingAppMono = appDetailsDelegate
+				.getAppDetails(cfOperations, cfAppProperties);
+
+
+		Mono<Void> bgResult = Mono.when(backupAppMono, existingAppMono).then(function((backupApp, existingApp) ->
+
+				(backupApp.isPresent() ? deleteAppDelegate.deleteApp(cfOperations, blueName) : Mono.empty())
 						.then(mapRouteDelegate.mapRoute(cfOperations, greenName))
-						.then(unMapRouteDelegate.unmapRoute(cfOperations, cfAppProperties))
+						.then(existingApp.isPresent() ? unMapRouteDelegate.unmapRoute(cfOperations, cfAppProperties) : Mono.empty())
 						.then(unMapRouteDelegate.unmapRoute(cfOperations, greenNameAndRoute))
-						.then(renameAppTaskDelegate.renameApp(cfOperations, cfAppProperties, blueName))
-						.then(renameAppTaskDelegate.renameApp(cfOperations, greenName, cfAppProperties))
-						.then(stopDelegate.stopApp(cfOperations, blueName));
-			} else {
-				return mapRouteDelegate.mapRoute(cfOperations, greenName)
-						.then(unMapRouteDelegate.unmapRoute(cfOperations, cfAppProperties))
-						.then(unMapRouteDelegate.unmapRoute(cfOperations, greenNameAndRoute))
-						.then(renameAppTaskDelegate.renameApp(cfOperations, cfAppProperties, blueName))
-						.then(renameAppTaskDelegate.renameApp(cfOperations, greenName, cfAppProperties))
-						.then(stopDelegate.stopApp(cfOperations, blueName));
-			}
-		});
+						.then(existingApp.isPresent() ? renameAppDelegate.renameApp(cfOperations, cfAppProperties, blueName) : Mono.empty())
+						.then(renameAppDelegate.renameApp(cfOperations, greenName, cfAppProperties))
+						.then(existingApp.isPresent() ? appStopDelegate.stopApp(cfOperations, blueName) : Mono.empty())
+
+		));
 
 		return bgResult;
 	}

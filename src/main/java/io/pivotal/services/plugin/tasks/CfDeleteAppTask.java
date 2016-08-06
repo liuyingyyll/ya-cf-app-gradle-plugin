@@ -1,7 +1,7 @@
 package io.pivotal.services.plugin.tasks;
 
 import io.pivotal.services.plugin.CfAppProperties;
-import io.pivotal.services.plugin.tasks.helper.CfDeleteAppTaskDelegate;
+import io.pivotal.services.plugin.tasks.helper.CfDeleteAppDelegate;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.gradle.api.tasks.TaskAction;
 import reactor.core.publisher.Mono;
@@ -15,7 +15,7 @@ import java.time.Duration;
  */
 public class CfDeleteAppTask extends AbstractCfTask {
 
-	private CfDeleteAppTaskDelegate deleteDelegate = new CfDeleteAppTaskDelegate();
+	private CfDeleteAppDelegate deleteDelegate = new CfDeleteAppDelegate();
 
 	@TaskAction
 	public void deleteApp() {

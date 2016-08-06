@@ -10,7 +10,7 @@ import reactor.core.publisher.Mono;
  *
  * @author Biju Kunjummen
  */
-public class CfMapRouteTaskDelegate {
+public class CfMapRouteDelegate {
 
 	public Mono<Void> mapRoute(CloudFoundryOperations cfOperations,
 							   CfAppProperties cfAppProperties) {

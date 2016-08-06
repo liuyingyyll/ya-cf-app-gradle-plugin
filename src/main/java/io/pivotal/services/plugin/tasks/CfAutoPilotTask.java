@@ -1,7 +1,7 @@
 package io.pivotal.services.plugin.tasks;
 
 import io.pivotal.services.plugin.CfAppProperties;
-import io.pivotal.services.plugin.tasks.helper.CfAutoPilotTaskDelegate;
+import io.pivotal.services.plugin.tasks.helper.CfAutoPilotDelegate;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.gradle.api.tasks.TaskAction;
 import reactor.core.publisher.Mono;
@@ -15,7 +15,7 @@ import java.time.Duration;
  */
 public class CfAutoPilotTask extends AbstractCfTask {
 
-	private CfAutoPilotTaskDelegate autoPilotTaskDelegate = new CfAutoPilotTaskDelegate();
+	private CfAutoPilotDelegate autoPilotTaskDelegate = new CfAutoPilotDelegate();
 
 	@TaskAction
 	public void runAutopilot() {

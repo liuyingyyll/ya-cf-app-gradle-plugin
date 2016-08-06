@@ -15,7 +15,7 @@ The purpose of this plugin is to provide ways to manage an application in the Cl
 ----
 buildscript {
 	ext {
-		cfAppVersion = '1.0.1.RC2'
+		cfAppVersion = '1.0.2.RC1'
 	}
 	repositories {
 		mavenCentral()

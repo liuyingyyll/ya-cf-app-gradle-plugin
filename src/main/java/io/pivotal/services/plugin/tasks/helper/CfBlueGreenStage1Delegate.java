@@ -4,6 +4,8 @@ import io.pivotal.services.plugin.CfAppProperties;
 import io.pivotal.services.plugin.CfAppPropertiesMapper;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.gradle.api.Project;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 import reactor.core.publisher.Mono;
 
 /**
@@ -36,16 +38,21 @@ import reactor.core.publisher.Mono;
  */
 public class CfBlueGreenStage1Delegate {
 
-	private CfPushDelegate cfPushDelegate = new CfPushDelegate();
+	private CfPushDelegate pushDelegate = new CfPushDelegate();
+
+	private static final Logger LOGGER = Logging.getLogger(CfBlueGreenStage1Delegate.class);
 
 	public Mono<Void> runStage1(Project project, CloudFoundryOperations cfOperations,
 								CfAppProperties cfAppProperties) {
+
+		LOGGER.quiet("Running Blue Green Deploy - deploying a 'green' app. App '{}' with route '{}'",
+				cfAppProperties.getName(), cfAppProperties.getHostName());
 
 		CfAppPropertiesMapper cfAppPropertiesMapper = new CfAppPropertiesMapper(project);
 		CfAppProperties withNewNameAndRoute = cfAppPropertiesMapper
 				.copyPropertiesWithNameAndRouteChange(cfAppProperties,
 						cfAppProperties.getName() + "-green", cfAppProperties.getHostName() + "-green");
 
-		return cfPushDelegate.push(cfOperations, withNewNameAndRoute);
+		return pushDelegate.push(cfOperations, withNewNameAndRoute);
 	}
 }

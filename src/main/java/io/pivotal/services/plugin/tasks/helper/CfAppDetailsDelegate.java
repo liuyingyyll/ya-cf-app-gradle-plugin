@@ -13,18 +13,20 @@ import java.util.Optional;
  *
  * @author Biju Kunjummen
  */
-public class CfAppDetailsTaskDelegate {
+public class CfAppDetailsDelegate {
 
 	public Mono<Optional<ApplicationDetail>> getAppDetails(CloudFoundryOperations cfOperations,
 														   CfAppProperties cfAppProperties) {
 
-		return cfOperations.applications()
+		Mono<ApplicationDetail> applicationDetailMono = cfOperations.applications()
 				.get(
 						GetApplicationRequest.builder()
 								.name(cfAppProperties.getName())
-								.build())
+								.build());
+
+		return applicationDetailMono
 				.map(appDetail -> Optional.ofNullable(appDetail))
-				.otherwise(IllegalArgumentException.class, ex -> Mono.just(Optional.empty()));
+				.otherwise(Exception.class, e -> Mono.just(Optional.empty()));
 	}
 
 }

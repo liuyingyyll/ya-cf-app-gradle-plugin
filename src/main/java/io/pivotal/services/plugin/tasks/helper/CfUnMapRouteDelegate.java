@@ -10,7 +10,7 @@ import reactor.core.publisher.Mono;
  *
  * @author Biju Kunjummen
  */
-public class CfUnMapRouteTaskDelegate {
+public class CfUnMapRouteDelegate {
 
 	public Mono<Void> unmapRoute(CloudFoundryOperations cfOperations, CfAppProperties cfAppProperties) {
 

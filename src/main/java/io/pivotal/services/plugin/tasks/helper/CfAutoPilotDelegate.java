@@ -12,27 +12,27 @@ import java.util.Optional;
 /**
  * Responsible for handling Autopilot flow.
  */
-public class CfAutoPilotTaskDelegate {
-	private CfPushDelegate cfPushDelegate = new CfPushDelegate();
-	private CfRenameAppTaskDelegate cfRenameAppTaskDelegate = new CfRenameAppTaskDelegate();
-	private CfDeleteAppTaskDelegate deleteDelegate = new CfDeleteAppTaskDelegate();
-	private CfAppDetailsTaskDelegate detailsTaskDelegate = new CfAppDetailsTaskDelegate();
+public class CfAutoPilotDelegate {
+	private CfPushDelegate pushDelegate = new CfPushDelegate();
+	private CfRenameAppDelegate renameAppDelegate = new CfRenameAppDelegate();
+	private CfDeleteAppDelegate deleteDelegate = new CfDeleteAppDelegate();
+	private CfAppDetailsDelegate detailsDelegate = new CfAppDetailsDelegate();
 
 	public Mono<Void> runAutopilot(Project project, CloudFoundryOperations cfOperations, CfAppProperties cfAppProperties) {
 		CfAppPropertiesMapper cfAppPropertiesMapper = new CfAppPropertiesMapper(project);
 		CfAppProperties withNameChanged = cfAppPropertiesMapper
 				.copyPropertiesWithNameChange(cfAppProperties, cfAppProperties.getName() + "-venerable");
 
-		Mono<Optional<ApplicationDetail>> appDetailMono = detailsTaskDelegate
+		Mono<Optional<ApplicationDetail>> appDetailMono = detailsDelegate
 				.getAppDetails(cfOperations, cfAppProperties);
 
 		Mono<Void> autopilotResult = appDetailMono.then(appDetail -> {
 			if (appDetail.isPresent()) {
-				Mono<Void> renameResult = cfRenameAppTaskDelegate.renameApp(cfOperations, cfAppProperties, withNameChanged);
-				return renameResult.then(cfPushDelegate.push(cfOperations, cfAppProperties))
+				Mono<Void> renameResult = renameAppDelegate.renameApp(cfOperations, cfAppProperties, withNameChanged);
+				return renameResult.then(pushDelegate.push(cfOperations, cfAppProperties))
 						.then(deleteDelegate.deleteApp(cfOperations, withNameChanged));
 			} else {
-				return cfPushDelegate.push(cfOperations, cfAppProperties);
+				return pushDelegate.push(cfOperations, cfAppProperties);
 			}
 		});
 

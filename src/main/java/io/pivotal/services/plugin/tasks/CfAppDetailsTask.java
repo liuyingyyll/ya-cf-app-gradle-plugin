@@ -1,7 +1,7 @@
 package io.pivotal.services.plugin.tasks;
 
 import io.pivotal.services.plugin.CfAppProperties;
-import io.pivotal.services.plugin.tasks.helper.CfAppDetailsTaskDelegate;
+import io.pivotal.services.plugin.tasks.helper.CfAppDetailsDelegate;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.applications.ApplicationDetail;
 import org.gradle.api.tasks.TaskAction;
@@ -17,7 +17,7 @@ import java.util.Optional;
  */
 public class CfAppDetailsTask extends AbstractCfTask {
 
-	private CfAppDetailsTaskDelegate detailsTaskDelegate = new CfAppDetailsTaskDelegate();
+	private CfAppDetailsDelegate detailsTaskDelegate = new CfAppDetailsDelegate();
 
 	@TaskAction
 	public void appDetails() {

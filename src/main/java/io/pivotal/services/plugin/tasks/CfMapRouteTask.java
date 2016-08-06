@@ -1,7 +1,7 @@
 package io.pivotal.services.plugin.tasks;
 
 import io.pivotal.services.plugin.CfAppProperties;
-import io.pivotal.services.plugin.tasks.helper.CfMapRouteTaskDelegate;
+import io.pivotal.services.plugin.tasks.helper.CfMapRouteDelegate;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.gradle.api.tasks.TaskAction;
 import reactor.core.publisher.Mono;
@@ -15,7 +15,7 @@ import java.time.Duration;
  */
 public class CfMapRouteTask extends AbstractCfTask {
 
-	private CfMapRouteTaskDelegate mapRouteDelegate = new CfMapRouteTaskDelegate();
+	private CfMapRouteDelegate mapRouteDelegate = new CfMapRouteDelegate();
 
 	@TaskAction
 	public void mapRoute() {

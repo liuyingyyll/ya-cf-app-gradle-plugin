@@ -10,7 +10,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import reactor.core.publisher.Mono;
-import reactor.test.TestSubscriber;
 
 import java.util.Optional;
 
@@ -58,7 +57,9 @@ public class CfAutoPilotDelegateTest {
 
 		Mono<Void> resp = this.cfAutoPilotTask.runAutopilot(project, cfOperations, cfAppProperties);
 
-		TestSubscriber.subscribe(resp).assertComplete();
+		resp.block();
+
+//		TestSubscriber.subscribe(resp).assertComplete();
 
 		verify(cfRenameAppDelegate, times(1)).renameApp(any(CloudFoundryOperations.class),
 				any(CfAppProperties.class), any(CfAppProperties.class));
@@ -80,7 +81,8 @@ public class CfAutoPilotDelegateTest {
 
 		Mono<Void> resp = this.cfAutoPilotTask.runAutopilot(project, cfOperations, cfAppProperties);
 
-		TestSubscriber.subscribe(resp).assertComplete();
+		resp.block();
+//		TestSubscriber.subscribe(resp).assertComplete();
 
 		verify(cfRenameAppDelegate, times(0)).renameApp(any(CloudFoundryOperations.class),
 				any(CfAppProperties.class), any(CfAppProperties.class));

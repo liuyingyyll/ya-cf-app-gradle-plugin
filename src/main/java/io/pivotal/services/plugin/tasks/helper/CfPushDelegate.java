@@ -7,6 +7,8 @@ import org.cloudfoundry.operations.applications.PushApplicationRequest;
 import org.cloudfoundry.operations.applications.RestartApplicationRequest;
 import org.cloudfoundry.operations.applications.SetEnvironmentVariableApplicationRequest;
 import org.cloudfoundry.operations.services.BindServiceInstanceRequest;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 import org.gradle.api.tasks.TaskAction;
 import reactor.core.publisher.Mono;
 
@@ -26,7 +28,10 @@ import java.util.Map;
  */
 public class CfPushDelegate {
 
+	private static final Logger LOGGER = Logging.getLogger(CfPushDelegate.class);
+
 	public Mono<Void> push(CloudFoundryOperations cfOperations, CfAppProperties cfAppProperties) {
+		LOGGER.lifecycle("Pushing app '{}'", cfAppProperties.getName());
 		Path path = Paths.get(cfAppProperties.getFilePath());
 		try {
 			Mono<Void> resp = cfOperations.applications()
@@ -47,6 +52,7 @@ public class CfPushDelegate {
 
 			if (cfAppProperties.getEnvironment() != null) {
 				for (Map.Entry<String, String> entry : cfAppProperties.getEnvironment().entrySet()) {
+					LOGGER.lifecycle("Setting env variable '{}'", entry.getKey());
 					resp = resp.then(cfOperations.applications()
 							.setEnvironmentVariable(SetEnvironmentVariableApplicationRequest
 									.builder()
@@ -59,6 +65,7 @@ public class CfPushDelegate {
 
 			if (cfAppProperties.getServices() != null) {
 				for (String serviceName : cfAppProperties.getServices()) {
+					LOGGER.lifecycle("Binding Service '{}'", serviceName);
 					resp = resp.then(cfOperations.services()
 							.bind(BindServiceInstanceRequest.builder()
 									.serviceInstanceName(serviceName)
@@ -67,6 +74,7 @@ public class CfPushDelegate {
 				}
 			}
 
+			LOGGER.lifecycle("Starting app '{}'", cfAppProperties.getName());
 			return resp.then(cfOperations.applications().restart(RestartApplicationRequest
 					.builder()
 					.name(cfAppProperties.getName()).build()));

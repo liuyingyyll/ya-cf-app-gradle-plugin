@@ -3,6 +3,8 @@ package io.pivotal.services.plugin.tasks.helper;
 import io.pivotal.services.plugin.CfAppProperties;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.routes.MapRouteRequest;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 import reactor.core.publisher.Mono;
 
 /**
@@ -12,8 +14,13 @@ import reactor.core.publisher.Mono;
  */
 public class CfMapRouteDelegate {
 
+	private static final Logger LOGGER = Logging.getLogger(CfMapRouteDelegate.class);
+
 	public Mono<Void> mapRoute(CloudFoundryOperations cfOperations,
 							   CfAppProperties cfAppProperties) {
+
+		LOGGER.lifecycle("Mapping hostname '{}' in domain '{}' with path '{}' of app '{}'", cfAppProperties.getHostName(),
+				cfAppProperties.getDomain(), cfAppProperties.getPath(), cfAppProperties.getName());
 
 		Mono<Void> resp = cfOperations.routes()
 				.map(MapRouteRequest

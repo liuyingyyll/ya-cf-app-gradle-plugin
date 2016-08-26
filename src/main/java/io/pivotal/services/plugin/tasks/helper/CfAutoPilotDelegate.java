@@ -5,6 +5,8 @@ import io.pivotal.services.plugin.CfAppPropertiesMapper;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.applications.ApplicationDetail;
 import org.gradle.api.Project;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 import reactor.core.publisher.Mono;
 
 import java.util.Optional;
@@ -18,7 +20,10 @@ public class CfAutoPilotDelegate {
 	private CfDeleteAppDelegate deleteDelegate = new CfDeleteAppDelegate();
 	private CfAppDetailsDelegate detailsDelegate = new CfAppDetailsDelegate();
 
+	private static final Logger LOGGER = Logging.getLogger(CfAutoPilotDelegate.class);
+
 	public Mono<Void> runAutopilot(Project project, CloudFoundryOperations cfOperations, CfAppProperties cfAppProperties) {
+		LOGGER.lifecycle("Running Autopilot on App: {}", cfAppProperties.getName());
 		CfAppPropertiesMapper cfAppPropertiesMapper = new CfAppPropertiesMapper(project);
 		CfAppProperties withNameChanged = cfAppPropertiesMapper
 				.copyPropertiesWithNameChange(cfAppProperties, cfAppProperties.getName() + "-venerable");

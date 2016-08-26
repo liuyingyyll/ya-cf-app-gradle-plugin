@@ -45,7 +45,7 @@ public class CfBlueGreenStage1Delegate {
 	public Mono<Void> runStage1(Project project, CloudFoundryOperations cfOperations,
 								CfAppProperties cfAppProperties) {
 
-		LOGGER.quiet("Running Blue Green Deploy - deploying a 'green' app. App '{}' with route '{}'",
+		LOGGER.lifecycle("Running Blue Green Deploy - deploying a 'green' app. App '{}' with route '{}'",
 				cfAppProperties.getName(), cfAppProperties.getHostName());
 
 		CfAppPropertiesMapper cfAppPropertiesMapper = new CfAppPropertiesMapper(project);

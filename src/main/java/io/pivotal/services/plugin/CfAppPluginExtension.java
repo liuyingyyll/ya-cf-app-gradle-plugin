@@ -7,9 +7,19 @@ import org.cloudfoundry.operations.applications.ApplicationDetail;
 
 import java.util.List;
 import java.util.Map;
-
 /**
- * Holds configuration related to cf-push
+ * A holder for properties set via a Gradle cfConfig closure
+ * <pre>
+ *     cfConfig {
+ *       ccHost = "api.local.pcfdev.io"
+ *       ccUser = "admin"
+ *       ccPassword = "admin"
+ *       org = "pcfdev-org"
+ *       space = "pcfdev-space"
+ *       ....
+ *       }
+ * </pre>
+ *
  * @author Biju Kunjummen
  */
 @Data

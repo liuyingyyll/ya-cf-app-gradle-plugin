@@ -3,10 +3,13 @@ package io.pivotal.services.plugin.tasks.helper;
 import io.pivotal.services.plugin.CfAppProperties;
 import io.pivotal.services.plugin.CfAppPropertiesMapper;
 import org.cloudfoundry.operations.CloudFoundryOperations;
+import org.cloudfoundry.operations.applications.ApplicationDetail;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 import reactor.core.publisher.Mono;
+
+import java.util.Optional;
 
 /**
  * route -&gt; app
@@ -39,11 +42,16 @@ import reactor.core.publisher.Mono;
 public class CfBlueGreenStage1Delegate {
 
 	private CfPushDelegate pushDelegate = new CfPushDelegate();
+	private CfAppDetailsDelegate appDetailsDelegate = new CfAppDetailsDelegate();
 
 	private static final Logger LOGGER = Logging.getLogger(CfBlueGreenStage1Delegate.class);
 
 	public Mono<Void> runStage1(Project project, CloudFoundryOperations cfOperations,
 								CfAppProperties cfAppProperties) {
+
+		Mono<Optional<ApplicationDetail>> appDetailMono = appDetailsDelegate.getAppDetails(cfOperations, cfAppProperties);
+
+		appDetailMono.block().ifPresent(appDetail -> printAppDetail(appDetail));
 
 		LOGGER.lifecycle("Running Blue Green Deploy - deploying a 'green' app. App '{}' with route '{}'",
 				cfAppProperties.getName(), cfAppProperties.getHostName());
@@ -54,5 +62,11 @@ public class CfBlueGreenStage1Delegate {
 						cfAppProperties.getName() + "-green", cfAppProperties.getHostName() + "-green");
 
 		return pushDelegate.push(cfOperations, withNewNameAndRoute);
+	}
+
+	private void printAppDetail(ApplicationDetail applicationDetail) {
+		LOGGER.lifecycle("**** Application Name: {}", applicationDetail.getName());
+		LOGGER.lifecycle("**** Intance Count: {}", applicationDetail.getInstances());
+		LOGGER.lifecycle("Running Instances: {}", applicationDetail.getRunningInstances());
 	}
 }

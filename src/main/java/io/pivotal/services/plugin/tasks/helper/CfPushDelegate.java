@@ -33,54 +33,52 @@ public class CfPushDelegate {
 	public Mono<Void> push(CloudFoundryOperations cfOperations, CfAppProperties cfAppProperties) {
 		LOGGER.lifecycle("Pushing app '{}'", cfAppProperties.getName());
 		Path path = Paths.get(cfAppProperties.getFilePath());
-		try {
-			Mono<Void> resp = cfOperations.applications()
-					.push(PushApplicationRequest.builder()
-							.name(cfAppProperties.getName())
-							.application(path)
-							.buildpack(cfAppProperties.getBuildpack())
-							.command(cfAppProperties.getCommand())
-							.diskQuota(cfAppProperties.getDiskQuota())
-							.instances(cfAppProperties.getInstances())
-							.memory(cfAppProperties.getMemory())
-							.timeout(cfAppProperties.getTimeout())
-							.domain(cfAppProperties.getDomain())
-							.host(cfAppProperties.getHostName())
-							.routePath(cfAppProperties.getPath())
-							.noStart(true)
-							.build());
 
-			if (cfAppProperties.getEnvironment() != null) {
-				for (Map.Entry<String, String> entry : cfAppProperties.getEnvironment().entrySet()) {
-					LOGGER.lifecycle("Setting env variable '{}'", entry.getKey());
-					resp = resp.then(cfOperations.applications()
-							.setEnvironmentVariable(SetEnvironmentVariableApplicationRequest
-									.builder()
-									.name(cfAppProperties.getName())
-									.variableName(entry.getKey())
-									.variableValue(entry.getValue())
-									.build()));
-				}
+
+		Mono<Void> resp = cfOperations.applications()
+				.push(PushApplicationRequest.builder()
+						.name(cfAppProperties.getName())
+						.application(path)
+						.buildpack(cfAppProperties.getBuildpack())
+						.command(cfAppProperties.getCommand())
+						.diskQuota(cfAppProperties.getDiskQuota())
+						.instances(cfAppProperties.getInstances())
+						.memory(cfAppProperties.getMemory())
+						.timeout(cfAppProperties.getTimeout())
+						.domain(cfAppProperties.getDomain())
+						.host(cfAppProperties.getHostName())
+						.routePath(cfAppProperties.getPath())
+						.noStart(true)
+						.build());
+
+		if (cfAppProperties.getEnvironment() != null) {
+			for (Map.Entry<String, String> entry : cfAppProperties.getEnvironment().entrySet()) {
+				LOGGER.lifecycle("Setting env variable '{}'", entry.getKey());
+				resp = resp.then(cfOperations.applications()
+						.setEnvironmentVariable(SetEnvironmentVariableApplicationRequest
+								.builder()
+								.name(cfAppProperties.getName())
+								.variableName(entry.getKey())
+								.variableValue(entry.getValue())
+								.build()));
 			}
-
-			if (cfAppProperties.getServices() != null) {
-				for (String serviceName : cfAppProperties.getServices()) {
-					LOGGER.lifecycle("Binding Service '{}'", serviceName);
-					resp = resp.then(cfOperations.services()
-							.bind(BindServiceInstanceRequest.builder()
-									.serviceInstanceName(serviceName)
-									.applicationName(cfAppProperties.getName())
-									.build()));
-				}
-			}
-
-			LOGGER.lifecycle("Starting app '{}'", cfAppProperties.getName());
-			return resp.then(cfOperations.applications().restart(RestartApplicationRequest
-					.builder()
-					.name(cfAppProperties.getName()).build()));
-
-		} catch (Exception e) {
-			throw new RuntimeException(e);
 		}
+
+		if (cfAppProperties.getServices() != null) {
+			for (String serviceName : cfAppProperties.getServices()) {
+				LOGGER.lifecycle("Binding Service '{}'", serviceName);
+				resp = resp.then(cfOperations.services()
+						.bind(BindServiceInstanceRequest.builder()
+								.serviceInstanceName(serviceName)
+								.applicationName(cfAppProperties.getName())
+								.build()));
+			}
+		}
+
+		LOGGER.lifecycle("Starting app '{}'", cfAppProperties.getName());
+		return resp.then(cfOperations.applications().restart(RestartApplicationRequest
+				.builder()
+				.name(cfAppProperties.getName()).build()));
+
 	}
 }

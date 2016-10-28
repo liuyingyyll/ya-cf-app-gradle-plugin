@@ -32,7 +32,7 @@ dependencies {
         exclude group: "com.fasterxml.jackson.core", module: "jackson-databind"
         exclude group: "com.fasterxml.jackson.datatype", module: "jackson-datatype-jdk8"
     }
-    compile("io.projectreactor:reactor-core:$reactorVersion")
+//    compile("io.projectreactor:reactor-core:$reactorVersion")
 //    compile("io.projectreactor:reactor-netty:$reactorVersion")
     testCompile('org.assertj:assertj-core:3.4.1')
     testCompile('org.mockito:mockito-core:1.10.19')

@@ -17,7 +17,6 @@ public class CfAppPropertiesMapper {
 	}
 
 
-
 	public CfAppProperties getProperties() {
 		return getArchetypePropertiesBuilder().build();
 	}

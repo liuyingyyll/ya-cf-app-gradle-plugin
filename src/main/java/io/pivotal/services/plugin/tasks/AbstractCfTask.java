@@ -12,8 +12,8 @@ import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.ReactorCloudFoundryClient;
 import org.cloudfoundry.reactor.tokenprovider.PasswordGrantTokenProvider;
 import org.gradle.api.DefaultTask;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 
 /**
  * Base class for all Concrete CF tasks
@@ -22,7 +22,7 @@ abstract class AbstractCfTask extends DefaultTask {
 
 	protected long defaultWaitTimeout = 600_000L; // 10 mins
 
-	static Logger LOGGER = LoggerFactory.getLogger(AbstractCfTask.class);
+	static Logger LOGGER = Logging.getLogger(AbstractCfTask.class);
 
 	protected CfAppPropertiesMapper appPropertiesMapper;
 

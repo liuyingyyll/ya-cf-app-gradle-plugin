@@ -1,7 +1,7 @@
 package io.pivotal.services.plugin.tasks.helper;
 
-import io.pivotal.services.plugin.CfAppProperties;
-import io.pivotal.services.plugin.CfAppPropertiesMapper;
+import io.pivotal.services.plugin.CfProperties;
+import io.pivotal.services.plugin.ImmutableCfProperties;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.applications.ApplicationDetail;
 import org.gradle.api.Project;
@@ -53,37 +53,36 @@ public class CfBlueGreenStage2Delegate {
 	private CfAppStopDelegate appStopDelegate = new CfAppStopDelegate();
 
 	public Mono<Void> runStage2(Project project, CloudFoundryOperations cfOperations,
-								CfAppProperties cfAppProperties) {
+								CfProperties cfProperties) {
 		LOGGER.quiet("Running Blue Green Deploy - after deploying a 'green' app. App '{}' with route '{}'",
-				cfAppProperties.getName(), cfAppProperties.getHostName());
+				cfProperties.name(), cfProperties.hostName());
 
-		CfAppPropertiesMapper cfAppPropertiesMapper = new CfAppPropertiesMapper(project);
 
-		CfAppProperties greenName = cfAppPropertiesMapper
-				.copyPropertiesWithNameChange(cfAppProperties, cfAppProperties.getName() + "-green");
+		CfProperties greenName = ImmutableCfProperties.copyOf(cfProperties)
+				.withName(cfProperties.name() + "-green");
 
-		CfAppProperties greenNameAndRoute = cfAppPropertiesMapper
-				.copyPropertiesWithNameAndRouteChange(cfAppProperties, cfAppProperties.getName() + "-green",
-						cfAppProperties.getHostName() + "-green");
+		CfProperties greenNameAndRoute =  ImmutableCfProperties.copyOf(cfProperties)
+				.withName(cfProperties.name() + "-green")
+				.withHostName(cfProperties.hostName() + "-green");
 
-		CfAppProperties blueName = cfAppPropertiesMapper.copyPropertiesWithNameChange(cfAppProperties,
-				cfAppProperties.getName() + "-blue");
+		CfProperties blueName = ImmutableCfProperties.copyOf(cfProperties)
+				.withName(cfProperties.name() + "-blue");
 
 		Mono<Optional<ApplicationDetail>> backupAppMono = appDetailsDelegate
 				.getAppDetails(cfOperations, blueName);
 
 		Mono<Optional<ApplicationDetail>> existingAppMono = appDetailsDelegate
-				.getAppDetails(cfOperations, cfAppProperties);
+				.getAppDetails(cfOperations, cfProperties);
 
 
 		Mono<Void> bgResult = Mono.when(backupAppMono, existingAppMono).then(function((backupApp, existingApp) ->
 
 				(backupApp.isPresent() ? deleteAppDelegate.deleteApp(cfOperations, blueName) : Mono.empty())
 						.then(mapRouteDelegate.mapRoute(cfOperations, greenName))
-						.then(existingApp.isPresent() ? unMapRouteDelegate.unmapRoute(cfOperations, cfAppProperties) : Mono.empty())
+						.then(existingApp.isPresent() ? unMapRouteDelegate.unmapRoute(cfOperations, cfProperties) : Mono.empty())
 						.then(unMapRouteDelegate.unmapRoute(cfOperations, greenNameAndRoute))
-						.then(existingApp.isPresent() ? renameAppDelegate.renameApp(cfOperations, cfAppProperties, blueName) : Mono.empty())
-						.then(renameAppDelegate.renameApp(cfOperations, greenName, cfAppProperties))
+						.then(existingApp.isPresent() ? renameAppDelegate.renameApp(cfOperations, cfProperties, blueName) : Mono.empty())
+						.then(renameAppDelegate.renameApp(cfOperations, greenName, cfProperties))
 						.then(existingApp.isPresent() ? appStopDelegate.stopApp(cfOperations, blueName) : Mono.empty())
 
 		));

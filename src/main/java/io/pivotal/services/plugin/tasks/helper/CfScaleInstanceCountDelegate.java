@@ -1,6 +1,6 @@
 package io.pivotal.services.plugin.tasks.helper;
 
-import io.pivotal.services.plugin.CfAppProperties;
+import io.pivotal.services.plugin.CfProperties;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.applications.ScaleApplicationRequest;
 import org.gradle.api.logging.Logger;
@@ -17,9 +17,9 @@ public class CfScaleInstanceCountDelegate {
 	private static final Logger LOGGER = Logging.getLogger(CfScaleInstanceCountDelegate.class);
 
 	public Mono<Void> scaleInstances(CloudFoundryOperations cfOperations,
-									 CfAppProperties cfAppProperties, int instanceCount) {
+									 CfProperties cfProperties, int instanceCount) {
 
-		LOGGER.lifecycle("Scaling app {} to instance count {}", cfAppProperties.getName(), instanceCount);
+		LOGGER.lifecycle("Scaling app {} to instance count {}", cfProperties.name(), instanceCount);
 		Mono<Void> resp = cfOperations.applications().scale(
 				ScaleApplicationRequest.builder()
 						.instances(instanceCount)

@@ -1,7 +1,7 @@
 package io.pivotal.services.plugin.tasks.helper;
 
-import io.pivotal.services.plugin.CfAppProperties;
-import io.pivotal.services.plugin.CfAppPropertiesMapper;
+import io.pivotal.services.plugin.CfProperties;
+import io.pivotal.services.plugin.ImmutableCfProperties;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.applications.ApplicationDetail;
 import org.gradle.api.Project;
@@ -47,19 +47,18 @@ public class CfBlueGreenStage1Delegate {
 	private static final Logger LOGGER = Logging.getLogger(CfBlueGreenStage1Delegate.class);
 
 	public Mono<Void> runStage1(Project project, CloudFoundryOperations cfOperations,
-								CfAppProperties cfAppProperties) {
+								CfProperties cfProperties) {
 
-		Mono<Optional<ApplicationDetail>> appDetailMono = appDetailsDelegate.getAppDetails(cfOperations, cfAppProperties);
+		Mono<Optional<ApplicationDetail>> appDetailMono = appDetailsDelegate.getAppDetails(cfOperations, cfProperties);
 
 		appDetailMono.block().ifPresent(appDetail -> printAppDetail(appDetail));
 
 		LOGGER.lifecycle("Running Blue Green Deploy - deploying a 'green' app. App '{}' with route '{}'",
-				cfAppProperties.getName(), cfAppProperties.getHostName());
+				cfProperties.name(), cfProperties.hostName());
 
-		CfAppPropertiesMapper cfAppPropertiesMapper = new CfAppPropertiesMapper(project);
-		CfAppProperties withNewNameAndRoute = cfAppPropertiesMapper
-				.copyPropertiesWithNameAndRouteChange(cfAppProperties,
-						cfAppProperties.getName() + "-green", cfAppProperties.getHostName() + "-green");
+		CfProperties withNewNameAndRoute = ImmutableCfProperties.copyOf(cfProperties)
+				.withName(cfProperties.name() + "-green")
+				.withHostName(cfProperties.hostName() + "-green");
 
 		return pushDelegate.push(cfOperations, withNewNameAndRoute);
 	}

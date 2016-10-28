@@ -1,8 +1,8 @@
 package io.pivotal.services.plugin.tasks;
 
-import io.pivotal.services.plugin.CfAppPluginExtension;
-import io.pivotal.services.plugin.CfAppProperties;
-import io.pivotal.services.plugin.CfAppPropertiesMapper;
+import io.pivotal.services.plugin.CfPluginExtension;
+import io.pivotal.services.plugin.CfProperties;
+import io.pivotal.services.plugin.CfPropertiesMapper;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.DefaultCloudFoundryOperations;
@@ -24,23 +24,23 @@ abstract class AbstractCfTask extends DefaultTask {
 
 	static Logger LOGGER = Logging.getLogger(AbstractCfTask.class);
 
-	protected CfAppPropertiesMapper appPropertiesMapper;
+	protected CfPropertiesMapper cfPropertiesMapper;
 
 	protected AbstractCfTask() {
-		this.appPropertiesMapper = new CfAppPropertiesMapper(getProject());
+		this.cfPropertiesMapper = new CfPropertiesMapper(getProject());
 	}
 
 	protected CloudFoundryOperations getCfOperations() {
-		CfAppProperties cfAppProperties = this.appPropertiesMapper.getProperties();
+		CfProperties cfAppProperties = this.cfPropertiesMapper.getProperties();
 
 		ConnectionContext connectionContext = DefaultConnectionContext.builder()
-				.apiHost(cfAppProperties.getCcHost())
+				.apiHost(cfAppProperties.ccHost())
 				.skipSslValidation(true)
 				.build();
 
 		TokenProvider tokenProvider = PasswordGrantTokenProvider.builder()
-				.password(cfAppProperties.getCcPassword())
-				.username(cfAppProperties.getCcUser())
+				.password(cfAppProperties.ccPassword())
+				.username(cfAppProperties.ccUser())
 				.build();
 
 		CloudFoundryClient cfClient = ReactorCloudFoundryClient.builder()
@@ -50,19 +50,19 @@ abstract class AbstractCfTask extends DefaultTask {
 
 		CloudFoundryOperations cfOperations = DefaultCloudFoundryOperations.builder()
 				.cloudFoundryClient(cfClient)
-				.organization(cfAppProperties.getOrg())
-				.space(cfAppProperties.getSpace())
+				.organization(cfAppProperties.org())
+				.space(cfAppProperties.space())
 				.build();
 
 		return cfOperations;
 	}
 
-	protected CfAppPluginExtension getExtension() {
-		return this.getProject().getExtensions().findByType(CfAppPluginExtension.class);
+	protected CfPluginExtension getExtension() {
+		return this.getProject().getExtensions().findByType(CfPluginExtension.class);
 	}
 
-	protected CfAppProperties getCfAppProperties() {
-		return this.appPropertiesMapper.getProperties();
+	protected CfProperties getCfProperties() {
+		return this.cfPropertiesMapper.getProperties();
 	}
 
 	@Override

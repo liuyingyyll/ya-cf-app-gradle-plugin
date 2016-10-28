@@ -1,6 +1,6 @@
 package io.pivotal.services.plugin.tasks;
 
-import io.pivotal.services.plugin.CfAppProperties;
+import io.pivotal.services.plugin.CfProperties;
 import io.pivotal.services.plugin.tasks.helper.CfAutoPilotDelegate;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.gradle.api.tasks.TaskAction;
@@ -21,7 +21,7 @@ public class CfAutoPilotTask extends AbstractCfTask {
 	public void runAutopilot() {
 
 		CloudFoundryOperations cfOperations = getCfOperations();
-		CfAppProperties originalProperties = getCfAppProperties();
+		CfProperties originalProperties = getCfProperties();
 
 		Mono<Void> resp = autoPilotTaskDelegate.runAutopilot(getProject(), cfOperations, originalProperties);
 

@@ -43,7 +43,7 @@ public class PcfDevIntegrationTests {
 				.build();
 
 		CfAppDetailsDelegate appDetailsTaskDelegate = new CfAppDetailsDelegate();
-		CfAppProperties cfAppProps = CfAppProperties.builder().name("cf-show-env").build();
+		CfProperties cfAppProps = envDetails();
 		Mono<Optional<ApplicationDetail>> applicationDetailMono = appDetailsTaskDelegate
 				.getAppDetails(cfOperations, cfAppProps);
 
@@ -56,5 +56,16 @@ public class PcfDevIntegrationTests {
 		resp.block();
 //		ApplicationDetail applicationDetail = applicationDetailMono.block(Duration.ofMillis(5000));
 //		System.out.println("applicationDetail = " + applicationDetail);
+	}
+
+	private CfProperties envDetails() {
+		return ImmutableCfProperties.builder()
+				.ccHost("api.local.pcfdev.io")
+				.ccUser("admin")
+				.ccPassword("admin")
+				.org("pcfdev-org")
+				.space("pcfdev-space")
+				.name("cf-show-env")
+				.build();
 	}
 }

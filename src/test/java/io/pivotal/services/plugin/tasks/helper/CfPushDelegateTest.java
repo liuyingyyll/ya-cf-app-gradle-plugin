@@ -1,6 +1,7 @@
 package io.pivotal.services.plugin.tasks.helper;
 
-import io.pivotal.services.plugin.CfAppProperties;
+import io.pivotal.services.plugin.CfProperties;
+import io.pivotal.services.plugin.ImmutableCfProperties;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.applications.Applications;
 import org.cloudfoundry.operations.applications.PushApplicationRequest;
@@ -32,15 +33,26 @@ public class CfPushDelegateTest {
 		when(cfOperations.applications()).thenReturn(mockApplications);
 		when(mockApplications.push(any(PushApplicationRequest.class))).thenReturn(Mono.empty());
 		when(mockApplications.restart(any(RestartApplicationRequest.class))).thenReturn(Mono.empty());
+
+
+
+		CfProperties cfAppProperties = sampleApp();
+		cfPushDelegate.push(cfOperations, cfAppProperties);
+	}
+
+
+	private CfProperties sampleApp() throws Exception {
 		URL sampleFile = this.getClass().getResource("/sample.txt");
 		File file = new File(sampleFile.toURI());
-
-		CfAppProperties cfAppProperties = CfAppProperties.builder()
-				.name("test")
-				.filePath(file.getAbsolutePath())
+		return ImmutableCfProperties.builder()
+				.ccHost("cchost")
+				.ccUser("ccuser")
+				.ccPassword("ccpassword")
+				.org("org")
+				.space("space")
+				.name("name")
+				.filePath(file.getPath())
 				.build();
-
-		cfPushDelegate.push(cfOperations, cfAppProperties);
 	}
 
 }

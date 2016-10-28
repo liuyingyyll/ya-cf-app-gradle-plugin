@@ -1,7 +1,6 @@
 package io.pivotal.services.plugin.tasks.helper;
 
-import io.pivotal.services.plugin.CfAppPluginExtension;
-import io.pivotal.services.plugin.CfAppProperties;
+import io.pivotal.services.plugin.CfProperties;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.applications.PushApplicationRequest;
 import org.cloudfoundry.operations.applications.RestartApplicationRequest;
@@ -9,15 +8,10 @@ import org.cloudfoundry.operations.applications.SetEnvironmentVariableApplicatio
 import org.cloudfoundry.operations.services.BindServiceInstanceRequest;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
-import org.gradle.api.tasks.TaskAction;
 import reactor.core.publisher.Mono;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Duration;
 import java.util.Map;
 
 /**
@@ -30,55 +24,55 @@ public class CfPushDelegate {
 
 	private static final Logger LOGGER = Logging.getLogger(CfPushDelegate.class);
 
-	public Mono<Void> push(CloudFoundryOperations cfOperations, CfAppProperties cfAppProperties) {
-		LOGGER.lifecycle("Pushing app '{}'", cfAppProperties.getName());
-		Path path = Paths.get(cfAppProperties.getFilePath());
+	public Mono<Void> push(CloudFoundryOperations cfOperations, CfProperties cfProperties) {
+		LOGGER.lifecycle("Pushing app '{}'", cfProperties.name());
+		Path path = Paths.get(cfProperties.filePath());
 
 
 		Mono<Void> resp = cfOperations.applications()
 				.push(PushApplicationRequest.builder()
-						.name(cfAppProperties.getName())
+						.name(cfProperties.name())
 						.application(path)
-						.buildpack(cfAppProperties.getBuildpack())
-						.command(cfAppProperties.getCommand())
-						.diskQuota(cfAppProperties.getDiskQuota())
-						.instances(cfAppProperties.getInstances())
-						.memory(cfAppProperties.getMemory())
-						.timeout(cfAppProperties.getTimeout())
-						.domain(cfAppProperties.getDomain())
-						.host(cfAppProperties.getHostName())
-						.routePath(cfAppProperties.getPath())
+						.buildpack(cfProperties.buildpack())
+						.command(cfProperties.command())
+						.diskQuota(cfProperties.diskQuota())
+						.instances(cfProperties.instances())
+						.memory(cfProperties.memory())
+						.timeout(cfProperties.timeout())
+						.domain(cfProperties.domain())
+						.host(cfProperties.hostName())
+						.routePath(cfProperties.path())
 						.noStart(true)
 						.build());
 
-		if (cfAppProperties.getEnvironment() != null) {
-			for (Map.Entry<String, String> entry : cfAppProperties.getEnvironment().entrySet()) {
+		if (cfProperties.environment() != null) {
+			for (Map.Entry<String, String> entry : cfProperties.environment().entrySet()) {
 				LOGGER.lifecycle("Setting env variable '{}'", entry.getKey());
 				resp = resp.then(cfOperations.applications()
 						.setEnvironmentVariable(SetEnvironmentVariableApplicationRequest
 								.builder()
-								.name(cfAppProperties.getName())
+								.name(cfProperties.name())
 								.variableName(entry.getKey())
 								.variableValue(entry.getValue())
 								.build()));
 			}
 		}
 
-		if (cfAppProperties.getServices() != null) {
-			for (String serviceName : cfAppProperties.getServices()) {
+		if (cfProperties.services() != null) {
+			for (String serviceName : cfProperties.services()) {
 				LOGGER.lifecycle("Binding Service '{}'", serviceName);
 				resp = resp.then(cfOperations.services()
 						.bind(BindServiceInstanceRequest.builder()
 								.serviceInstanceName(serviceName)
-								.applicationName(cfAppProperties.getName())
+								.applicationName(cfProperties.name())
 								.build()));
 			}
 		}
 
-		LOGGER.lifecycle("Starting app '{}'", cfAppProperties.getName());
+		LOGGER.lifecycle("Starting app '{}'", cfProperties.name());
 		return resp.then(cfOperations.applications().restart(RestartApplicationRequest
 				.builder()
-				.name(cfAppProperties.getName()).build()));
+				.name(cfProperties.name()).build()));
 
 	}
 }

@@ -1,6 +1,6 @@
 package io.pivotal.services.plugin.tasks.helper;
 
-import io.pivotal.services.plugin.CfAppProperties;
+import io.pivotal.services.plugin.CfProperties;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.applications.DeleteApplicationRequest;
 import org.gradle.api.logging.Logger;
@@ -17,12 +17,12 @@ public class CfDeleteAppDelegate {
 
 	private static final Logger LOGGER = Logging.getLogger(CfDeleteAppDelegate.class);
 
-	public Mono<Void> deleteApp(CloudFoundryOperations cfOperations, CfAppProperties cfAppProperties) {
-		LOGGER.quiet("About to delete App '{}'", cfAppProperties.getName());
+	public Mono<Void> deleteApp(CloudFoundryOperations cfOperations, CfProperties cfProperties) {
+		LOGGER.quiet("About to delete App '{}'", cfProperties.name());
 		return cfOperations.applications().delete(
 				DeleteApplicationRequest
 						.builder()
-						.name(cfAppProperties.getName())
+						.name(cfProperties.name())
 						.build());
 	}
 }

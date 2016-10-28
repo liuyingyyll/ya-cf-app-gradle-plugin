@@ -1,6 +1,7 @@
 package io.pivotal.services.plugin.tasks.helper;
 
-import io.pivotal.services.plugin.CfAppProperties;
+import io.pivotal.services.plugin.CfProperties;
+import io.pivotal.services.plugin.ImmutableCfProperties;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.applications.ApplicationDetail;
 import org.gradle.api.Project;
@@ -41,19 +42,19 @@ public class CfAutoPilotDelegateTest {
 	public void testCfAutoPilotExistingAppShouldCallRenameAndDelete() {
 		Project project = mock(Project.class);
 		CloudFoundryOperations cfOperations = mock(CloudFoundryOperations.class);
-		CfAppProperties cfAppProperties = CfAppProperties.builder().name("test").build();
+		CfProperties cfAppProperties = sampleApp();
 
 		ApplicationDetail appDetail = sampleApplicationDetail();
 		when(detailsTaskDelegate.getAppDetails(cfOperations, cfAppProperties))
 				.thenReturn(Mono.just(Optional.of(appDetail)));
 
 		when(cfRenameAppDelegate.renameApp(any(CloudFoundryOperations.class),
-				any(CfAppProperties.class),
-				any(CfAppProperties.class))).thenReturn(Mono.empty());
+				any(CfProperties.class),
+				any(CfProperties.class))).thenReturn(Mono.empty());
 
 		when(cfPushDelegate.push(cfOperations, cfAppProperties)).thenReturn(Mono.empty());
 		when(deleteDelegate.deleteApp(any(CloudFoundryOperations.class),
-				any(CfAppProperties.class))).thenReturn(Mono.empty());
+				any(CfProperties.class))).thenReturn(Mono.empty());
 
 		Mono<Void> resp = this.cfAutoPilotTask.runAutopilot(project, cfOperations, cfAppProperties);
 
@@ -62,18 +63,18 @@ public class CfAutoPilotDelegateTest {
 //		TestSubscriber.subscribe(resp).assertComplete();
 
 		verify(cfRenameAppDelegate, times(1)).renameApp(any(CloudFoundryOperations.class),
-				any(CfAppProperties.class), any(CfAppProperties.class));
+				any(CfProperties.class), any(CfProperties.class));
 
-		verify(cfPushDelegate, times(1)).push(any(CloudFoundryOperations.class), any(CfAppProperties.class));
+		verify(cfPushDelegate, times(1)).push(any(CloudFoundryOperations.class), any(CfProperties.class));
 
-		verify(deleteDelegate, times(1)).deleteApp(any(CloudFoundryOperations.class), any(CfAppProperties.class));
+		verify(deleteDelegate, times(1)).deleteApp(any(CloudFoundryOperations.class), any(CfProperties.class));
 	}
 
 	@Test
 	public void testAutopilotNewAppShouldCallPushAlone() {
 		Project project = mock(Project.class);
 		CloudFoundryOperations cfOperations = mock(CloudFoundryOperations.class);
-		CfAppProperties cfAppProperties = CfAppProperties.builder().name("test").build();
+		CfProperties cfAppProperties = sampleApp();
 
 		when(detailsTaskDelegate.getAppDetails(cfOperations, cfAppProperties)).thenReturn(Mono.just(Optional.empty()));
 
@@ -85,11 +86,11 @@ public class CfAutoPilotDelegateTest {
 //		TestSubscriber.subscribe(resp).assertComplete();
 
 		verify(cfRenameAppDelegate, times(0)).renameApp(any(CloudFoundryOperations.class),
-				any(CfAppProperties.class), any(CfAppProperties.class));
+				any(CfProperties.class), any(CfProperties.class));
 
-		verify(cfPushDelegate, times(1)).push(any(CloudFoundryOperations.class), any(CfAppProperties.class));
+		verify(cfPushDelegate, times(1)).push(any(CloudFoundryOperations.class), any(CfProperties.class));
 
-		verify(deleteDelegate, times(0)).deleteApp(any(CloudFoundryOperations.class), any(CfAppProperties.class));
+		verify(deleteDelegate, times(0)).deleteApp(any(CloudFoundryOperations.class), any(CfProperties.class));
 	}
 
 
@@ -104,6 +105,17 @@ public class CfAutoPilotDelegateTest {
 				.requestedState("started")
 				.memoryLimit(1000)
 				.runningInstances(2)
+				.build();
+	}
+
+	private CfProperties sampleApp() {
+		return ImmutableCfProperties.builder()
+				.ccHost("cchost")
+				.ccUser("ccuser")
+				.ccPassword("ccpassword")
+				.org("org")
+				.space("space")
+				.name("name")
 				.build();
 	}
 }

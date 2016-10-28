@@ -1,6 +1,6 @@
 package io.pivotal.services.plugin.tasks;
 
-import io.pivotal.services.plugin.CfAppProperties;
+import io.pivotal.services.plugin.CfProperties;
 import io.pivotal.services.plugin.tasks.helper.CfAppStopDelegate;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.gradle.api.tasks.TaskAction;
@@ -21,9 +21,9 @@ public class CfAppStopTask extends AbstractCfTask {
 	public void stopApp() {
 
 		CloudFoundryOperations cfOperations = getCfOperations();
-		CfAppProperties cfAppProperties = getCfAppProperties();
+		CfProperties cfProperties = getCfProperties();
 
-		Mono<Void> resp = this.stopDelegate.stopApp(cfOperations, cfAppProperties);
+		Mono<Void> resp = this.stopDelegate.stopApp(cfOperations, cfProperties);
 
 		resp.block(Duration.ofMillis(defaultWaitTimeout));
 

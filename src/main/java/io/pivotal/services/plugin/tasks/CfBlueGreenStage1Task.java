@@ -1,6 +1,6 @@
 package io.pivotal.services.plugin.tasks;
 
-import io.pivotal.services.plugin.CfAppProperties;
+import io.pivotal.services.plugin.CfProperties;
 import io.pivotal.services.plugin.tasks.helper.CfBlueGreenStage1Delegate;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.gradle.api.tasks.TaskAction;
@@ -24,7 +24,7 @@ public class CfBlueGreenStage1Task extends AbstractCfTask {
 	public void runBlueGreen() {
 
 		CloudFoundryOperations cfOperations = getCfOperations();
-		CfAppProperties originalProperties = getCfAppProperties();
+		CfProperties originalProperties = getCfProperties();
 
 		Mono<Void> resp = blueGreenStage1Delegate.runStage1(getProject(), cfOperations, originalProperties);
 

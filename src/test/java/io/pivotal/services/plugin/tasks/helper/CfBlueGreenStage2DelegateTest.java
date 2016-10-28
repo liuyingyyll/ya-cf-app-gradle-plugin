@@ -1,13 +1,13 @@
 package io.pivotal.services.plugin.tasks.helper;
 
 
-import io.pivotal.services.plugin.CfAppProperties;
+import io.pivotal.services.plugin.CfProperties;
+import io.pivotal.services.plugin.ImmutableCfProperties;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.applications.ApplicationDetail;
 import org.gradle.api.Project;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -15,7 +15,6 @@ import reactor.core.publisher.Mono;
 
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
@@ -51,74 +50,66 @@ public class CfBlueGreenStage2DelegateTest {
 	public void testStage2NoExistingApp() {
 		Project project = mock(Project.class);
 		CloudFoundryOperations cfOperations = mock(CloudFoundryOperations.class);
-		CfAppProperties cfAppProperties = CfAppProperties
-				.builder()
-				.name("test")
-				.hostName("route")
-				.build();
+		CfProperties cfAppProperties = sampleApp();
 
 
-		when(detailsTaskDelegate.getAppDetails(any(CloudFoundryOperations.class), any(CfAppProperties.class)))
+		when(detailsTaskDelegate.getAppDetails(any(CloudFoundryOperations.class), any(CfProperties.class)))
 				.thenReturn(Mono.just(Optional.empty()));
 
-		when(this.mapRouteDelegate.mapRoute(any(CloudFoundryOperations.class), any(CfAppProperties.class))).thenReturn(Mono.empty());
-		when(this.unMapRouteDelegate.unmapRoute(any(CloudFoundryOperations.class), any(CfAppProperties.class))).thenReturn(Mono.empty());
-		when(this.renameAppTaskDelegate.renameApp(any(CloudFoundryOperations.class), any(CfAppProperties.class), any(CfAppProperties.class))).thenReturn(Mono.empty());
-		when(this.deleteAppTaskDelegate.deleteApp(any(CloudFoundryOperations.class), any(CfAppProperties.class))).thenReturn(Mono.empty());
-		when(this.stopDelegate.stopApp(any(CloudFoundryOperations.class), any(CfAppProperties.class))).thenReturn(Mono.empty());
+		when(this.mapRouteDelegate.mapRoute(any(CloudFoundryOperations.class), any(CfProperties.class))).thenReturn(Mono.empty());
+		when(this.unMapRouteDelegate.unmapRoute(any(CloudFoundryOperations.class), any(CfProperties.class))).thenReturn(Mono.empty());
+		when(this.renameAppTaskDelegate.renameApp(any(CloudFoundryOperations.class), any(CfProperties.class), any(CfProperties.class))).thenReturn(Mono.empty());
+		when(this.deleteAppTaskDelegate.deleteApp(any(CloudFoundryOperations.class), any(CfProperties.class))).thenReturn(Mono.empty());
+		when(this.stopDelegate.stopApp(any(CloudFoundryOperations.class), any(CfProperties.class))).thenReturn(Mono.empty());
 
 		Mono<Void> resp = this.blueGreenStage2Delegate.runStage2(project, cfOperations, cfAppProperties);
 		resp.block();
 
 		//delete of old backup should not be called..there is no backup app..
-		verify(this.deleteAppTaskDelegate, times(0)).deleteApp(any(CloudFoundryOperations.class), any(CfAppProperties.class));
+		verify(this.deleteAppTaskDelegate, times(0)).deleteApp(any(CloudFoundryOperations.class), any(CfProperties.class));
 
 		//mapping correct route to green
-		verify(this.mapRouteDelegate, times(1)).mapRoute(any(CloudFoundryOperations.class), any(CfAppProperties.class));
+		verify(this.mapRouteDelegate, times(1)).mapRoute(any(CloudFoundryOperations.class), any(CfProperties.class));
 
 		//unmapping green route from green app
-		verify(this.unMapRouteDelegate, times(1)).unmapRoute(any(CloudFoundryOperations.class), any(CfAppProperties.class));
+		verify(this.unMapRouteDelegate, times(1)).unmapRoute(any(CloudFoundryOperations.class), any(CfProperties.class));
 
 		//rename green to app
-		verify(this.renameAppTaskDelegate, times(1)).renameApp(any(CloudFoundryOperations.class), any(CfAppProperties.class), any(CfAppProperties.class));
+		verify(this.renameAppTaskDelegate, times(1)).renameApp(any(CloudFoundryOperations.class), any(CfProperties.class), any(CfProperties.class));
 	}
 
 	@Test
 	public void testStage2ExistingAppAndBackup() {
 		Project project = mock(Project.class);
 		CloudFoundryOperations cfOperations = mock(CloudFoundryOperations.class);
-		CfAppProperties cfAppProperties = CfAppProperties
-				.builder()
-				.name("test")
-				.hostName("route")
-				.build();
+		CfProperties cfAppProperties = sampleApp();
 
 
-		when(detailsTaskDelegate.getAppDetails(any(CloudFoundryOperations.class), any(CfAppProperties.class)))
+		when(detailsTaskDelegate.getAppDetails(any(CloudFoundryOperations.class), any(CfProperties.class)))
 				.thenReturn(Mono.just(Optional.of(sampleApplicationDetail())));
 
-		when(this.mapRouteDelegate.mapRoute(any(CloudFoundryOperations.class), any(CfAppProperties.class))).thenReturn(Mono.empty());
-		when(this.unMapRouteDelegate.unmapRoute(any(CloudFoundryOperations.class), any(CfAppProperties.class))).thenReturn(Mono.empty());
-		when(this.renameAppTaskDelegate.renameApp(any(CloudFoundryOperations.class), any(CfAppProperties.class), any(CfAppProperties.class))).thenReturn(Mono.empty());
-		when(this.deleteAppTaskDelegate.deleteApp(any(CloudFoundryOperations.class), any(CfAppProperties.class))).thenReturn(Mono.empty());
-		when(this.stopDelegate.stopApp(any(CloudFoundryOperations.class), any(CfAppProperties.class))).thenReturn(Mono.empty());
+		when(this.mapRouteDelegate.mapRoute(any(CloudFoundryOperations.class), any(CfProperties.class))).thenReturn(Mono.empty());
+		when(this.unMapRouteDelegate.unmapRoute(any(CloudFoundryOperations.class), any(CfProperties.class))).thenReturn(Mono.empty());
+		when(this.renameAppTaskDelegate.renameApp(any(CloudFoundryOperations.class), any(CfProperties.class), any(CfProperties.class))).thenReturn(Mono.empty());
+		when(this.deleteAppTaskDelegate.deleteApp(any(CloudFoundryOperations.class), any(CfProperties.class))).thenReturn(Mono.empty());
+		when(this.stopDelegate.stopApp(any(CloudFoundryOperations.class), any(CfProperties.class))).thenReturn(Mono.empty());
 
 		Mono<Void> resp = this.blueGreenStage2Delegate.runStage2(project, cfOperations, cfAppProperties);
 		resp.block();
 
 		//delete of old backup
-		verify(this.deleteAppTaskDelegate, times(1)).deleteApp(any(CloudFoundryOperations.class), any(CfAppProperties.class));
+		verify(this.deleteAppTaskDelegate, times(1)).deleteApp(any(CloudFoundryOperations.class), any(CfProperties.class));
 
 		//mapping correct route to green
-		verify(this.mapRouteDelegate, times(1)).mapRoute(any(CloudFoundryOperations.class), any(CfAppProperties.class));
+		verify(this.mapRouteDelegate, times(1)).mapRoute(any(CloudFoundryOperations.class), any(CfProperties.class));
 
 		//unmapping green route from green app
 		//unmapping route from existing app
-		verify(this.unMapRouteDelegate, times(2)).unmapRoute(any(CloudFoundryOperations.class), any(CfAppProperties.class));
+		verify(this.unMapRouteDelegate, times(2)).unmapRoute(any(CloudFoundryOperations.class), any(CfProperties.class));
 
 		//rename green to app
 		//rename existing app to blue
-		verify(this.renameAppTaskDelegate, times(2)).renameApp(any(CloudFoundryOperations.class), any(CfAppProperties.class), any(CfAppProperties.class));
+		verify(this.renameAppTaskDelegate, times(2)).renameApp(any(CloudFoundryOperations.class), any(CfProperties.class), any(CfProperties.class));
 	}
 
 	private ApplicationDetail sampleApplicationDetail() {
@@ -131,6 +122,18 @@ public class CfBlueGreenStage2DelegateTest {
 				.requestedState("started")
 				.memoryLimit(1000)
 				.runningInstances(2)
+				.build();
+	}
+
+	private CfProperties sampleApp() {
+		return ImmutableCfProperties.builder()
+				.ccHost("cchost")
+				.ccUser("ccuser")
+				.ccPassword("ccpassword")
+				.org("org")
+				.space("space")
+				.name("test")
+				.hostName("test")
 				.build();
 	}
 

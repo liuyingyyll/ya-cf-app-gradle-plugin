@@ -1,6 +1,6 @@
 package io.pivotal.services.plugin.tasks.helper;
 
-import io.pivotal.services.plugin.CfAppProperties;
+import io.pivotal.services.plugin.CfProperties;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.applications.StopApplicationRequest;
 import org.gradle.api.logging.Logger;
@@ -16,11 +16,11 @@ public class CfAppStopDelegate {
 
 	private static final Logger LOGGER = Logging.getLogger(CfAppStopDelegate.class);
 
-	public Mono<Void> stopApp(CloudFoundryOperations cfOperations, CfAppProperties cfAppProperties) {
+	public Mono<Void> stopApp(CloudFoundryOperations cfOperations, CfProperties cfProperties) {
 
-		LOGGER.lifecycle("Stopping app '{}'", cfAppProperties.getName());
+		LOGGER.lifecycle("Stopping app '{}'", cfProperties.name());
 		return cfOperations.applications()
-				.stop(StopApplicationRequest.builder().name(cfAppProperties.getName()).build());
+				.stop(StopApplicationRequest.builder().name(cfProperties.name()).build());
 
 	}
 

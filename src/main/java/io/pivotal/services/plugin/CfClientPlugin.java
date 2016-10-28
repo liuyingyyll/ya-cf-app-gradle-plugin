@@ -28,6 +28,6 @@ public class CfClientPlugin implements Plugin<Project> {
 		CfBlueGreenStage2Task bgStage2Task = project.getTasks().create("cf-push-blue-green", CfBlueGreenStage2Task.class);
 		bgStage2Task.dependsOn(bgStage1Task);
 
-		project.getExtensions().create("cfConfig", CfAppPluginExtension.class);
+		project.getExtensions().create("cfConfig", CfPluginExtension.class);
 	}
 }

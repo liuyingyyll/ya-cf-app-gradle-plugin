@@ -24,7 +24,7 @@ import java.util.Map;
  */
 @Data
 @ToString(exclude="ccPassword")
-public class CfAppPluginExtension {
+public class CfPluginExtension {
 	private String ccHost;
 	private String ccUser;
 	private String ccPassword;
@@ -49,6 +49,8 @@ public class CfAppPluginExtension {
 	private Boolean enableSsh;
 	private Map<String, String> environment;
 	private Integer timeout;
+	private Integer stagingTimeout;
+	private Integer startupTimeout;
 	private String healthCheckType;
 	private Integer instances;
 	private Integer memory;

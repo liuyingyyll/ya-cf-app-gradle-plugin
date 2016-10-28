@@ -1,7 +1,8 @@
 package io.pivotal.services.plugin.tasks.helper;
 
 
-import io.pivotal.services.plugin.CfAppProperties;
+import io.pivotal.services.plugin.CfProperties;
+import io.pivotal.services.plugin.ImmutableCfProperties;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.applications.ApplicationDetail;
 import org.gradle.api.Project;
@@ -15,12 +16,10 @@ import reactor.core.publisher.Mono;
 
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class CfBlueGreenStage1DelegateTest {
 
@@ -42,11 +41,7 @@ public class CfBlueGreenStage1DelegateTest {
 	public void testStage1ExistingApp() {
 		Project project = mock(Project.class);
 		CloudFoundryOperations cfOperations = mock(CloudFoundryOperations.class);
-		CfAppProperties cfAppProperties = CfAppProperties
-				.builder()
-				.name("test")
-				.hostName("route")
-				.build();
+		CfProperties cfAppProperties = sampleApp();
 
 		when(appDetailsDelegate.getAppDetails(any(CloudFoundryOperations.class), eq(cfAppProperties)))
 				.thenReturn(Mono.just(Optional.of(ApplicationDetail.builder().
@@ -61,13 +56,25 @@ public class CfBlueGreenStage1DelegateTest {
 
 		this.blueGreenStage1Delegate.runStage1(project, cfOperations, cfAppProperties);
 
-		ArgumentCaptor<CfAppProperties> argumentCaptor = ArgumentCaptor.forClass(CfAppProperties.class);
+		ArgumentCaptor<CfProperties> argumentCaptor = ArgumentCaptor.forClass(CfProperties.class);
 
 		verify(this.pushDelegate).push(any(CloudFoundryOperations.class), argumentCaptor.capture());
 
-		CfAppProperties captured = argumentCaptor.getValue();
-		assertThat(captured.getName()).isEqualTo("test-green");
-		assertThat(captured.getHostName()).isEqualTo("route-green");
+		CfProperties captured = argumentCaptor.getValue();
+		assertThat(captured.name()).isEqualTo("test-green");
+		assertThat(captured.hostName()).isEqualTo("route-green");
 	}
 
+	private CfProperties sampleApp() {
+		return ImmutableCfProperties.builder()
+				.ccHost("cchost")
+				.ccUser("ccuser")
+				.ccPassword("ccpassword")
+				.org("org")
+				.space("space")
+				.name("test")
+				.instances(2)
+				.hostName("route")
+				.build();
+	}
 }

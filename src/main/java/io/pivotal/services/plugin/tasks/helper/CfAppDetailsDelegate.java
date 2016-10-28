@@ -1,6 +1,6 @@
 package io.pivotal.services.plugin.tasks.helper;
 
-import io.pivotal.services.plugin.CfAppProperties;
+import io.pivotal.services.plugin.CfProperties;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.applications.ApplicationDetail;
 import org.cloudfoundry.operations.applications.GetApplicationRequest;
@@ -20,13 +20,13 @@ public class CfAppDetailsDelegate {
 	private static final Logger LOGGER = Logging.getLogger(CfAppDetailsDelegate.class);
 
 	public Mono<Optional<ApplicationDetail>> getAppDetails(CloudFoundryOperations cfOperations,
-														   CfAppProperties cfAppProperties) {
+														   CfProperties cfProperties) {
 
-		LOGGER.lifecycle("Checking details of app '{}'", cfAppProperties.getName());
+		LOGGER.lifecycle("Checking details of app '{}'", cfProperties.name());
 		Mono<ApplicationDetail> applicationDetailMono = cfOperations.applications()
 				.get(
 						GetApplicationRequest.builder()
-								.name(cfAppProperties.getName())
+								.name(cfProperties.name())
 								.build());
 
 		return applicationDetailMono

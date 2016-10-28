@@ -1,7 +1,7 @@
 package io.pivotal.services.plugin.tasks;
 
-import io.pivotal.services.plugin.CfAppPluginExtension;
-import io.pivotal.services.plugin.CfAppProperties;
+import io.pivotal.services.plugin.CfPluginExtension;
+import io.pivotal.services.plugin.CfProperties;
 import org.gradle.api.Project;
 import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.Test;
@@ -14,22 +14,23 @@ public class PropertyEnvironmentOverridesTest {
 	public void testPropertyOverridesForAppName() {
 		Project project = ProjectBuilder.builder().build();
 		project.getPluginManager().apply("cf-app");
-		setPropsInExtension((CfAppPluginExtension)project.getExtensions().getByName("cfConfig"));
+		setPropsInExtension((CfPluginExtension)project.getExtensions().getByName("cfConfig"));
 		overrideProjectProperties(project);
 
 		CfPushTask cfPushTask = (CfPushTask)project.getTasks().getAt("cf-push");
-		CfAppProperties props = cfPushTask.getCfAppProperties();
-		assertThat(props.getName()).isEqualTo("appName-new");
-		assertThat(props.getCcHost()).isEqualTo("cchost-new");
-		assertThat(props.getCcPassword()).isEqualTo("ccpassword-new");
-		assertThat(props.getOrg()).isEqualTo("org-new");
-		assertThat(props.getSpace()).isEqualTo("space-new");
-		assertThat(props.getDomain()).isEqualTo("domain-new");
+		CfProperties props = cfPushTask.getCfProperties();
+		assertThat(props.name()).isEqualTo("appName-new");
+		assertThat(props.ccHost()).isEqualTo("cchost-new");
+		assertThat(props.ccPassword()).isEqualTo("ccpassword-new");
+		assertThat(props.org()).isEqualTo("org-new");
+		assertThat(props.space()).isEqualTo("space-new");
+		assertThat(props.domain()).isEqualTo("domain-new");
 	}
 
-	private void setPropsInExtension(CfAppPluginExtension ext) {
+	private void setPropsInExtension(CfPluginExtension ext) {
 		ext.setName("appName");
 		ext.setCcHost("cchost");
+		ext.setCcUser("ccuser");
 		ext.setCcPassword("ccpassword");
 		ext.setBuildpack("buildpack");
 		ext.setOrg("org");

@@ -22,4 +22,6 @@ public interface PropertyNameConstants {
 	String CF_HEALTH_CHECK_TIMEOUT = "cf.timeout";
 	String CF_DISK_QUOTA = "cf.diskQuota";
 	String CF_PATH = "cf.path";
+	String CF_STAGING_TIMEOUT = "cf.stagingTimeout" ;
+	String CF_STARTUP_TIMEOUT = "cf.startupTimeout" ;
 }

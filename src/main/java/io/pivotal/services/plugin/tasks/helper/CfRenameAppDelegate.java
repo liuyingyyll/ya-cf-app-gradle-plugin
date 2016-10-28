@@ -1,6 +1,6 @@
 package io.pivotal.services.plugin.tasks.helper;
 
-import io.pivotal.services.plugin.CfAppProperties;
+import io.pivotal.services.plugin.CfProperties;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.applications.RenameApplicationRequest;
 import org.gradle.api.logging.Logger;
@@ -17,17 +17,17 @@ public class CfRenameAppDelegate {
 	private static final Logger LOGGER = Logging.getLogger(CfRenameAppDelegate.class);
 
 	public Mono<Void> renameApp(CloudFoundryOperations cfOperations,
-						  CfAppProperties cfOldAppProperties, CfAppProperties cfNewAppProperties) {
+								CfProperties cfOldAppProperties, CfProperties cfNewProperties) {
 
-		if (cfNewAppProperties.getName() == null) {
+		if (cfNewProperties.name() == null) {
 			throw new RuntimeException("New name not provided");
 		}
-		LOGGER.lifecycle("Renaming app from {} to {}", cfOldAppProperties.getName(), cfNewAppProperties.getName());
+		LOGGER.lifecycle("Renaming app from {} to {}", cfOldAppProperties.name(), cfNewProperties.name());
 
 		return cfOperations.applications().rename(RenameApplicationRequest
 				.builder()
-				.name(cfOldAppProperties.getName())
-				.newName(cfNewAppProperties.getName())
+				.name(cfOldAppProperties.name())
+				.newName(cfNewProperties.name())
 				.build());
 	}
 

@@ -1,6 +1,7 @@
 package io.pivotal.services.plugin.tasks.helper;
 
-import io.pivotal.services.plugin.CfAppProperties;
+import io.pivotal.services.plugin.CfProperties;
+import io.pivotal.services.plugin.ImmutableCfProperties;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.applications.ApplicationDetail;
 import org.cloudfoundry.operations.applications.Applications;
@@ -8,12 +9,10 @@ import org.cloudfoundry.operations.applications.GetApplicationRequest;
 import org.junit.Test;
 import reactor.core.publisher.Mono;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.Optional;
 
-import static org.mockito.Mockito.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
 
 public class CfGetDetailsTaskDelegateTest {
 
@@ -24,7 +23,7 @@ public class CfGetDetailsTaskDelegateTest {
 	@Test
 	public void testGetDetailsNoException() {
 		CloudFoundryOperations cfOperations = mock(CloudFoundryOperations.class);
-		CfAppProperties cfAppProperties = CfAppProperties.builder().name("test").build();
+		CfProperties cfAppProperties = sampleApp();
 
 		ApplicationDetail appDetail = sampleApplicationDetail();
 
@@ -41,7 +40,7 @@ public class CfGetDetailsTaskDelegateTest {
 	@Test
 	public void testGetDetailsNoApplication() {
 		CloudFoundryOperations cfOperations = mock(CloudFoundryOperations.class);
-		CfAppProperties cfAppProperties = CfAppProperties.builder().name("test").build();
+		CfProperties cfAppProperties = sampleApp();
 
 		Applications mockApplications = mock(Applications.class);
 		when(cfOperations.applications()).thenReturn(mockApplications);
@@ -70,4 +69,18 @@ public class CfGetDetailsTaskDelegateTest {
 				.runningInstances(2)
 				.build();
 	}
+
+	private CfProperties sampleApp() {
+		return ImmutableCfProperties.builder()
+				.ccHost("cchost")
+				.ccUser("ccuser")
+				.ccPassword("ccpassword")
+				.org("org")
+				.space("space")
+				.name("test")
+				.hostName("test")
+				.build();
+	}
+
+
 }

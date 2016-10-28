@@ -1,6 +1,7 @@
 package io.pivotal.services.plugin.tasks;
 
-import io.pivotal.services.plugin.CfAppProperties;
+import io.pivotal.services.plugin.CfProperties;
+import io.pivotal.services.plugin.ImmutableCfProperties;
 import io.pivotal.services.plugin.tasks.helper.CfRenameAppDelegate;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.gradle.api.tasks.TaskAction;
@@ -20,24 +21,23 @@ public class CfRenameAppTask extends AbstractCfTask {
 	@TaskAction
 	public void renameApp() {
 		CloudFoundryOperations cfOperations = getCfOperations();
-		CfAppProperties cfAppProperties = getCfAppProperties();
+		CfProperties cfAppProperties = getCfProperties();
 
 		if (getNewName() == null) {
 			throw new RuntimeException("New name not provided");
 		}
 
-		CfAppProperties oldAppProperties = cfAppProperties;
+		CfProperties oldCfProperties = cfAppProperties;
 
-		CfAppProperties newAppProperties =
-				this.appPropertiesMapper.copyPropertiesWithNameChange(oldAppProperties, getNewName());
+		CfProperties newCfProperties = ImmutableCfProperties.copyOf(oldCfProperties).withName(getNewName());
 
-		Mono<Void> resp = renameDelegate.renameApp(cfOperations, oldAppProperties, newAppProperties);
+		Mono<Void> resp = renameDelegate.renameApp(cfOperations, oldCfProperties, newCfProperties);
 
 		resp.block(Duration.ofMillis(defaultWaitTimeout));
 	}
 
 	private String getNewName() {
-		return this.appPropertiesMapper.getNewName();
+		return this.cfPropertiesMapper.getNewName();
 	}
 
 

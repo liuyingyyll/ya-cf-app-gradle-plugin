@@ -1,6 +1,6 @@
 package io.pivotal.services.plugin.tasks;
 
-import io.pivotal.services.plugin.CfAppProperties;
+import io.pivotal.services.plugin.CfProperties;
 import io.pivotal.services.plugin.tasks.helper.CfAppDetailsDelegate;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.applications.ApplicationDetail;
@@ -23,9 +23,9 @@ public class CfAppDetailsTask extends AbstractCfTask {
 	public void appDetails() {
 
 		CloudFoundryOperations cfOperations = getCfOperations();
-		CfAppProperties cfAppProperties = getCfAppProperties();
+		CfProperties cfProperties = getCfProperties();
 
-		Mono<Optional<ApplicationDetail>> resp = detailsTaskDelegate.getAppDetails(cfOperations, cfAppProperties);
+		Mono<Optional<ApplicationDetail>> resp = detailsTaskDelegate.getAppDetails(cfOperations, cfProperties);
 
 		Optional<ApplicationDetail> applicationDetail = resp.block(Duration.ofMillis(defaultWaitTimeout));
 

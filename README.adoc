@@ -15,14 +15,12 @@ The purpose of this plugin is to provide ways to manage an application in the Cl
 ----
 buildscript {
 	ext {
-		cfAppVersion = '1.0.2.RC1'
+		cfAppVersion = '1.0.4.RELEASE'
 	}
 	repositories {
 		mavenCentral()
 		maven { url "https://oss.sonatype.org/content/repositories/releases" }
-		//Some of the dependent libraries are snapshots
-		maven { url "https://repo.spring.io/snapshot" }
-		maven { url "https://repo.spring.io/milestone" }
+		maven { url "https://repo.spring.io/release" }
 	}
 	dependencies {
 		classpath("com.github.pivotalservices:ya-cf-app-gradle-plugin:${cfAppVersion}")
@@ -97,6 +95,8 @@ task acceptanceTest(type: Test, dependsOn: "cf-get-app-detail")  {
 	}
 }
 ----
+
+NOTE: A sample project demonstrating the plugin is availble https://github.com/bijukunjummen/cf-show-env[here]
 
 === Using the Plugin for a https://docs.cloudfoundry.org/devguide/deploy-apps/blue-green.html[Blue-Green] Application Deployment
 

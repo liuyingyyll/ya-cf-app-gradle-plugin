@@ -64,8 +64,8 @@ public class CfBlueGreenStage1Delegate {
 	}
 
 	private void printAppDetail(ApplicationDetail applicationDetail) {
-		LOGGER.lifecycle("**** Application Name: {}", applicationDetail.getName());
-		LOGGER.lifecycle("**** Intance Count: {}", applicationDetail.getInstances());
+		LOGGER.lifecycle("Application Name: {}", applicationDetail.getName());
+		LOGGER.lifecycle("Intance Count: {}", applicationDetail.getInstances());
 		LOGGER.lifecycle("Running Instances: {}", applicationDetail.getRunningInstances());
 	}
 }

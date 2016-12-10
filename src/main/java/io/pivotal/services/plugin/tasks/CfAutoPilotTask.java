@@ -15,6 +15,7 @@ import java.time.Duration;
  */
 public class CfAutoPilotTask extends AbstractCfTask {
 
+
 	private CfAutoPilotDelegate autoPilotTaskDelegate = new CfAutoPilotDelegate();
 
 	@TaskAction
@@ -22,6 +23,7 @@ public class CfAutoPilotTask extends AbstractCfTask {
 
 		CloudFoundryOperations cfOperations = getCfOperations();
 		CfProperties originalProperties = getCfProperties();
+
 
 		Mono<Void> resp = autoPilotTaskDelegate.runAutopilot(getProject(), cfOperations, originalProperties);
 

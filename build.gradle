@@ -1,4 +1,4 @@
-version = "1.0.5-RC-3"
+version = "1.0.5"
 group = "com.github.pivotalservices"
 
 apply plugin: 'java'

@@ -1,4 +1,4 @@
-version = "1.0.5-RC-1"
+version = "1.0.5-RC-3"
 group = "com.github.pivotalservices"
 
 apply plugin: 'java'
@@ -20,6 +20,18 @@ repositories {
     maven { url "https://repo.spring.io/milestone" }
     maven { url "https://repo.spring.io/release" }
 }
+buildscript {
+	repositories {
+		maven {
+			url "https://plugins.gradle.org/m2/"
+		}
+	}
+	dependencies {
+		classpath "com.gradle.publish:plugin-publish-plugin:0.9.7"
+	}
+}
+
+apply plugin: "com.gradle.plugin-publish"
 
 dependencies {
     compile gradleApi()
@@ -100,4 +112,18 @@ uploadArchives {
             }
         }
     }
+}
+
+pluginBundle {
+	website = 'https://github.com/pivotalservices/ya-cf-app-gradle-plugin'
+	vcsUrl = 'https://github.com/pivotalservices/ya-cf-app-gradle-plugin'
+	description = 'Yet-Another-Gradle Plugin is an alternate plugin to facilitate deploying an app to Cloud Foundry'
+	tags = ['cloudfoundry', 'cloud foundry']
+
+	plugins {
+		yaCfAppGradlePlugin {
+			id = 'com.github.pivotalservices.cf-app'
+			displayName = 'Gradle Cloud Foundry Plugin - Yet Another'
+		}
+	}
 }

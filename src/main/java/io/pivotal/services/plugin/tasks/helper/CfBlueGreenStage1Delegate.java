@@ -11,34 +11,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.Optional;
 
-/**
- * route -&gt; app
- * <p>
- * Stage 1:
- * Step 1:
- * route-green -&gt; app-green
- * ...testing after stage 1..
- * Stage 2:
- * Step 2:
- * route       -&gt; app-green, app
- * route-green -&gt; app-green
- * <p>
- * Step 3:
- * route       -&gt; app-green
- * route-green -&gt; app-green
- *             -&gt; app
- * Step 4:
- * route       -&gt; app-green
- *             -&gt; app
- * <p>
- * Step 5:
- * route       -&gt; app-green
- *             -&gt; app-blue
- * <p>
- * Step 6:
- * route       -&gt; app
- *             -&gt; app-blue
- */
+
 public class CfBlueGreenStage1Delegate {
 
 	private CfPushDelegate pushDelegate = new CfPushDelegate();
@@ -51,16 +24,24 @@ public class CfBlueGreenStage1Delegate {
 
 		Mono<Optional<ApplicationDetail>> appDetailMono = appDetailsDelegate.getAppDetails(cfOperations, cfProperties);
 
-		appDetailMono.block().ifPresent(appDetail -> printAppDetail(appDetail));
 
 		LOGGER.lifecycle("Running Blue Green Deploy - deploying a 'green' app. App '{}' with route '{}'",
-				cfProperties.name(), cfProperties.hostName());
+			cfProperties.name(), cfProperties.hostName());
 
-		CfProperties withNewNameAndRoute = ImmutableCfProperties.copyOf(cfProperties)
-				.withName(cfProperties.name() + "-green")
-				.withHostName(cfProperties.hostName() + "-green");
+		Mono<CfProperties> cfPropertiesMono = appDetailMono.map(appDetailOpt -> appDetailOpt.map(appDetail -> {
+				printAppDetail(appDetail);
+				return ImmutableCfProperties.copyOf(cfProperties)
+					.withName(cfProperties.name() + "-green")
+					.withHostName(cfProperties.hostName() + "-green")
+					.withInstances(appDetail.getInstances())
+					.withMemory(appDetail.getMemoryLimit())
+					.withDiskQuota(appDetail.getDiskQuota());
+			}
+		).orElse(ImmutableCfProperties.copyOf(cfProperties)
+			.withName(cfProperties.name() + "-green")
+			.withHostName(cfProperties.hostName() + "-green")));
 
-		return pushDelegate.push(cfOperations, withNewNameAndRoute);
+		return cfPropertiesMono.then(withNewNameAndRoute -> pushDelegate.push(cfOperations, withNewNameAndRoute));
 	}
 
 	private void printAppDetail(ApplicationDetail applicationDetail) {

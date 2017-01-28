@@ -56,6 +56,7 @@ public class CfPropertiesMapper {
             .ccHost(getCcHost())
             .ccUser(getCcUser())
             .ccPassword(getCcPassword())
+			.ccToken(getCcToken())
             .org(getOrg())
             .space(getSpace())
             .filePath(getFilePath())
@@ -130,6 +131,11 @@ public class CfPropertiesMapper {
         return getStringPropertyFromProject(PropertyNameConstants.CC_PASSWORD)
             .orElse(this.getExtension().getCcPassword());
     }
+
+    public String getCcToken() {
+    	return getStringPropertyFromProject(PropertyNameConstants.CC_TOKEN)
+			.orElse(this.getExtension().getCcToken());
+	}
 
     public String getBuildpack() {
         return getStringPropertyFromProject(PropertyNameConstants.CF_BUILDPACK)

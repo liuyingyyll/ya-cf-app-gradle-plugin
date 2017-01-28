@@ -129,6 +129,14 @@ public class CfPropertiesMapperTest {
         assertThat(props.ccUser()).isEqualTo("newuser");
     }
 
+	@Test
+	public void testTokenIsOverridden() {
+		setProjectProperty(PropertyNameConstants.CC_TOKEN, "newtoken");
+		CfProperties props = this.cfPropertiesMapper.getProperties();
+
+		assertThat(props.ccToken()).isEqualTo("newtoken");
+	}
+
     @Test
     public void testCcPasswordIsOverriddenViaProjectProperty() {
         setProjectProperty(PropertyNameConstants.CC_PASSWORD, "newpwd");
@@ -284,6 +292,7 @@ public class CfPropertiesMapperTest {
 
         ext.setStagingTimeout(101);
         ext.setStartupTimeout(102);
+        ext.setCcToken("cctoken");
 
         return ext;
     }

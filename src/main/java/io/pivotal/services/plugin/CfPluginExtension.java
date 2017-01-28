@@ -28,6 +28,7 @@ public class CfPluginExtension {
 	private String ccHost;
 	private String ccUser;
 	private String ccPassword;
+	private String ccToken;
 
 	private String org;
 	private String space;

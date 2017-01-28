@@ -52,7 +52,7 @@ public class CfAutoPilotDelegateTest {
 				any(CfProperties.class),
 				any(CfProperties.class))).thenReturn(Mono.empty());
 
-		when(cfPushDelegate.push(cfOperations, cfAppProperties)).thenReturn(Mono.empty());
+		when(cfPushDelegate.push(any(CloudFoundryOperations.class), any(CfProperties.class))).thenReturn(Mono.empty());
 		when(deleteDelegate.deleteApp(any(CloudFoundryOperations.class),
 				any(CfProperties.class))).thenReturn(Mono.empty());
 

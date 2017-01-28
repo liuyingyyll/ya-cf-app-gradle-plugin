@@ -45,7 +45,7 @@ public class CfBlueGreenStage1DelegateTest {
 
 		when(appDetailsDelegate.getAppDetails(any(CloudFoundryOperations.class), eq(cfAppProperties)))
 				.thenReturn(Mono.just(Optional.of(ApplicationDetail.builder().
-						name("test").instances(2)
+						name("test").instances(10)
 						.runningInstances(2)
 						.stack("stack")
 						.diskQuota(500)
@@ -54,7 +54,11 @@ public class CfBlueGreenStage1DelegateTest {
 						.id("id")
 						.build())));
 
-		this.blueGreenStage1Delegate.runStage1(project, cfOperations, cfAppProperties);
+		when(pushDelegate.push(any(CloudFoundryOperations.class), any(CfProperties.class)))
+			.thenReturn(Mono.empty());
+
+		Mono<Void> resultMono = this.blueGreenStage1Delegate.runStage1(project, cfOperations, cfAppProperties);
+		resultMono.blockMillis(2000L);
 
 		ArgumentCaptor<CfProperties> argumentCaptor = ArgumentCaptor.forClass(CfProperties.class);
 
@@ -63,6 +67,38 @@ public class CfBlueGreenStage1DelegateTest {
 		CfProperties captured = argumentCaptor.getValue();
 		assertThat(captured.name()).isEqualTo("test-green");
 		assertThat(captured.hostName()).isEqualTo("route-green");
+		assertThat(captured.instances()).isEqualTo(10);
+		assertThat(captured.diskQuota()).isEqualTo(500);
+		assertThat(captured.memory()).isEqualTo(100);
+	}
+
+
+	@Test
+	public void testStage1NoExistingApp() {
+		Project project = mock(Project.class);
+		CloudFoundryOperations cfOperations = mock(CloudFoundryOperations.class);
+		CfProperties cfAppProperties = sampleApp();
+
+		when(appDetailsDelegate.getAppDetails(any(CloudFoundryOperations.class), eq(cfAppProperties)))
+			.thenReturn(Mono.just(Optional.empty()));
+
+		when(pushDelegate.push(any(CloudFoundryOperations.class), any(CfProperties.class)))
+			.thenReturn(Mono.empty());
+
+		Mono<Void> resultMono = this.blueGreenStage1Delegate.runStage1(project, cfOperations, cfAppProperties);
+		resultMono.blockMillis(2000L);
+
+		ArgumentCaptor<CfProperties> argumentCaptor = ArgumentCaptor.forClass(CfProperties.class);
+
+		verify(this.pushDelegate).push(any(CloudFoundryOperations.class), argumentCaptor.capture());
+
+		CfProperties captured = argumentCaptor.getValue();
+		assertThat(captured.name()).isEqualTo("test-green");
+		assertThat(captured.hostName()).isEqualTo("route-green");
+
+		assertThat(captured.instances()).isEqualTo(2);
+		assertThat(captured.diskQuota()).isNull();
+		assertThat(captured.memory()).isNull();
 	}
 
 	private CfProperties sampleApp() {

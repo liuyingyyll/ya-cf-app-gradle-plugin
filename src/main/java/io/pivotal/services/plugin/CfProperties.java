@@ -30,8 +30,15 @@ import java.util.Map;
 @Value.Immutable(copy = true)
 public abstract class CfProperties {
 	public abstract String ccHost();
-    public abstract String ccUser();
-    public abstract String ccPassword();
+
+	@Nullable
+	public abstract String ccUser();
+
+	@Nullable
+	public abstract String ccPassword();
+
+	@Nullable
+	public abstract String ccToken();
 
     public abstract String org();
     public abstract String space();

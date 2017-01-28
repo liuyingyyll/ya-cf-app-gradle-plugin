@@ -1,8 +1,5 @@
 package io.pivotal.services.plugin.tasks;
 
-import io.pivotal.services.plugin.CfPluginExtension;
-import io.pivotal.services.plugin.CfProperties;
-import io.pivotal.services.plugin.CfPropertiesMapper;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.DefaultCloudFoundryOperations;
@@ -14,6 +11,11 @@ import org.cloudfoundry.reactor.tokenprovider.PasswordGrantTokenProvider;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
+
+import io.pivotal.services.plugin.CfPluginExtension;
+import io.pivotal.services.plugin.CfProperties;
+import io.pivotal.services.plugin.CfPropertiesMapper;
+import io.pivotal.services.plugin.cf.StaticTokenProvider;
 
 /**
  * Base class for all Concrete CF tasks
@@ -38,10 +40,7 @@ abstract class AbstractCfTask extends DefaultTask {
 				.skipSslValidation(true)
 				.build();
 
-		TokenProvider tokenProvider = PasswordGrantTokenProvider.builder()
-				.password(cfAppProperties.ccPassword())
-				.username(cfAppProperties.ccUser())
-				.build();
+		TokenProvider tokenProvider = getTokenProvider(cfAppProperties);
 
 		CloudFoundryClient cfClient = ReactorCloudFoundryClient.builder()
 				.connectionContext(connectionContext)
@@ -55,6 +54,22 @@ abstract class AbstractCfTask extends DefaultTask {
 				.build();
 
 		return cfOperations;
+	}
+
+	protected TokenProvider getTokenProvider(CfProperties cfAppProperties) {
+		if (cfAppProperties.ccToken() == null &&
+			(cfAppProperties.ccUser() == null && cfAppProperties.ccPassword() == null)) {
+			throw new IllegalStateException("One of token or user/password should be provided");
+		}
+
+		if (cfAppProperties.ccToken() != null) {
+			return new StaticTokenProvider(cfAppProperties.ccToken());
+		} else {
+			return PasswordGrantTokenProvider.builder()
+				.password(cfAppProperties.ccPassword())
+				.username(cfAppProperties.ccUser())
+				.build();
+		}
 	}
 
 	protected CfPluginExtension getExtension() {

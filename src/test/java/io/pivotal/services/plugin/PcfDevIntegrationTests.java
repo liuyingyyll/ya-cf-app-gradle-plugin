@@ -48,12 +48,11 @@ public class PcfDevIntegrationTests {
 				.getAppDetails(cfOperations, cfAppProps);
 
 
-		Mono<Void> resp = applicationDetailMono.then(applicationDetail -> Mono.fromSupplier(() -> {
-			System.out.println("About to supply " + applicationDetail);
-			return 1;
-		})).then();
-
-		resp.block();
+//		Mono<Void> resp = applicationDetailMono.then(applicationDetail -> Mono.fromSupplier(() -> {
+//			return 1;
+//		})).then();
+//
+//		resp.block();
 //		ApplicationDetail applicationDetail = applicationDetailMono.block(Duration.ofMillis(5000));
 //		System.out.println("applicationDetail = " + applicationDetail);
 	}

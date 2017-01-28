@@ -29,10 +29,15 @@ public class CfAutoPilotDelegate {
 		Mono<Optional<ApplicationDetail>> appDetailMono = detailsDelegate
 				.getAppDetails(cfOperations, cfProperties);
 
-		Mono<Void> autopilotResult = appDetailMono.then(appDetail -> {
-			if (appDetail.isPresent()) {
+		Mono<Void> autopilotResult = appDetailMono.then(appDetailOpt -> {
+			if (appDetailOpt.isPresent()) {
+				ApplicationDetail appDetail = appDetailOpt.get();
+				CfProperties withExistingDetails = ImmutableCfProperties.copyOf(cfProperties)
+					.withInstances(appDetail.getInstances())
+					.withMemory(appDetail.getMemoryLimit())
+					.withDiskQuota(appDetail.getDiskQuota());
 				Mono<Void> renameResult = renameAppDelegate.renameApp(cfOperations, cfProperties, withNameChanged);
-				return renameResult.then(pushDelegate.push(cfOperations, cfProperties))
+				return renameResult.then(pushDelegate.push(cfOperations, withExistingDetails))
 						.then(deleteDelegate.deleteApp(cfOperations, withNameChanged));
 			} else {
 				return pushDelegate.push(cfOperations, cfProperties);

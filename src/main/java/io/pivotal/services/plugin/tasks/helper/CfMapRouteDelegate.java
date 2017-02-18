@@ -28,7 +28,7 @@ public class CfMapRouteDelegate {
 						.applicationName(cfProperties.name())
 						.domain(cfProperties.domain())
 						.host(cfProperties.hostName())
-						.path(cfProperties.path()).build());
+						.path(cfProperties.path()).build()).then();
 
 		return resp;
 

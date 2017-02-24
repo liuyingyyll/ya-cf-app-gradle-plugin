@@ -9,13 +9,17 @@ The purpose of this plugin is to provide ways to manage an application in the Cl
 
 === Using the Plugin
 
+Start by looking at a sample project using the plugin https://github.com/bijukunjummen/cf-show-env[here]
+
+==== Details
+
 * Add a buildscript dependency:
 
 [source]
 ----
 buildscript {
 	ext {
-		cfAppVersion = '1.0.4.RELEASE'
+		cfAppVersion = '1.0.7'
 	}
 	repositories {
 		mavenCentral()
@@ -25,6 +29,14 @@ buildscript {
 	dependencies {
 		classpath("com.github.pivotalservices:ya-cf-app-gradle-plugin:${cfAppVersion}")
 	}
+}
+----
+
+OR Via the new Gradle plugins mechanism:
+[source]
+----
+plugins {
+	id "com.github.pivotalservices.cf-app" version "1.0.7"
 }
 ----
 

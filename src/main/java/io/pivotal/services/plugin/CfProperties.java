@@ -106,4 +106,10 @@ public abstract class CfProperties {
 
     @Nullable
     public abstract Integer startupTimeout();
+    
+    @Nullable
+    public abstract List<CfServiceDetail> cfServices();
+    
+    @Nullable
+    public abstract List<CfUserProvidedServiceDetail> cfUserProvidedServices();
 }

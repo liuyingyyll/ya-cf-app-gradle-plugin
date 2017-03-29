@@ -19,8 +19,8 @@ public class CfPushClientPluginTests {
 	}
 
 	@Test
-	public void testThatThereAre12Tasks() {
-		assertThat(this.project.getTasks().size()).isEqualTo(14);
+	public void testValidateCount() {
+		assertThat(this.project.getTasks().size()).isEqualTo(15);
 		assertThat(this.project.getTasks().getAt("cf-push").getGroup()).isEqualTo("Cloud Foundry");
 	}
 

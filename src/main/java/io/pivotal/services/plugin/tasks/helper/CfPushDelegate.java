@@ -24,55 +24,74 @@ public class CfPushDelegate {
 
 	private static final Logger LOGGER = Logging.getLogger(CfPushDelegate.class);
 
+	private CfCreateUserProvidedServiceHelper cfCreateUserProvidedServiceHelper = new CfCreateUserProvidedServiceHelper();
+	private CfCreateServiceHelper cfCreateServiceHelper = new CfCreateServiceHelper();
+
 	public Mono<Void> push(CloudFoundryOperations cfOperations, CfProperties cfProperties) {
 		LOGGER.lifecycle("Pushing app '{}'", cfProperties.name());
 		Path path = Paths.get(cfProperties.filePath());
 
+		if (path.toFile().exists()) {
 
-		Mono<Void> resp = cfOperations.applications()
+			if (cfProperties.cfServices() != null) {
+				cfProperties.cfServices().forEach(service -> {
+					cfCreateServiceHelper.createService(cfOperations, service);
+				});
+			}
+
+			if (cfProperties.cfUserProvidedServices() != null) {
+				cfProperties.cfUserProvidedServices().forEach(service -> {
+					cfCreateUserProvidedServiceHelper.createUserProvidedService(cfOperations, service);
+				});
+			}
+
+			Mono<Void> resp = cfOperations.applications()
 				.push(PushApplicationRequest.builder()
-						.name(cfProperties.name())
-						.application(path)
-						.buildpack(cfProperties.buildpack())
-						.command(cfProperties.command())
-						.diskQuota(cfProperties.diskQuota())
-						.instances(cfProperties.instances())
-						.memory(cfProperties.memory())
-						.timeout(cfProperties.timeout())
-						.domain(cfProperties.domain())
-						.host(cfProperties.hostName())
-						.routePath(cfProperties.path())
-						.noStart(true)
-						.build());
+					.name(cfProperties.name())
+					.application(path)
+					.buildpack(cfProperties.buildpack())
+					.command(cfProperties.command())
+					.diskQuota(cfProperties.diskQuota())
+					.instances(cfProperties.instances())
+					.memory(cfProperties.memory())
+					.timeout(cfProperties.timeout())
+					.domain(cfProperties.domain())
+					.host(cfProperties.hostName())
+					.routePath(cfProperties.path())
+					.noStart(true)
+					.build());
 
-		if (cfProperties.environment() != null) {
-			for (Map.Entry<String, String> entry : cfProperties.environment().entrySet()) {
-				LOGGER.lifecycle("Setting env variable '{}'", entry.getKey());
-				resp = resp.then(cfOperations.applications()
+			if (cfProperties.environment() != null) {
+				for (Map.Entry<String, String> entry : cfProperties.environment().entrySet()) {
+					LOGGER.lifecycle("Setting env variable '{}'", entry.getKey());
+					resp = resp.then(cfOperations.applications()
 						.setEnvironmentVariable(SetEnvironmentVariableApplicationRequest
-								.builder()
-								.name(cfProperties.name())
-								.variableName(entry.getKey())
-								.variableValue(entry.getValue())
-								.build()));
+							.builder()
+							.name(cfProperties.name())
+							.variableName(entry.getKey())
+							.variableValue(entry.getValue())
+							.build()));
+				}
 			}
-		}
 
-		if (cfProperties.services() != null) {
-			for (String serviceName : cfProperties.services()) {
-				LOGGER.lifecycle("Binding Service '{}'", serviceName);
-				resp = resp.then(cfOperations.services()
+			if (cfProperties.services() != null) {
+				for (String serviceName : cfProperties.services()) {
+					LOGGER.lifecycle("Binding Service '{}'", serviceName);
+					resp = resp.then(cfOperations.services()
 						.bind(BindServiceInstanceRequest.builder()
-								.serviceInstanceName(serviceName)
-								.applicationName(cfProperties.name())
-								.build()));
+							.serviceInstanceName(serviceName)
+							.applicationName(cfProperties.name())
+							.build()));
+				}
 			}
-		}
 
-		LOGGER.lifecycle("Starting app '{}'", cfProperties.name());
-		return resp.then(cfOperations.applications().restart(RestartApplicationRequest
+			LOGGER.lifecycle("Starting app '{}'", cfProperties.name());
+			return resp.then(cfOperations.applications().restart(RestartApplicationRequest
 				.builder()
 				.name(cfProperties.name()).build()));
+		} else {
+			throw new RuntimeException("Missing file : " + path);
+		}
 
 	}
 }

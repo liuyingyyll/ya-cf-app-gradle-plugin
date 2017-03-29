@@ -1,5 +1,9 @@
 package io.pivotal.services.plugin.tasks;
 
+import io.pivotal.services.plugin.CfPluginExtension;
+import io.pivotal.services.plugin.CfProperties;
+import io.pivotal.services.plugin.CfPropertiesMapper;
+import io.pivotal.services.plugin.cf.StaticTokenProvider;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.DefaultCloudFoundryOperations;
@@ -11,11 +15,6 @@ import org.cloudfoundry.reactor.tokenprovider.PasswordGrantTokenProvider;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
-
-import io.pivotal.services.plugin.CfPluginExtension;
-import io.pivotal.services.plugin.CfProperties;
-import io.pivotal.services.plugin.CfPropertiesMapper;
-import io.pivotal.services.plugin.cf.StaticTokenProvider;
 
 /**
  * Base class for all Concrete CF tasks

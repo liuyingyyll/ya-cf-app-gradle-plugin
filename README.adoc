@@ -19,7 +19,7 @@ Start by looking at a sample project using the plugin https://github.com/bijukun
 ----
 buildscript {
 	ext {
-		cfAppVersion = '1.0.7'
+		cfAppVersion = '1.0.9'
 	}
 	repositories {
 		mavenCentral()
@@ -36,7 +36,7 @@ OR Via the new Gradle plugins mechanism:
 [source]
 ----
 plugins {
-	id "com.github.pivotalservices.cf-app" version "1.0.7"
+	id "com.github.pivotalservices.cf-app" version "1.0.9"
 }
 ----
 
@@ -134,49 +134,6 @@ and run
 ./gradlew cf-push-blue-green
 ----
 
-
-OR if you prefer writing all the blue-green steps yourself, the following is a rough outline of steps:
-
-* Provide a default set of configuration in your build.gradle file.
-
-* Push the `Blue` app mapping to `demo-time.domain`:
-[source]
-----
-./gradlew cf-push -Pcf.name=Blue -Pcf.hostName=demo-time
-----
-
-* Push the `Green` app mapping to `demo-time-temp.domain`:
-[source]
-----
-./gradlew cf-push -Pcf.name=Green -Pcf.hostName=demo-time-temp
-----
-
-* Once `Green` is verified, remap the route for `Green`:
-[source]
-----
-./gradlew cf-map-route -Pcf.name=Green -Pcf.hostName=demo-time
-----
-
-* Unmap the temporary route for Green:
-[source]
-----
-./gradlew cf-unmap-route -Pcf.name=Green -Pcf.hostName=demo-time-temp
-----
-
-* Delete the Blue app:
-[source]
-----
-./gradlew cf-delete-app -Pcf.name=Blue
-----
-
-* Delete the temporary route:
-[source]
-----
-./gradlew cf-delete-route -Pcf.hostName=demo-time-temp
-----
-
-
-
 === Using the Plugin for a https://github.com/concourse/autopilot[Autopilot] equivalent deployment
 
 The plugin natively understands how to perform the steps of an Autopilot based deploy. Just run the following on the command line:
@@ -186,24 +143,29 @@ The plugin natively understands how to perform the steps of an Autopilot based d
 ./gradlew cf-push-autopilot
 ----
 
-OR if you prefer to write each step of autopilot yourself, these are the rough steps:
 
-* Rename the application to something else
-[source]
-----
-./gradlew cf-rename-app -Pcf.newName=old-app-venerable
-----
+=== Creating services
 
-* Push the application, the source of truth is anything specified in cfConfig closure as described above.
-[source]
-----
-./gradlew cf-push
-----
+Services can be created and automatically bound to the app in the targeted org and space by providing information the following way:
 
-* Delete the old app
-[source]
+[source, java]
 ----
-./gradlew cf-delete-app -Pcf.name=old-app-venerable
+    cfService {
+        name = "p-mysql"
+        plan = "512mb"
+        instanceName = "test-db"
+    }
+    
+    cfService {
+        name = "p-rabbitmq"
+        plan = "standard"
+        instanceName = "test-rabbitmq"
+    }
+    
+    cfUserProvidedService {
+        instanceName = "mydb1"
+        credentials = ["jdbcUri": "someuri1"]
+    }
 ----
 
 === List of all Tasks
@@ -224,4 +186,5 @@ OR if you prefer to write each step of autopilot yourself, these are the rough s
 |cf-restart-app            |Restart an Application
 |cf-push-autopilot         |Push with https://github.com/concourse/autopilot[Autopilot] steps
 |cf-push-blue-green        |Push with https://docs.cloudfoundry.org/devguide/deploy-apps/blue-green.html[Blue-Green] steps
+|cf-create-services        |Create a set of services
 |================================================================================================

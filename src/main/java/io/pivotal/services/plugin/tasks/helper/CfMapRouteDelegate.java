@@ -14,24 +14,24 @@ import reactor.core.publisher.Mono;
  */
 public class CfMapRouteDelegate {
 
-	private static final Logger LOGGER = Logging.getLogger(CfMapRouteDelegate.class);
+    private static final Logger LOGGER = Logging.getLogger(CfMapRouteDelegate.class);
 
-	public Mono<Void> mapRoute(CloudFoundryOperations cfOperations,
-							   CfProperties cfProperties) {
+    public Mono<Void> mapRoute(CloudFoundryOperations cfOperations,
+                               CfProperties cfProperties) {
 
-		LOGGER.lifecycle("Mapping hostname '{}' in domain '{}' with path '{}' of app '{}'", cfProperties.hostName(),
-				cfProperties.domain(), cfProperties.path(), cfProperties.name());
+        Mono<Void> resp = cfOperations.routes()
+            .map(MapRouteRequest
+                .builder()
+                .applicationName(cfProperties.name())
+                .domain(cfProperties.domain())
+                .host(cfProperties.hostName())
+                .path(cfProperties.path()).build()).then().doOnSubscribe((s) -> {
+                LOGGER.lifecycle("Mapping hostname '{}' in domain '{}' with path '{}' of app '{}'", cfProperties.hostName(),
+                    cfProperties.domain(), cfProperties.path(), cfProperties.name());
+            });
 
-		Mono<Void> resp = cfOperations.routes()
-				.map(MapRouteRequest
-						.builder()
-						.applicationName(cfProperties.name())
-						.domain(cfProperties.domain())
-						.host(cfProperties.hostName())
-						.path(cfProperties.path()).build()).then();
+        return resp;
 
-		return resp;
-
-	}
+    }
 
 }

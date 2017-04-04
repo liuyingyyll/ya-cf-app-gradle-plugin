@@ -23,94 +23,94 @@ import static org.mockito.Mockito.*;
 
 public class CfBlueGreenStage1DelegateTest {
 
-	@Mock
-	private CfPushDelegate pushDelegate;
+    @Mock
+    private CfPushDelegate pushDelegate;
 
-	@Mock
-	private CfAppDetailsDelegate appDetailsDelegate;
+    @Mock
+    private CfAppDetailsDelegate appDetailsDelegate;
 
-	@InjectMocks
-	private CfBlueGreenStage1Delegate blueGreenStage1Delegate;
+    @InjectMocks
+    private CfBlueGreenStage1Delegate blueGreenStage1Delegate;
 
-	@Before
-	public void setup() {
-		MockitoAnnotations.initMocks(this);
-	}
+    @Before
+    public void setup() {
+        MockitoAnnotations.initMocks(this);
+    }
 
-	@Test
-	public void testStage1ExistingApp() {
-		Project project = mock(Project.class);
-		CloudFoundryOperations cfOperations = mock(CloudFoundryOperations.class);
-		CfProperties cfAppProperties = sampleApp();
+    @Test
+    public void testStage1ExistingApp() {
+        Project project = mock(Project.class);
+        CloudFoundryOperations cfOperations = mock(CloudFoundryOperations.class);
+        CfProperties cfAppProperties = sampleApp();
 
-		when(appDetailsDelegate.getAppDetails(any(CloudFoundryOperations.class), eq(cfAppProperties)))
-				.thenReturn(Mono.just(Optional.of(ApplicationDetail.builder().
-						name("test").instances(10)
-						.runningInstances(2)
-						.stack("stack")
-						.diskQuota(500)
-						.memoryLimit(100)
-						.requestedState("start")
-						.id("id")
-						.build())));
+        when(appDetailsDelegate.getAppDetails(any(CloudFoundryOperations.class), eq(cfAppProperties)))
+            .thenReturn(Mono.just(Optional.of(ApplicationDetail.builder().
+                name("test").instances(10)
+                .runningInstances(2)
+                .stack("stack")
+                .diskQuota(500)
+                .memoryLimit(100)
+                .requestedState("start")
+                .id("id")
+                .build())));
 
-		when(pushDelegate.push(any(CloudFoundryOperations.class), any(CfProperties.class)))
-			.thenReturn(Mono.empty());
+        when(pushDelegate.push(any(CloudFoundryOperations.class), any(CfProperties.class)))
+            .thenReturn(Mono.empty());
 
-		Mono<Void> resultMono = this.blueGreenStage1Delegate.runStage1(project, cfOperations, cfAppProperties);
-		resultMono.blockMillis(2000L);
+        Mono<Void> resultMono = this.blueGreenStage1Delegate.runStage1(project, cfOperations, cfAppProperties);
+        resultMono.blockMillis(2000L);
 
-		ArgumentCaptor<CfProperties> argumentCaptor = ArgumentCaptor.forClass(CfProperties.class);
+        ArgumentCaptor<CfProperties> argumentCaptor = ArgumentCaptor.forClass(CfProperties.class);
 
-		verify(this.pushDelegate).push(any(CloudFoundryOperations.class), argumentCaptor.capture());
+        verify(this.pushDelegate).push(any(CloudFoundryOperations.class), argumentCaptor.capture());
 
-		CfProperties captured = argumentCaptor.getValue();
-		assertThat(captured.name()).isEqualTo("test-green");
-		assertThat(captured.hostName()).isEqualTo("route-green");
-		assertThat(captured.instances()).isEqualTo(10);
-		assertThat(captured.diskQuota()).isEqualTo(500);
-		assertThat(captured.memory()).isEqualTo(100);
-	}
+        CfProperties captured = argumentCaptor.getValue();
+        assertThat(captured.name()).isEqualTo("test-green");
+        assertThat(captured.hostName()).isEqualTo("route-green");
+        assertThat(captured.instances()).isEqualTo(10);
+        assertThat(captured.diskQuota()).isEqualTo(500);
+        assertThat(captured.memory()).isEqualTo(100);
+    }
 
 
-	@Test
-	public void testStage1NoExistingApp() {
-		Project project = mock(Project.class);
-		CloudFoundryOperations cfOperations = mock(CloudFoundryOperations.class);
-		CfProperties cfAppProperties = sampleApp();
+    @Test
+    public void testStage1NoExistingApp() {
+        Project project = mock(Project.class);
+        CloudFoundryOperations cfOperations = mock(CloudFoundryOperations.class);
+        CfProperties cfAppProperties = sampleApp();
 
-		when(appDetailsDelegate.getAppDetails(any(CloudFoundryOperations.class), eq(cfAppProperties)))
-			.thenReturn(Mono.just(Optional.empty()));
+        when(appDetailsDelegate.getAppDetails(any(CloudFoundryOperations.class), eq(cfAppProperties)))
+            .thenReturn(Mono.just(Optional.empty()));
 
-		when(pushDelegate.push(any(CloudFoundryOperations.class), any(CfProperties.class)))
-			.thenReturn(Mono.empty());
+        when(pushDelegate.push(any(CloudFoundryOperations.class), any(CfProperties.class)))
+            .thenReturn(Mono.empty());
 
-		Mono<Void> resultMono = this.blueGreenStage1Delegate.runStage1(project, cfOperations, cfAppProperties);
-		resultMono.blockMillis(2000L);
+        Mono<Void> resultMono = this.blueGreenStage1Delegate.runStage1(project, cfOperations, cfAppProperties);
+        resultMono.blockMillis(2000L);
 
-		ArgumentCaptor<CfProperties> argumentCaptor = ArgumentCaptor.forClass(CfProperties.class);
+        ArgumentCaptor<CfProperties> argumentCaptor = ArgumentCaptor.forClass(CfProperties.class);
 
-		verify(this.pushDelegate).push(any(CloudFoundryOperations.class), argumentCaptor.capture());
+        verify(this.pushDelegate).push(any(CloudFoundryOperations.class), argumentCaptor.capture());
 
-		CfProperties captured = argumentCaptor.getValue();
-		assertThat(captured.name()).isEqualTo("test-green");
-		assertThat(captured.hostName()).isEqualTo("route-green");
+        CfProperties captured = argumentCaptor.getValue();
+        assertThat(captured.name()).isEqualTo("test-green");
+        assertThat(captured.hostName()).isEqualTo("route-green");
 
-		assertThat(captured.instances()).isEqualTo(2);
-		assertThat(captured.diskQuota()).isNull();
-		assertThat(captured.memory()).isNull();
-	}
+        assertThat(captured.instances()).isEqualTo(2);
+        assertThat(captured.diskQuota()).isNull();
+        assertThat(captured.memory()).isNull();
+    }
 
-	private CfProperties sampleApp() {
-		return ImmutableCfProperties.builder()
-				.ccHost("cchost")
-				.ccUser("ccuser")
-				.ccPassword("ccpassword")
-				.org("org")
-				.space("space")
-				.name("test")
-				.instances(2)
-				.hostName("route")
-				.build();
-	}
+    private CfProperties sampleApp() {
+        return ImmutableCfProperties.builder()
+            .ccHost("cchost")
+            .ccUser("ccuser")
+            .ccPassword("ccpassword")
+            .org("org")
+            .space("space")
+            .name("test")
+            .instances(2)
+            .hostName("route")
+            .build();
+    }
 }

@@ -15,22 +15,22 @@ import java.time.Duration;
  */
 public class CfPushTask extends AbstractCfTask {
 
-	private CfPushDelegate pushTaskDelegate = new CfPushDelegate();
+    private CfPushDelegate pushTaskDelegate = new CfPushDelegate();
 
-	@TaskAction
-	public void push() {
-		CfProperties cfProperties = getCfProperties();
-		LOGGER.info("About to call Push task : {} ", cfProperties.toString());
+    @TaskAction
+    public void push() {
+        CfProperties cfProperties = getCfProperties();
+        LOGGER.info("About to call Push task : {} ", cfProperties.toString());
 
-		CloudFoundryOperations cfOperations = getCfOperations();
+        CloudFoundryOperations cfOperations = getCfOperations();
 
-		Mono<Void> resp = pushTaskDelegate.push(cfOperations, cfProperties);
-		resp.block(Duration.ofMillis(defaultWaitTimeout));
+        Mono<Void> resp = pushTaskDelegate.push(cfOperations, cfProperties);
+        resp.block(Duration.ofMillis(defaultWaitTimeout));
 
-	}
+    }
 
-	@Override
-	public String getDescription() {
-		return "Pushes an Application to Cloud Foundry";
-	}
+    @Override
+    public String getDescription() {
+        return "Pushes an Application to Cloud Foundry";
+    }
 }

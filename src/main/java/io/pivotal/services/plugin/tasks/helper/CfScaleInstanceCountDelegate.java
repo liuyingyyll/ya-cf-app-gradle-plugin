@@ -14,20 +14,21 @@ import reactor.core.publisher.Mono;
  */
 public class CfScaleInstanceCountDelegate {
 
-	private static final Logger LOGGER = Logging.getLogger(CfScaleInstanceCountDelegate.class);
+    private static final Logger LOGGER = Logging.getLogger(CfScaleInstanceCountDelegate.class);
 
-	public Mono<Void> scaleInstances(CloudFoundryOperations cfOperations,
-									 CfProperties cfProperties, int instanceCount) {
+    public Mono<Void> scaleInstances(CloudFoundryOperations cfOperations,
+                                     CfProperties cfProperties, int instanceCount) {
 
-		LOGGER.lifecycle("Scaling app {} to instance count {}", cfProperties.name(), instanceCount);
-		Mono<Void> resp = cfOperations.applications().scale(
-				ScaleApplicationRequest.builder()
-						.instances(instanceCount)
-						.build()
-		);
+        Mono<Void> resp = cfOperations.applications().scale(
+            ScaleApplicationRequest.builder()
+                .instances(instanceCount)
+                .build()
+        ).doOnSubscribe((s) -> {
+            LOGGER.lifecycle("Scaling app {} to instance count {}", cfProperties.name(), instanceCount);
+        });
 
-		return resp;
+        return resp;
 
-	}
+    }
 
 }

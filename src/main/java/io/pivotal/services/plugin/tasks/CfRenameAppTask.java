@@ -16,33 +16,33 @@ import java.time.Duration;
  */
 public class CfRenameAppTask extends AbstractCfTask {
 
-	private CfRenameAppDelegate renameDelegate = new CfRenameAppDelegate();
+    private CfRenameAppDelegate renameDelegate = new CfRenameAppDelegate();
 
-	@TaskAction
-	public void renameApp() {
-		CloudFoundryOperations cfOperations = getCfOperations();
-		CfProperties cfAppProperties = getCfProperties();
+    @TaskAction
+    public void renameApp() {
+        CloudFoundryOperations cfOperations = getCfOperations();
+        CfProperties cfAppProperties = getCfProperties();
 
-		if (getNewName() == null) {
-			throw new RuntimeException("New name not provided");
-		}
+        if (getNewName() == null) {
+            throw new RuntimeException("New name not provided");
+        }
 
-		CfProperties oldCfProperties = cfAppProperties;
+        CfProperties oldCfProperties = cfAppProperties;
 
-		CfProperties newCfProperties = ImmutableCfProperties.copyOf(oldCfProperties).withName(getNewName());
+        CfProperties newCfProperties = ImmutableCfProperties.copyOf(oldCfProperties).withName(getNewName());
 
-		Mono<Void> resp = renameDelegate.renameApp(cfOperations, oldCfProperties, newCfProperties);
+        Mono<Void> resp = renameDelegate.renameApp(cfOperations, oldCfProperties, newCfProperties);
 
-		resp.block(Duration.ofMillis(defaultWaitTimeout));
-	}
+        resp.block(Duration.ofMillis(defaultWaitTimeout));
+    }
 
-	private String getNewName() {
-		return this.cfPropertiesMapper.getNewName();
-	}
+    private String getNewName() {
+        return this.cfPropertiesMapper.getNewName();
+    }
 
 
-	@Override
-	public String getDescription() {
-		return "Rename an Application";
-	}
+    @Override
+    public String getDescription() {
+        return "Rename an Application";
+    }
 }

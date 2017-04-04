@@ -14,21 +14,22 @@ import reactor.core.publisher.Mono;
  * @author Biju Kunjummen
  */
 public class CfRenameAppDelegate {
-	private static final Logger LOGGER = Logging.getLogger(CfRenameAppDelegate.class);
+    private static final Logger LOGGER = Logging.getLogger(CfRenameAppDelegate.class);
 
-	public Mono<Void> renameApp(CloudFoundryOperations cfOperations,
-								CfProperties cfOldAppProperties, CfProperties cfNewProperties) {
+    public Mono<Void> renameApp(CloudFoundryOperations cfOperations,
+                                CfProperties cfOldAppProperties, CfProperties cfNewProperties) {
 
-		if (cfNewProperties.name() == null) {
-			throw new RuntimeException("New name not provided");
-		}
-		LOGGER.lifecycle("Renaming app from {} to {}", cfOldAppProperties.name(), cfNewProperties.name());
+        if (cfNewProperties.name() == null) {
+            throw new RuntimeException("New name not provided");
+        }
 
-		return cfOperations.applications().rename(RenameApplicationRequest
-				.builder()
-				.name(cfOldAppProperties.name())
-				.newName(cfNewProperties.name())
-				.build());
-	}
+        return cfOperations.applications().rename(RenameApplicationRequest
+            .builder()
+            .name(cfOldAppProperties.name())
+            .newName(cfNewProperties.name())
+            .build()).doOnSubscribe((s) -> {
+            LOGGER.lifecycle("Renaming app from {} to {}", cfOldAppProperties.name(), cfNewProperties.name());
+        });
+    }
 
 }

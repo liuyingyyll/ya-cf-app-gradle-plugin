@@ -8,7 +8,7 @@ note that this should be totally private to your machine and should never be sha
 [source]
 ----
 signing.keyId=GPG_KEY_ID
-signing.password=GPG_PASSEORD
+signing.password=GPG_PASSWORD
 signing.secretKeyRingFile=Signing Key Ring..
 
 ossrhUsername=user

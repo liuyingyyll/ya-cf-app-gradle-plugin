@@ -14,22 +14,22 @@ import reactor.core.publisher.Mono;
  */
 public class CfDeleteRouteDelegate {
 
-	private static final Logger LOGGER = Logging.getLogger(CfDeleteRouteDelegate.class);
+    private static final Logger LOGGER = Logging.getLogger(CfDeleteRouteDelegate.class);
 
-	public Mono<Void> deleteRoute(CloudFoundryOperations cfOperations,
-								  CfProperties cfProperties) {
+    public Mono<Void> deleteRoute(CloudFoundryOperations cfOperations,
+                                  CfProperties cfProperties) {
 
-		LOGGER.lifecycle("Deleting hostname '{}' in domain '{}' with path '{}' of app '{}'", cfProperties.hostName(),
-				cfProperties.domain(), cfProperties.path(), cfProperties.name());
+        return cfOperations.routes().delete(
+            DeleteRouteRequest
+                .builder()
+                .domain(cfProperties.domain())
+                .host(cfProperties.hostName())
+                .path(cfProperties.path())
+                .build()).doOnSubscribe((s) -> {
+            LOGGER.lifecycle("Deleting hostname '{}' in domain '{}' with path '{}' of app '{}'", cfProperties.hostName(),
+                cfProperties.domain(), cfProperties.path(), cfProperties.name());
+        });
 
-		return cfOperations.routes().delete(
-				DeleteRouteRequest
-						.builder()
-						.domain(cfProperties.domain())
-						.host(cfProperties.hostName())
-						.path(cfProperties.path())
-						.build());
-
-	}
+    }
 
 }

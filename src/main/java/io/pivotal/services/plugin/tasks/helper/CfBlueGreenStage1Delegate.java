@@ -11,42 +11,47 @@ import reactor.core.publisher.Mono;
 
 import java.util.Optional;
 
-
 public class CfBlueGreenStage1Delegate {
 
-	private CfPushDelegate pushDelegate = new CfPushDelegate();
-	private CfAppDetailsDelegate appDetailsDelegate = new CfAppDetailsDelegate();
+    private CfPushDelegate pushDelegate = new CfPushDelegate();
+    private CfAppDetailsDelegate appDetailsDelegate = new CfAppDetailsDelegate();
 
-	private static final Logger LOGGER = Logging.getLogger(CfBlueGreenStage1Delegate.class);
+    private static final Logger LOGGER = Logging
+        .getLogger(CfBlueGreenStage1Delegate.class);
 
-	public Mono<Void> runStage1(Project project, CloudFoundryOperations cfOperations,
-								CfProperties cfProperties) {
+    public Mono<Void> runStage1(Project project, CloudFoundryOperations cfOperations,
+                                CfProperties cfProperties) {
 
-		Mono<Optional<ApplicationDetail>> appDetailMono = appDetailsDelegate.getAppDetails(cfOperations, cfProperties);
+        Mono<Optional<ApplicationDetail>> appDetailMono = appDetailsDelegate
+            .getAppDetails(cfOperations, cfProperties);
 
+        Mono<CfProperties> cfPropertiesMono = appDetailMono.map((appDetailOpt) -> {
 
-		LOGGER.lifecycle("Running Blue Green Deploy - deploying a 'green' app. App '{}' with route '{}'",
-			cfProperties.name(), cfProperties.hostName());
+            LOGGER.lifecycle(
+                "Running Blue Green Deploy - deploying a 'green' app. App '{}' with route '{}'",
+                cfProperties.name(), cfProperties.hostName());
 
-		Mono<CfProperties> cfPropertiesMono = appDetailMono.map(appDetailOpt -> appDetailOpt.map(appDetail -> {
-				printAppDetail(appDetail);
-				return ImmutableCfProperties.copyOf(cfProperties)
-					.withName(cfProperties.name() + "-green")
-					.withHostName(cfProperties.hostName() + "-green")
-					.withInstances(appDetail.getInstances())
-					.withMemory(appDetail.getMemoryLimit())
-					.withDiskQuota(appDetail.getDiskQuota());
-			}
-		).orElse(ImmutableCfProperties.copyOf(cfProperties)
-			.withName(cfProperties.name() + "-green")
-			.withHostName(cfProperties.hostName() + "-green")));
+            return appDetailOpt.map(appDetail -> {
+                printAppDetail(appDetail);
+                return ImmutableCfProperties.copyOf(cfProperties)
+                    .withName(cfProperties.name() + "-green")
+                    .withHostName(cfProperties.hostName() + "-green")
+                    .withInstances(appDetail.getInstances())
+                    .withMemory(appDetail.getMemoryLimit())
+                    .withDiskQuota(appDetail.getDiskQuota());
+            }).orElse(ImmutableCfProperties.copyOf(cfProperties)
+                .withName(cfProperties.name() + "-green")
+                .withHostName(cfProperties.hostName() + "-green"));
+        });
 
-		return cfPropertiesMono.then(withNewNameAndRoute -> pushDelegate.push(cfOperations, withNewNameAndRoute));
-	}
+        return cfPropertiesMono.then(
+            withNewNameAndRoute -> pushDelegate.push(cfOperations, withNewNameAndRoute));
+    }
 
-	private void printAppDetail(ApplicationDetail applicationDetail) {
-		LOGGER.lifecycle("Application Name: {}", applicationDetail.getName());
-		LOGGER.lifecycle("Intance Count: {}", applicationDetail.getInstances());
-		LOGGER.lifecycle("Running Instances: {}", applicationDetail.getRunningInstances());
-	}
+    private void printAppDetail(ApplicationDetail applicationDetail) {
+        LOGGER.lifecycle("Application Name: {}", applicationDetail.getName());
+        LOGGER.lifecycle("Intance Count: {}", applicationDetail.getInstances());
+        LOGGER
+            .lifecycle("Running Instances: {}", applicationDetail.getRunningInstances());
+    }
 }

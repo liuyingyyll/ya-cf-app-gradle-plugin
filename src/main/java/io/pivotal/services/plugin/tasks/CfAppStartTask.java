@@ -15,21 +15,21 @@ import java.time.Duration;
  */
 public class CfAppStartTask extends AbstractCfTask {
 
-	@TaskAction
-	public void startApp() {
+    @TaskAction
+    public void startApp() {
 
-		CloudFoundryOperations cfOperations = getCfOperations();
-		CfProperties cfProperties = getCfProperties();
+        CloudFoundryOperations cfOperations = getCfOperations();
+        CfProperties cfProperties = getCfProperties();
 
-		Mono<Void> resp = cfOperations.applications()
-				.start(StartApplicationRequest.builder().name(cfProperties.name()).build());
+        Mono<Void> resp = cfOperations.applications()
+            .start(StartApplicationRequest.builder().name(cfProperties.name()).build());
 
-		resp.block(Duration.ofMillis(defaultWaitTimeout));
-	}
+        resp.block(Duration.ofMillis(defaultWaitTimeout));
+    }
 
-	@Override
-	public String getDescription() {
-		return "Start an Application";
-	}
+    @Override
+    public String getDescription() {
+        return "Start an Application";
+    }
 
 }

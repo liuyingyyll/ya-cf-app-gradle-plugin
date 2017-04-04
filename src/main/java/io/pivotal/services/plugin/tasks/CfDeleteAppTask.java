@@ -15,19 +15,19 @@ import java.time.Duration;
  */
 public class CfDeleteAppTask extends AbstractCfTask {
 
-	private CfDeleteAppDelegate deleteDelegate = new CfDeleteAppDelegate();
+    private CfDeleteAppDelegate deleteDelegate = new CfDeleteAppDelegate();
 
-	@TaskAction
-	public void deleteApp() {
-		CloudFoundryOperations cfOperations = getCfOperations();
-		CfProperties cfProperties = getCfProperties();
+    @TaskAction
+    public void deleteApp() {
+        CloudFoundryOperations cfOperations = getCfOperations();
+        CfProperties cfProperties = getCfProperties();
 
-		Mono<Void> resp = deleteDelegate.deleteApp(cfOperations, cfProperties);
-		resp.block(Duration.ofMillis(defaultWaitTimeout));
-	}
+        Mono<Void> resp = deleteDelegate.deleteApp(cfOperations, cfProperties);
+        resp.block(Duration.ofMillis(defaultWaitTimeout));
+    }
 
-	@Override
-	public String getDescription() {
-		return "Delete an application from Cloud Foundry";
-	}
+    @Override
+    public String getDescription() {
+        return "Delete an application from Cloud Foundry";
+    }
 }

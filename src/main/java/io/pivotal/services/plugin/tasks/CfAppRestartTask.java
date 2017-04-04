@@ -15,22 +15,22 @@ import java.time.Duration;
  */
 public class CfAppRestartTask extends AbstractCfTask {
 
-	@TaskAction
-	public void restartApp() {
+    @TaskAction
+    public void restartApp() {
 
-		CloudFoundryOperations cfOperations = getCfOperations();
-		CfProperties cfProperties = getCfProperties();
+        CloudFoundryOperations cfOperations = getCfOperations();
+        CfProperties cfProperties = getCfProperties();
 
-		Mono<Void> resp = cfOperations.applications()
-				.restart(RestartApplicationRequest.builder().name(cfProperties.name()).build());
+        Mono<Void> resp = cfOperations.applications()
+            .restart(RestartApplicationRequest.builder().name(cfProperties.name()).build());
 
-		resp.block(Duration.ofMillis(defaultWaitTimeout));
+        resp.block(Duration.ofMillis(defaultWaitTimeout));
 
-	}
+    }
 
-	@Override
-	public String getDescription() {
-		return "Restart an Application";
-	}
+    @Override
+    public String getDescription() {
+        return "Restart an Application";
+    }
 
 }

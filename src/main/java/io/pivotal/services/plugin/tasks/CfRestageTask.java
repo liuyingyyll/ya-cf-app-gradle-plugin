@@ -15,24 +15,24 @@ import java.time.Duration;
  */
 public class CfRestageTask extends AbstractCfTask {
 
-	@TaskAction
-	public void restage() {
-		CfProperties cfProperties = getCfProperties();
-		LOGGER.info("About to call Restage task : {} ", cfProperties.toString());
+    @TaskAction
+    public void restage() {
+        CfProperties cfProperties = getCfProperties();
+        LOGGER.info("About to call Restage task : {} ", cfProperties.toString());
 
-		CloudFoundryOperations cfOperations = getCfOperations();
+        CloudFoundryOperations cfOperations = getCfOperations();
 
-		Mono<Void> resp = cfOperations.applications().restage(RestageApplicationRequest.builder()
-				.name(cfProperties.name())
-				.stagingTimeout(Duration.ofMinutes(cfProperties.stagingTimeout()))
-				.startupTimeout(Duration.ofMinutes(cfProperties.startupTimeout())).build()
-		);
+        Mono<Void> resp = cfOperations.applications().restage(RestageApplicationRequest.builder()
+            .name(cfProperties.name())
+            .stagingTimeout(Duration.ofMinutes(cfProperties.stagingTimeout()))
+            .startupTimeout(Duration.ofMinutes(cfProperties.startupTimeout())).build()
+        );
 
-		resp.block(Duration.ofMillis(defaultWaitTimeout));
-	}
+        resp.block(Duration.ofMillis(defaultWaitTimeout));
+    }
 
-	@Override
-	public String getDescription() {
-		return "Restage an Application";
-	}
+    @Override
+    public String getDescription() {
+        return "Restage an Application";
+    }
 }

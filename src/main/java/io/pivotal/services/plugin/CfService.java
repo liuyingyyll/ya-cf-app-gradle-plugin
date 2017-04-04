@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class CfService {
-	private String name;
-	private String plan;
-	private String instanceName;
+    private String name;
+    private String plan;
+    private String instanceName;
 }

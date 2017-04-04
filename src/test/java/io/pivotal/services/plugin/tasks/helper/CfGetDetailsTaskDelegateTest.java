@@ -16,71 +16,68 @@ import static org.mockito.Mockito.*;
 
 public class CfGetDetailsTaskDelegateTest {
 
-	private CfAppDetailsDelegate detailsTaskDelegate = new CfAppDetailsDelegate();
+    private CfAppDetailsDelegate detailsTaskDelegate = new CfAppDetailsDelegate();
 
 
+    @Test
+    public void testGetDetailsNoException() {
+        CloudFoundryOperations cfOperations = mock(CloudFoundryOperations.class);
+        CfProperties cfAppProperties = sampleApp();
 
-	@Test
-	public void testGetDetailsNoException() {
-		CloudFoundryOperations cfOperations = mock(CloudFoundryOperations.class);
-		CfProperties cfAppProperties = sampleApp();
+        ApplicationDetail appDetail = sampleApplicationDetail();
 
-		ApplicationDetail appDetail = sampleApplicationDetail();
+        Applications mockApplications = mock(Applications.class);
+        when(cfOperations.applications()).thenReturn(mockApplications);
 
-		Applications mockApplications = mock(Applications.class);
-		when(cfOperations.applications()).thenReturn(mockApplications);
+        when(mockApplications.get(any(GetApplicationRequest.class))).thenReturn(Mono.just(appDetail));
 
-		when(mockApplications.get(any(GetApplicationRequest.class))).thenReturn(Mono.just(appDetail));
+        Mono<Optional<ApplicationDetail>> appDetailsMono = detailsTaskDelegate.getAppDetails(cfOperations, cfAppProperties);
 
-		Mono<Optional<ApplicationDetail>> appDetailsMono = detailsTaskDelegate.getAppDetails(cfOperations, cfAppProperties);
+        assertThat(appDetailsMono.block().isPresent()).isTrue();
+    }
 
-		assertThat(appDetailsMono.block().isPresent()).isTrue();
-	}
+    @Test
+    public void testGetDetailsNoApplication() {
+        CloudFoundryOperations cfOperations = mock(CloudFoundryOperations.class);
+        CfProperties cfAppProperties = sampleApp();
 
-	@Test
-	public void testGetDetailsNoApplication() {
-		CloudFoundryOperations cfOperations = mock(CloudFoundryOperations.class);
-		CfProperties cfAppProperties = sampleApp();
+        Applications mockApplications = mock(Applications.class);
+        when(cfOperations.applications()).thenReturn(mockApplications);
 
-		Applications mockApplications = mock(Applications.class);
-		when(cfOperations.applications()).thenReturn(mockApplications);
+        when(mockApplications.get(any(GetApplicationRequest.class))).thenReturn(Mono.error(new RuntimeException("No such app")));
 
-		when(mockApplications.get(any(GetApplicationRequest.class))).thenReturn(Mono.error(new RuntimeException("No such app")));
+        Mono<Optional<ApplicationDetail>> appDetailsMono = detailsTaskDelegate.getAppDetails(cfOperations, cfAppProperties);
 
-		Mono<Optional<ApplicationDetail>> appDetailsMono = detailsTaskDelegate.getAppDetails(cfOperations, cfAppProperties);
+        Optional<ApplicationDetail> appDetailOptional = appDetailsMono.block();
 
-		Optional<ApplicationDetail> appDetailOptional = appDetailsMono.block();
-
-		assertThat(appDetailOptional.isPresent()).isFalse();
-	}
-
+        assertThat(appDetailOptional.isPresent()).isFalse();
+    }
 
 
+    private ApplicationDetail sampleApplicationDetail() {
+        return ApplicationDetail.builder()
+            .id("id")
+            .instances(1)
+            .name("test")
+            .stack("stack")
+            .diskQuota(1)
+            .requestedState("started")
+            .memoryLimit(1000)
+            .runningInstances(2)
+            .build();
+    }
 
-	private ApplicationDetail sampleApplicationDetail() {
-		return ApplicationDetail.builder()
-				.id("id")
-				.instances(1)
-				.name("test")
-				.stack("stack")
-				.diskQuota(1)
-				.requestedState("started")
-				.memoryLimit(1000)
-				.runningInstances(2)
-				.build();
-	}
-
-	private CfProperties sampleApp() {
-		return ImmutableCfProperties.builder()
-				.ccHost("cchost")
-				.ccUser("ccuser")
-				.ccPassword("ccpassword")
-				.org("org")
-				.space("space")
-				.name("test")
-				.hostName("test")
-				.build();
-	}
+    private CfProperties sampleApp() {
+        return ImmutableCfProperties.builder()
+            .ccHost("cchost")
+            .ccUser("ccuser")
+            .ccPassword("ccpassword")
+            .org("org")
+            .space("space")
+            .name("test")
+            .hostName("test")
+            .build();
+    }
 
 
 }

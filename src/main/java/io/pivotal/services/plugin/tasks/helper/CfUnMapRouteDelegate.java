@@ -14,23 +14,23 @@ import reactor.core.publisher.Mono;
  */
 public class CfUnMapRouteDelegate {
 
-	private static final Logger LOGGER = Logging.getLogger(CfUnMapRouteDelegate.class);
+    private static final Logger LOGGER = Logging.getLogger(CfUnMapRouteDelegate.class);
 
-	public Mono<Void> unmapRoute(CloudFoundryOperations cfOperations, CfProperties cfProperties) {
+    public Mono<Void> unmapRoute(CloudFoundryOperations cfOperations, CfProperties cfProperties) {
 
-		LOGGER.lifecycle("Unmapping hostname '{}' in domain '{}' with path '{}' of app '{}'", cfProperties.hostName(),
-				cfProperties.domain(), cfProperties.path(), cfProperties.name());
+        return cfOperations.routes()
+            .unmap(UnmapRouteRequest
+                .builder()
+                .applicationName(cfProperties.name())
+                .domain(cfProperties.domain())
+                .host(cfProperties.hostName())
+                .path(cfProperties.path())
+                .build()).doOnSubscribe((s) -> {
+                LOGGER.lifecycle("Unmapping hostname '{}' in domain '{}' with path '{}' of app '{}'", cfProperties.hostName(),
+                    cfProperties.domain(), cfProperties.path(), cfProperties.name());
+            });
 
-		return cfOperations.routes()
-				.unmap(UnmapRouteRequest
-						.builder()
-						.applicationName(cfProperties.name())
-						.domain(cfProperties.domain())
-						.host(cfProperties.hostName())
-						.path(cfProperties.path())
-						.build());
 
-
-	}
+    }
 
 }

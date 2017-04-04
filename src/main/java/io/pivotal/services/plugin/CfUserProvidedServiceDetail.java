@@ -6,12 +6,13 @@ import java.util.Map;
 
 /**
  * Details of a user provided service instance
- * 
+ *
  * @author Biju Kunjummen
  */
 
 @Value.Immutable(copy = true)
 public abstract class CfUserProvidedServiceDetail {
-	public abstract String instanceName();
-	public abstract Map<String, String> credentials();
+    public abstract String instanceName();
+
+    public abstract Map<String, String> credentials();
 }

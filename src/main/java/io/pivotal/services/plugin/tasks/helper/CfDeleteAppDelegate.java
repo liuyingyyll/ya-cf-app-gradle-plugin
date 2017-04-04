@@ -15,14 +15,14 @@ import reactor.core.publisher.Mono;
  */
 public class CfDeleteAppDelegate {
 
-	private static final Logger LOGGER = Logging.getLogger(CfDeleteAppDelegate.class);
+    private static final Logger LOGGER = Logging.getLogger(CfDeleteAppDelegate.class);
 
-	public Mono<Void> deleteApp(CloudFoundryOperations cfOperations, CfProperties cfProperties) {
-		LOGGER.quiet("About to delete App '{}'", cfProperties.name());
-		return cfOperations.applications().delete(
-				DeleteApplicationRequest
-						.builder()
-						.name(cfProperties.name())
-						.build());
-	}
+    public Mono<Void> deleteApp(CloudFoundryOperations cfOperations,
+                                CfProperties cfProperties) {
+        return cfOperations.applications()
+            .delete(DeleteApplicationRequest.builder().name(cfProperties.name()).build())
+            .doOnSubscribe((s) -> {
+                LOGGER.lifecycle("About to delete App '{}'", cfProperties.name());
+            });
+    }
 }

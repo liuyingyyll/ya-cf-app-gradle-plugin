@@ -15,23 +15,23 @@ import java.time.Duration;
  */
 public class CfMapRouteTask extends AbstractCfTask {
 
-	private CfMapRouteDelegate mapRouteDelegate = new CfMapRouteDelegate();
+    private CfMapRouteDelegate mapRouteDelegate = new CfMapRouteDelegate();
 
-	@TaskAction
-	public void mapRoute() {
+    @TaskAction
+    public void mapRoute() {
 
-		CloudFoundryOperations cfOperations = getCfOperations();
-		CfProperties cfProperties = getCfProperties();
+        CloudFoundryOperations cfOperations = getCfOperations();
+        CfProperties cfProperties = getCfProperties();
 
-		Mono<Void> resp = mapRouteDelegate.mapRoute(cfOperations, cfProperties);
+        Mono<Void> resp = mapRouteDelegate.mapRoute(cfOperations, cfProperties);
 
-		resp.block(Duration.ofMillis(defaultWaitTimeout));
+        resp.block(Duration.ofMillis(defaultWaitTimeout));
 
-	}
+    }
 
-	@Override
-	public String getDescription() {
-		return "Add a route for an application";
-	}
+    @Override
+    public String getDescription() {
+        return "Add a route for an application";
+    }
 
 }

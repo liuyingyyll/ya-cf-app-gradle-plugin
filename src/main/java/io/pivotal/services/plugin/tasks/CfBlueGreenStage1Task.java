@@ -10,7 +10,7 @@ import java.time.Duration;
 
 /**
  * Responsible for a <a href="https://docs.cloudfoundry.org/devguide/deploy-apps/blue-green.html">Blue Green</a> style deployment
- *
+ * <p>
  * Upto the point of getting a new application with a new route deployed to CF. There will be subsequent stage which
  * will make this new app the primary app and remove the old app routes
  *
@@ -18,22 +18,22 @@ import java.time.Duration;
  */
 public class CfBlueGreenStage1Task extends AbstractCfTask {
 
-	private CfBlueGreenStage1Delegate blueGreenStage1Delegate = new CfBlueGreenStage1Delegate();
+    private CfBlueGreenStage1Delegate blueGreenStage1Delegate = new CfBlueGreenStage1Delegate();
 
-	@TaskAction
-	public void runBlueGreen() {
+    @TaskAction
+    public void runBlueGreen() {
 
-		CloudFoundryOperations cfOperations = getCfOperations();
-		CfProperties originalProperties = getCfProperties();
+        CloudFoundryOperations cfOperations = getCfOperations();
+        CfProperties originalProperties = getCfProperties();
 
-		Mono<Void> resp = blueGreenStage1Delegate.runStage1(getProject(), cfOperations, originalProperties);
+        Mono<Void> resp = blueGreenStage1Delegate.runStage1(getProject(), cfOperations, originalProperties);
 
-		resp.block(Duration.ofMillis(defaultWaitTimeout));
-	}
+        resp.block(Duration.ofMillis(defaultWaitTimeout));
+    }
 
-	@Override
-	public String getDescription() {
-		return "Push an Application in a Blue-Green no downtime mode - Stage 1";
-	}
+    @Override
+    public String getDescription() {
+        return "Push an Application in a Blue-Green no downtime mode - Stage 1";
+    }
 
 }

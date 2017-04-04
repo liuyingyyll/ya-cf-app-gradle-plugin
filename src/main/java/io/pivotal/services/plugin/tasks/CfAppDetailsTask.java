@@ -17,27 +17,27 @@ import java.util.Optional;
  */
 public class CfAppDetailsTask extends AbstractCfTask {
 
-	private CfAppDetailsDelegate detailsTaskDelegate = new CfAppDetailsDelegate();
+    private CfAppDetailsDelegate detailsTaskDelegate = new CfAppDetailsDelegate();
 
-	@TaskAction
-	public void appDetails() {
+    @TaskAction
+    public void appDetails() {
 
-		CloudFoundryOperations cfOperations = getCfOperations();
-		CfProperties cfProperties = getCfProperties();
+        CloudFoundryOperations cfOperations = getCfOperations();
+        CfProperties cfProperties = getCfProperties();
 
-		Mono<Optional<ApplicationDetail>> resp = detailsTaskDelegate.getAppDetails(cfOperations, cfProperties);
+        Mono<Optional<ApplicationDetail>> resp = detailsTaskDelegate.getAppDetails(cfOperations, cfProperties);
 
-		Optional<ApplicationDetail> applicationDetail = resp.block(Duration.ofMillis(defaultWaitTimeout));
+        Optional<ApplicationDetail> applicationDetail = resp.block(Duration.ofMillis(defaultWaitTimeout));
 
-		setApplicationDetail(applicationDetail.orElseThrow(() -> new IllegalArgumentException("No application found")));
-	}
+        setApplicationDetail(applicationDetail.orElseThrow(() -> new IllegalArgumentException("No application found")));
+    }
 
-	private void setApplicationDetail(ApplicationDetail applicationDetail) {
-		this.getExtension().setApplicationDetail(applicationDetail);
-	}
+    private void setApplicationDetail(ApplicationDetail applicationDetail) {
+        this.getExtension().setApplicationDetail(applicationDetail);
+    }
 
-	@Override
-	public String getDescription() {
-		return "Get the application detail from Cloud Foundry";
-	}
+    @Override
+    public String getDescription() {
+        return "Get the application detail from Cloud Foundry";
+    }
 }

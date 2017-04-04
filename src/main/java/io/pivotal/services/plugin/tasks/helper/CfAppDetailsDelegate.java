@@ -17,21 +17,18 @@ import java.util.Optional;
  */
 public class CfAppDetailsDelegate {
 
-	private static final Logger LOGGER = Logging.getLogger(CfAppDetailsDelegate.class);
+    private static final Logger LOGGER = Logging.getLogger(CfAppDetailsDelegate.class);
 
-	public Mono<Optional<ApplicationDetail>> getAppDetails(CloudFoundryOperations cfOperations,
-														   CfProperties cfProperties) {
+    public Mono<Optional<ApplicationDetail>> getAppDetails(
+        CloudFoundryOperations cfOperations, CfProperties cfProperties) {
+        Mono<ApplicationDetail> applicationDetailMono = cfOperations.applications()
+            .get(GetApplicationRequest.builder().name(cfProperties.name()).build())
+            .doOnSubscribe((c) -> {
+                LOGGER.lifecycle("Checking details of app '{}'", cfProperties.name());
+            });
 
-		LOGGER.lifecycle("Checking details of app '{}'", cfProperties.name());
-		Mono<ApplicationDetail> applicationDetailMono = cfOperations.applications()
-				.get(
-						GetApplicationRequest.builder()
-								.name(cfProperties.name())
-								.build());
-
-		return applicationDetailMono
-				.map(appDetail -> Optional.ofNullable(appDetail))
-				.otherwise(Exception.class, e -> Mono.just(Optional.empty()));
-	}
+        return applicationDetailMono.map(appDetail -> Optional.ofNullable(appDetail))
+            .otherwise(Exception.class, e -> Mono.just(Optional.empty()));
+    }
 
 }

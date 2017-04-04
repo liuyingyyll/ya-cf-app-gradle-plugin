@@ -6,6 +6,6 @@ import java.util.Map;
 
 @Data
 public class CfUserProvidedService {
-	private String instanceName;
-	private Map<String, String> credentials;
+    private String instanceName;
+    private Map<String, String> credentials;
 }

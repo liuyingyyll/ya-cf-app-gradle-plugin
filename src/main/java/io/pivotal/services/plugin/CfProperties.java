@@ -29,18 +29,19 @@ import java.util.Map;
  */
 @Value.Immutable(copy = true)
 public abstract class CfProperties {
-	public abstract String ccHost();
+    public abstract String ccHost();
 
-	@Nullable
-	public abstract String ccUser();
+    @Nullable
+    public abstract String ccUser();
 
-	@Nullable
-	public abstract String ccPassword();
+    @Nullable
+    public abstract String ccPassword();
 
-	@Nullable
-	public abstract String ccToken();
+    @Nullable
+    public abstract String ccToken();
 
     public abstract String org();
+
     public abstract String space();
 
     public abstract String name();
@@ -50,6 +51,7 @@ public abstract class CfProperties {
 
     @Nullable
     public abstract String hostName();
+
     @Nullable
     public abstract String domain();
 
@@ -106,10 +108,10 @@ public abstract class CfProperties {
 
     @Nullable
     public abstract Integer startupTimeout();
-    
+
     @Nullable
     public abstract List<CfServiceDetail> cfServices();
-    
+
     @Nullable
     public abstract List<CfUserProvidedServiceDetail> cfUserProvidedServices();
 }

@@ -17,26 +17,29 @@ import java.util.Optional;
  */
 public class CfCreateUserProvidedServiceHelper {
 
-	private CfServicesDetailHelper servicesDetailHelper = new CfServicesDetailHelper();
-	private static final Logger LOGGER = Logging.getLogger(CfCreateServiceHelper.class);
+    private CfServicesDetailHelper servicesDetailHelper = new CfServicesDetailHelper();
+    private static final Logger LOGGER = Logging.getLogger(CfCreateServiceHelper.class);
 
-	public Mono<Void> createUserProvidedService(CloudFoundryOperations cfOperations,
-												CfUserProvidedServiceDetail cfUserProvidedServiceDetail) {
+    public Mono<Void> createUserProvidedService(CloudFoundryOperations cfOperations,
+                                                CfUserProvidedServiceDetail cfUserProvidedServiceDetail) {
 
-		Mono<Optional<ServiceInstance>> serviceInstanceMono =
-			servicesDetailHelper.getServiceInstanceDetail(cfOperations, cfUserProvidedServiceDetail.instanceName());
+        Mono<Optional<ServiceInstance>> serviceInstanceMono = servicesDetailHelper
+            .getServiceInstanceDetail(cfOperations,
+                cfUserProvidedServiceDetail.instanceName());
 
-		return serviceInstanceMono.then(serviceInstanceOpt ->
-			serviceInstanceOpt.map(serviceInstance -> {
-				LOGGER.lifecycle("Existing service with name {} found. This service will not be re-created", cfUserProvidedServiceDetail.instanceName());
-				return Mono.empty().then();
-			}).orElseGet(() -> {
-				LOGGER.lifecycle("Creating user provided service -  instance: {}",
-					cfUserProvidedServiceDetail.instanceName());
-				return cfOperations.services()
-					.createUserProvidedInstance(CreateUserProvidedServiceInstanceRequest.builder()
-						.name(cfUserProvidedServiceDetail.instanceName())
-						.credentials(cfUserProvidedServiceDetail.credentials()).build());
-			}));
-	}
+        return serviceInstanceMono
+            .then(serviceInstanceOpt -> serviceInstanceOpt.map(serviceInstance -> {
+                LOGGER.lifecycle(
+                    "Existing service with name {} found. This service will not be re-created",
+                    cfUserProvidedServiceDetail.instanceName());
+                return Mono.empty().then();
+            }).orElseGet(() -> {
+                LOGGER.lifecycle("Creating user provided service -  instance: {}",
+                    cfUserProvidedServiceDetail.instanceName());
+                return cfOperations.services().createUserProvidedInstance(
+                    CreateUserProvidedServiceInstanceRequest.builder()
+                        .name(cfUserProvidedServiceDetail.instanceName())
+                        .credentials(cfUserProvidedServiceDetail.credentials()).build());
+            }));
+    }
 }

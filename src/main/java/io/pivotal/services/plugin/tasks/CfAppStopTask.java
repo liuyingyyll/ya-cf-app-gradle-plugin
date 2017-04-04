@@ -15,23 +15,23 @@ import java.time.Duration;
  */
 public class CfAppStopTask extends AbstractCfTask {
 
-	private CfAppStopDelegate stopDelegate = new CfAppStopDelegate();
+    private CfAppStopDelegate stopDelegate = new CfAppStopDelegate();
 
-	@TaskAction
-	public void stopApp() {
+    @TaskAction
+    public void stopApp() {
 
-		CloudFoundryOperations cfOperations = getCfOperations();
-		CfProperties cfProperties = getCfProperties();
+        CloudFoundryOperations cfOperations = getCfOperations();
+        CfProperties cfProperties = getCfProperties();
 
-		Mono<Void> resp = this.stopDelegate.stopApp(cfOperations, cfProperties);
+        Mono<Void> resp = this.stopDelegate.stopApp(cfOperations, cfProperties);
 
-		resp.block(Duration.ofMillis(defaultWaitTimeout));
+        resp.block(Duration.ofMillis(defaultWaitTimeout));
 
-	}
+    }
 
-	@Override
-	public String getDescription() {
-		return "Stop an Application";
-	}
+    @Override
+    public String getDescription() {
+        return "Stop an Application";
+    }
 
 }

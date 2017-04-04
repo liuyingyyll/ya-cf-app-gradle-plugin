@@ -14,14 +14,17 @@ import reactor.core.publisher.Mono;
  */
 public class CfAppStopDelegate {
 
-	private static final Logger LOGGER = Logging.getLogger(CfAppStopDelegate.class);
+    private static final Logger LOGGER = Logging.getLogger(CfAppStopDelegate.class);
 
-	public Mono<Void> stopApp(CloudFoundryOperations cfOperations, CfProperties cfProperties) {
+    public Mono<Void> stopApp(CloudFoundryOperations cfOperations,
+                              CfProperties cfProperties) {
 
-		LOGGER.lifecycle("Stopping app '{}'", cfProperties.name());
-		return cfOperations.applications()
-				.stop(StopApplicationRequest.builder().name(cfProperties.name()).build());
+        return cfOperations.applications()
+            .stop(StopApplicationRequest.builder().name(cfProperties.name()).build())
+            .doOnSubscribe((s) -> {
+                LOGGER.lifecycle("Stopping app '{}'", cfProperties.name());
+            });
 
-	}
+    }
 
 }

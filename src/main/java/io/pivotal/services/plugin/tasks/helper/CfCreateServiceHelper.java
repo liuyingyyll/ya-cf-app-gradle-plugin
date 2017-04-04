@@ -17,31 +17,33 @@ import java.util.Optional;
  */
 public class CfCreateServiceHelper {
 
-	private CfServicesDetailHelper servicesDetailHelper = new CfServicesDetailHelper();
-	private static final Logger LOGGER = Logging.getLogger(CfCreateServiceHelper.class);
+    private CfServicesDetailHelper servicesDetailHelper = new CfServicesDetailHelper();
+    private static final Logger LOGGER = Logging.getLogger(CfCreateServiceHelper.class);
 
-	public Mono<Void> createService(CloudFoundryOperations cfOperations,
-									CfServiceDetail cfServiceDetail) {
+    public Mono<Void> createService(CloudFoundryOperations cfOperations,
+                                    CfServiceDetail cfServiceDetail) {
 
+        Mono<Optional<ServiceInstance>> serviceInstanceMono = servicesDetailHelper
+            .getServiceInstanceDetail(cfOperations, cfServiceDetail.instanceName());
 
-		Mono<Optional<ServiceInstance>> serviceInstanceMono =
-			servicesDetailHelper.getServiceInstanceDetail(cfOperations, cfServiceDetail.instanceName());
+        return serviceInstanceMono
+            .then(serviceInstanceOpt -> serviceInstanceOpt.map(serviceInstance -> {
+                LOGGER.lifecycle(
+                    "Existing service with name {} found. This service will not be re-created",
+                    cfServiceDetail.instanceName());
+                return Mono.empty().then();
+            }).orElseGet(() -> {
+                LOGGER
+                    .lifecycle("Creating service -  instance: {}, service: {}, plan: {}",
+                        cfServiceDetail.instanceName(), cfServiceDetail.name(),
+                        cfServiceDetail.plan());
 
-		return serviceInstanceMono.then(serviceInstanceOpt ->
-			serviceInstanceOpt.map(serviceInstance -> {
-				LOGGER.lifecycle("Existing service with name {} found. This service will not be re-created", cfServiceDetail.instanceName());
-				return Mono.empty().then();
-			}).orElseGet(() -> {
-				LOGGER.lifecycle("Creating service -  instance: {}, service: {}, plan: {}",
-					cfServiceDetail.instanceName(), cfServiceDetail.name(), cfServiceDetail.plan());
-				
-				return cfOperations.services()
-					.createInstance(CreateServiceInstanceRequest.builder()
-						.serviceInstanceName(cfServiceDetail.instanceName())
-						.serviceName(cfServiceDetail.name())
-						.planName(cfServiceDetail.plan()).build());
-			})
-		);
+                return cfOperations.services().createInstance(
+                    CreateServiceInstanceRequest.builder()
+                        .serviceInstanceName(cfServiceDetail.instanceName())
+                        .serviceName(cfServiceDetail.name())
+                        .planName(cfServiceDetail.plan()).build());
+            }));
 
-	}
+    }
 }

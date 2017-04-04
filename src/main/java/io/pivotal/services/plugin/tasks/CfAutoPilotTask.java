@@ -16,23 +16,22 @@ import java.time.Duration;
 public class CfAutoPilotTask extends AbstractCfTask {
 
 
-	private CfAutoPilotDelegate autoPilotTaskDelegate = new CfAutoPilotDelegate();
+    private CfAutoPilotDelegate autoPilotTaskDelegate = new CfAutoPilotDelegate();
 
-	@TaskAction
-	public void runAutopilot() {
+    @TaskAction
+    public void runAutopilot() {
+        CloudFoundryOperations cfOperations = getCfOperations();
+        CfProperties originalProperties = getCfProperties();
 
-		CloudFoundryOperations cfOperations = getCfOperations();
-		CfProperties originalProperties = getCfProperties();
 
+        Mono<Void> resp = autoPilotTaskDelegate.runAutopilot(getProject(), cfOperations, originalProperties);
 
-		Mono<Void> resp = autoPilotTaskDelegate.runAutopilot(getProject(), cfOperations, originalProperties);
+        resp.block(Duration.ofMillis(defaultWaitTimeout));
+    }
 
-		resp.block(Duration.ofMillis(defaultWaitTimeout));
-	}
-
-	@Override
-	public String getDescription() {
-		return "Push an Application in a no downtime Autopilot mode";
-	}
+    @Override
+    public String getDescription() {
+        return "Push an Application in a no downtime Autopilot mode";
+    }
 
 }

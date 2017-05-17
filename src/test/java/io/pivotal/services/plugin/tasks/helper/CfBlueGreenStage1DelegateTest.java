@@ -13,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 import java.time.Duration;
 import java.util.Optional;
@@ -59,7 +60,9 @@ public class CfBlueGreenStage1DelegateTest {
             .thenReturn(Mono.empty());
 
         Mono<Void> resultMono = this.blueGreenStage1Delegate.runStage1(project, cfOperations, cfAppProperties);
-        resultMono.block(Duration.ofMillis(2000L));
+        StepVerifier.create(resultMono)
+            .expectComplete()
+            .verify(Duration.ofMillis(2000L));
 
         ArgumentCaptor<CfProperties> argumentCaptor = ArgumentCaptor.forClass(CfProperties.class);
 
@@ -87,7 +90,9 @@ public class CfBlueGreenStage1DelegateTest {
             .thenReturn(Mono.empty());
 
         Mono<Void> resultMono = this.blueGreenStage1Delegate.runStage1(project, cfOperations, cfAppProperties);
-        resultMono.block(Duration.ofMillis(2000L));
+        StepVerifier.create(resultMono)
+            .expectComplete()
+            .verify(Duration.ofMillis(2000L));
 
         ArgumentCaptor<CfProperties> argumentCaptor = ArgumentCaptor.forClass(CfProperties.class);
 

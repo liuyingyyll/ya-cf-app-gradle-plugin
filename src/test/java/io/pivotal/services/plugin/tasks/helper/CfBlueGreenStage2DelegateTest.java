@@ -12,7 +12,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
+import java.time.Duration;
 import java.util.Optional;
 
 import static org.mockito.Matchers.any;
@@ -63,7 +65,9 @@ public class CfBlueGreenStage2DelegateTest {
         when(this.stopDelegate.stopApp(any(CloudFoundryOperations.class), any(CfProperties.class))).thenReturn(Mono.empty());
 
         Mono<Void> resp = this.blueGreenStage2Delegate.runStage2(project, cfOperations, cfAppProperties);
-        resp.block();
+        StepVerifier.create(resp)
+            .expectComplete()
+            .verify(Duration.ofMillis(2000L));
 
         //delete of old backup should not be called..there is no backup app..
         verify(this.deleteAppTaskDelegate, times(0)).deleteApp(any(CloudFoundryOperations.class), any(CfProperties.class));
@@ -95,7 +99,9 @@ public class CfBlueGreenStage2DelegateTest {
         when(this.stopDelegate.stopApp(any(CloudFoundryOperations.class), any(CfProperties.class))).thenReturn(Mono.empty());
 
         Mono<Void> resp = this.blueGreenStage2Delegate.runStage2(project, cfOperations, cfAppProperties);
-        resp.block();
+        StepVerifier.create(resp)
+            .expectComplete()
+            .verify(Duration.ofMillis(2000L));
 
         //delete of old backup
         verify(this.deleteAppTaskDelegate, times(1)).deleteApp(any(CloudFoundryOperations.class), any(CfProperties.class));

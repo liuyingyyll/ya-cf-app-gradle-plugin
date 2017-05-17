@@ -35,7 +35,6 @@ apply plugin: "com.gradle.plugin-publish"
 
 dependencies {
     compile gradleApi()
-//    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8', version: '2.4.3'
     compile("org.cloudfoundry:cloudfoundry-client-reactor:$cfClientVersion")
     compile("org.cloudfoundry:cloudfoundry-operations:$cfClientVersion")
     testCompile('org.assertj:assertj-core:3.4.1')
@@ -43,6 +42,7 @@ dependencies {
     testCompile('junit:junit:4.12')
     compileOnly("org.immutables:value:2.3.7")
     compileOnly "org.projectlombok:lombok:1.16.8"
+    testCompile("io.projectreactor.addons:reactor-test:3.0.7.RELEASE")
 }
 
 task javadocJar(type: Jar) {

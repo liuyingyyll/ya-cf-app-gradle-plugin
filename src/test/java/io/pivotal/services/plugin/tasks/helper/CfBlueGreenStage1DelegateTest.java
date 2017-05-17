@@ -14,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -58,7 +59,7 @@ public class CfBlueGreenStage1DelegateTest {
             .thenReturn(Mono.empty());
 
         Mono<Void> resultMono = this.blueGreenStage1Delegate.runStage1(project, cfOperations, cfAppProperties);
-        resultMono.blockMillis(2000L);
+        resultMono.block(Duration.ofMillis(2000L));
 
         ArgumentCaptor<CfProperties> argumentCaptor = ArgumentCaptor.forClass(CfProperties.class);
 
@@ -86,7 +87,7 @@ public class CfBlueGreenStage1DelegateTest {
             .thenReturn(Mono.empty());
 
         Mono<Void> resultMono = this.blueGreenStage1Delegate.runStage1(project, cfOperations, cfAppProperties);
-        resultMono.blockMillis(2000L);
+        resultMono.block(Duration.ofMillis(2000L));
 
         ArgumentCaptor<CfProperties> argumentCaptor = ArgumentCaptor.forClass(CfProperties.class);
 

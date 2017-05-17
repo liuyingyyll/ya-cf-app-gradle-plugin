@@ -27,7 +27,7 @@ public class CfServicesDetailHelper {
 
         return serviceInstanceMono
             .map(serviceInstance -> Optional.ofNullable(serviceInstance))
-            .otherwise(Exception.class, e -> Mono.just(Optional.empty()));
+            .onErrorResume(Exception.class, e -> Mono.just(Optional.empty()));
     }
 
 }

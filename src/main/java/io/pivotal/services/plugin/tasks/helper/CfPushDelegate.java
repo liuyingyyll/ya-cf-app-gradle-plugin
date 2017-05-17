@@ -47,12 +47,12 @@ public class CfPushDelegate {
                 }
             }
 
-            resp = resp.then(() -> {
+            resp = resp.then(Mono.defer(() -> {
                 LOGGER.lifecycle("Pushing app '{}'", cfProperties.name());
                 return cfOperations.applications()
                     .push(PushApplicationRequest.builder()
                         .name(cfProperties.name())
-                        .application(path)
+                        .path(path)
                         .buildpack(cfProperties.buildpack())
                         .command(cfProperties.command())
                         .diskQuota(cfProperties.diskQuota())
@@ -64,11 +64,11 @@ public class CfPushDelegate {
                         .routePath(cfProperties.path())
                         .noStart(true)
                         .build());
-            });
+            }));
 
             if (cfProperties.environment() != null) {
                 for (Map.Entry<String, String> entry : cfProperties.environment().entrySet()) {
-                    resp = resp.then(() -> {
+                    resp = resp.then(Mono.defer(() -> {
                         LOGGER.lifecycle("Setting env variable '{}'", entry.getKey());
                         return cfOperations.applications()
                             .setEnvironmentVariable(SetEnvironmentVariableApplicationRequest
@@ -77,31 +77,31 @@ public class CfPushDelegate {
                                 .variableName(entry.getKey())
                                 .variableValue(entry.getValue())
                                 .build());
-                    });
+                    }));
                 }
             }
 
             if (cfProperties.services() != null) {
                 for (String serviceName : cfProperties.services()) {
 
-                    resp = resp.then(() -> {
+                    resp = resp.then(Mono.defer(() -> {
                         LOGGER.lifecycle("Binding Service '{}'", serviceName);
                         return cfOperations.services()
                             .bind(BindServiceInstanceRequest.builder()
                                 .serviceInstanceName(serviceName)
                                 .applicationName(cfProperties.name())
                                 .build());
-                    });
+                    }));
                 }
             }
 
 
-            return resp.then(() -> {
+            return resp.then(Mono.defer(() -> {
                 LOGGER.lifecycle("Starting app '{}'", cfProperties.name());
                 return cfOperations.applications().restart(RestartApplicationRequest
                     .builder()
                     .name(cfProperties.name()).build());
-            });
+            }));
         } else {
             throw new RuntimeException("Missing file : " + path);
         }

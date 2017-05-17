@@ -27,8 +27,9 @@ public class CfAppDetailsDelegate {
                 LOGGER.lifecycle("Checking details of app '{}'", cfProperties.name());
             });
 
-        return applicationDetailMono.map(appDetail -> Optional.ofNullable(appDetail))
-            .otherwise(Exception.class, e -> Mono.just(Optional.empty()));
+        return applicationDetailMono
+            .map(appDetail -> Optional.ofNullable(appDetail))
+            .onErrorResume(Exception.class, e -> Mono.just(Optional.empty()));
     }
 
 }

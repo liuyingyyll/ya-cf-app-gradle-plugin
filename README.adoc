@@ -2,9 +2,10 @@
 
 image:https://travis-ci.org/pivotalservices/ya-cf-app-gradle-plugin.svg?branch=master["Build Status", link="https://travis-ci.org/pivotalservices/ya-cf-app-gradle-plugin"]
 
-The purpose of this plugin is to provide ways to manage an application in the Cloud Foundry Environment - Be able to deploy, update, start/stop/restart, attach/remove routes.
+The purpose of this plugin is to provide ways to manage the deployment of an application to a Cloud Foundry Environment - 
+Be able to deploy, update, start/stop/restart application, attach/remove routes, create/bind services/CUPS.
 
-"Yet another" because the authoritative source of Cloud Foundry Gradle plugin is expected to be https://github.com/cloudfoundry/cf-java-client/tree/master/cloudfoundry-gradle-plugin[here]
+"Yet another" because the authoritative source of Cloud Foundry Gradle plugin is expected to be with the https://github.com/cloudfoundry/cf-java-client[CF-Java-Client project].
 
 
 === Using the Plugin
@@ -30,6 +31,8 @@ buildscript {
 		classpath("com.github.pivotalservices:ya-cf-app-gradle-plugin:${cfAppVersion}")
 	}
 }
+
+apply plugin: 'cf-app'
 ----
 
 OR Via the new Gradle plugins mechanism:
@@ -40,11 +43,10 @@ plugins {
 }
 ----
 
-* Apply the plugin and provide the Cloud Foundry details:
+* Provide the Cloud Foundry connectivity and application details:
 
 [source]
 ----
-apply plugin: 'cf-app'
 
 cfConfig {
 	//CF Details
@@ -85,7 +87,7 @@ cfConfig {
 ----
 
 * There is one task to retrieve the details of an application (cf-get-app-detail).
-You can use the plugin the following way, say to retrieve the app url's in a gradle task:
+You can use this task in the following way, say to retrieve the app url's in a gradle task:
 
 [source]
 ----
@@ -94,7 +96,7 @@ task showAppUrls(dependsOn: "cf-get-app-detail") << {
 }
 ----
 
-Say if you wanted to deploy an app and use the apps url to run an acceptance test against you can define a task alone these lines:
+or if you want to run an acceptance test you can define a task alone these lines:
 
 [source]
 ----

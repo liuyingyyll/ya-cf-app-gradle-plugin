@@ -11,3 +11,4 @@ build/
 *.zip
 classes/
 src/main/generated
+out/

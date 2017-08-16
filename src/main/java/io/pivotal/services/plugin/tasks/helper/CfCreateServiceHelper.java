@@ -20,8 +20,8 @@ public class CfCreateServiceHelper {
     private CfServicesDetailHelper servicesDetailHelper = new CfServicesDetailHelper();
     private static final Logger LOGGER = Logging.getLogger(CfCreateServiceHelper.class);
 
-    public Mono<Void> createService(CloudFoundryOperations cfOperations,
-                                    CfServiceDetail cfServiceDetail) {
+    public Mono<ServiceInstance> createService(CloudFoundryOperations cfOperations,
+                                               CfServiceDetail cfServiceDetail) {
 
         Mono<Optional<ServiceInstance>> serviceInstanceMono = servicesDetailHelper
             .getServiceInstanceDetail(cfOperations, cfServiceDetail.instanceName());
@@ -31,7 +31,7 @@ public class CfCreateServiceHelper {
                 LOGGER.lifecycle(
                     "Existing service with name {} found. This service will not be re-created",
                     cfServiceDetail.instanceName());
-                return Mono.empty().then();
+                return Mono.just(serviceInstance);
             }).orElseGet(() -> {
                 LOGGER
                     .lifecycle("Creating service -  instance: {}, service: {}, plan: {}",
@@ -42,7 +42,11 @@ public class CfCreateServiceHelper {
                     CreateServiceInstanceRequest.builder()
                         .serviceInstanceName(cfServiceDetail.instanceName())
                         .serviceName(cfServiceDetail.name())
-                        .planName(cfServiceDetail.plan()).build());
+                        .planName(cfServiceDetail.plan())
+                        .tags(cfServiceDetail.tags())
+                        .build())
+                    .then(servicesDetailHelper.getServiceInstanceDetail(cfOperations, cfServiceDetail.instanceName()))
+                    .map(instanceOpt -> instanceOpt.get());
             }));
 
     }

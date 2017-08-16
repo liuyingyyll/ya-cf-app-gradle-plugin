@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Responsible for creating the list of services in
+ * Responsible for creating the list of services
  *
  * @author Biju Kunjummen
  */
@@ -30,7 +30,7 @@ public class CfCreateServicesTask extends AbstractCfTask {
 
         List<Mono<Void>> createServicesResult = cfProperties.cfServices()
             .stream()
-            .map(service -> createServiceHelper.createService(cfOperations, service))
+            .map(service -> createServiceHelper.createService(cfOperations, service).then())
             .collect(Collectors.toList());
 
         List<Mono<Void>> createUserProvidedServicesResult = cfProperties.cfUserProvidedServices()
@@ -42,12 +42,6 @@ public class CfCreateServicesTask extends AbstractCfTask {
         });
         Flux.merge(createUserProvidedServicesResult).toIterable().forEach(r -> {
         });
-
-
-    }
-
-    private void setApplicationDetail(ApplicationDetail applicationDetail) {
-        this.getExtension().setApplicationDetail(applicationDetail);
     }
 
     @Override

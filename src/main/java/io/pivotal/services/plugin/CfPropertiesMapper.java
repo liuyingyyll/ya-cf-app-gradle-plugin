@@ -94,7 +94,9 @@ public class CfPropertiesMapper {
                 CfServiceDetail cfServiceDetail = ImmutableCfServiceDetail.builder()
                     .instanceName(cfService.getInstanceName())
                     .name(cfService.getName())
-                    .plan(cfService.getPlan()).build();
+                    .plan(cfService.getPlan())
+                    .tags(cfService.getTags())
+                    .build();
 
                 serviceDetails.add(cfServiceDetail);
             }

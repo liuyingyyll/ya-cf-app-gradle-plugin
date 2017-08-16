@@ -37,7 +37,7 @@ public class CfPushDelegate {
 
             if (cfProperties.cfServices() != null) {
                 for (CfServiceDetail service : cfProperties.cfServices()) {
-                    resp = resp.then(cfCreateServiceHelper.createService(cfOperations, service));
+                    resp = resp.then(cfCreateServiceHelper.createService(cfOperations, service)).then();
                 }
             }
 

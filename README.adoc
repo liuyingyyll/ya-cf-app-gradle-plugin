@@ -20,7 +20,7 @@ Start by looking at a sample project using the plugin https://github.com/bijukun
 ----
 buildscript {
 	ext {
-		cfAppVersion = '1.0.9'
+		cfAppVersion = '1.0.10-RC1'
 	}
 	repositories {
 		mavenCentral()
@@ -39,7 +39,7 @@ OR Via the new Gradle plugins mechanism:
 [source]
 ----
 plugins {
-	id "com.github.pivotalservices.cf-app" version "1.0.9"
+	id "com.github.pivotalservices.cf-app" version "1.0.10-RC1"
 }
 ----
 
@@ -162,6 +162,7 @@ Services can be created and automatically bound to the app in the targeted org a
         name = "p-rabbitmq"
         plan = "standard"
         instanceName = "test-rabbitmq"
+        tags = ["tag1", "tag2"]
     }
     
     cfUserProvidedService {

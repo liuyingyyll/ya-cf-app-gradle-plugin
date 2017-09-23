@@ -39,7 +39,7 @@ OR Via the new Gradle plugins mechanism:
 [source]
 ----
 plugins {
-	id "com.github.pivotalservices.cf-app" version "1.0.10-RC1"
+	id "com.github.pivotalservices.cf-app" version "1.0.10"
 }
 ----
 

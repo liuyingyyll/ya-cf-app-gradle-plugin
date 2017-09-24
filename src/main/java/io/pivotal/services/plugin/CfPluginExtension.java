@@ -41,7 +41,7 @@ public class CfPluginExtension {
 
     private String name;
     private String filePath;
-    private String hostName;
+    private String host;
     private String domain;
     private String path;
 
@@ -147,12 +147,12 @@ public class CfPluginExtension {
         this.filePath = filePath;
     }
 
-    public String getHostName() {
-        return hostName;
+    public String getHost() {
+        return host;
     }
 
-    public void setHostName(String hostName) {
-        this.hostName = hostName;
+    public void setHost(String host) {
+        this.host = host;
     }
 
     public String getDomain() {
@@ -342,7 +342,7 @@ public class CfPluginExtension {
         sb.append(", space='").append(space).append('\'');
         sb.append(", name='").append(name).append('\'');
         sb.append(", filePath='").append(filePath).append('\'');
-        sb.append(", hostName='").append(hostName).append('\'');
+        sb.append(", host='").append(host).append('\'');
         sb.append(", domain='").append(domain).append('\'');
         sb.append(", path='").append(path).append('\'');
         sb.append(", state='").append(state).append('\'');

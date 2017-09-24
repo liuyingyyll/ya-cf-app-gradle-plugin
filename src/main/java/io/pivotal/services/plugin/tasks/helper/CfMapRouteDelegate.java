@@ -24,9 +24,9 @@ public class CfMapRouteDelegate {
                 .builder()
                 .applicationName(cfProperties.name())
                 .domain(cfProperties.domain())
-                .host(cfProperties.hostName())
+                .host(cfProperties.host())
                 .path(cfProperties.path()).build()).then().doOnSubscribe((s) -> {
-                LOGGER.lifecycle("Mapping hostname '{}' in domain '{}' with path '{}' of app '{}'", cfProperties.hostName(),
+                LOGGER.lifecycle("Mapping hostname '{}' in domain '{}' with path '{}' of app '{}'", cfProperties.host(),
                     cfProperties.domain(), cfProperties.path(), cfProperties.name());
             });
 

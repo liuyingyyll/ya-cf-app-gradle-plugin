@@ -29,19 +29,19 @@ public class CfBlueGreenStage1Delegate {
 
             LOGGER.lifecycle(
                 "Running Blue Green Deploy - deploying a 'green' app. App '{}' with route '{}'",
-                cfProperties.name(), cfProperties.hostName());
+                cfProperties.name(), cfProperties.host());
 
             return appDetailOpt.map(appDetail -> {
                 printAppDetail(appDetail);
                 return ImmutableCfProperties.copyOf(cfProperties)
                     .withName(cfProperties.name() + "-green")
-                    .withHostName(cfProperties.hostName() + "-green")
+                    .withHost(cfProperties.host() + "-green")
                     .withInstances(appDetail.getInstances())
                     .withMemory(appDetail.getMemoryLimit())
                     .withDiskQuota(appDetail.getDiskQuota());
             }).orElse(ImmutableCfProperties.copyOf(cfProperties)
                 .withName(cfProperties.name() + "-green")
-                .withHostName(cfProperties.hostName() + "-green"));
+                .withHost(cfProperties.host() + "-green"));
         });
 
         return cfPropertiesMono.then(

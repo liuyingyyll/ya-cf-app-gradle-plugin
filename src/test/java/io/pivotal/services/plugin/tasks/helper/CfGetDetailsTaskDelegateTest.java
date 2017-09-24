@@ -75,7 +75,7 @@ public class CfGetDetailsTaskDelegateTest {
             .org("org")
             .space("space")
             .name("test")
-            .hostName("test")
+            .host("test")
             .build();
     }
 

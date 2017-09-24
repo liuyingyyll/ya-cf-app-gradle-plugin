@@ -61,7 +61,7 @@ public class CfBlueGreenStage2Delegate {
 
         CfProperties greenNameAndRoute = ImmutableCfProperties.copyOf(cfProperties)
             .withName(cfProperties.name() + "-green")
-            .withHostName(cfProperties.hostName() + "-green");
+            .withHost(cfProperties.host() + "-green");
 
         CfProperties blueName = ImmutableCfProperties.copyOf(cfProperties)
             .withName(cfProperties.name() + "-blue");
@@ -76,7 +76,7 @@ public class CfBlueGreenStage2Delegate {
             .then(function((backupApp, existingApp) -> {
                 LOGGER.lifecycle(
                     "Running Blue Green Deploy - after deploying a 'green' app. App '{}' with route '{}'",
-                    cfProperties.name(), cfProperties.hostName());
+                    cfProperties.name(), cfProperties.host());
 
                 return (backupApp.isPresent() ?
                     deleteAppDelegate.deleteApp(cfOperations, blueName) :

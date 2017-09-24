@@ -50,7 +50,7 @@ public abstract class CfProperties {
     public abstract String filePath();
 
     @Nullable
-    public abstract String hostName();
+    public abstract String host();
 
     @Nullable
     public abstract String domain();

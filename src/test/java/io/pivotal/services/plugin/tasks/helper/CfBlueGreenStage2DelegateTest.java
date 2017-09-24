@@ -139,7 +139,7 @@ public class CfBlueGreenStage2DelegateTest {
             .org("org")
             .space("space")
             .name("test")
-            .hostName("test")
+            .host("test")
             .build();
     }
 

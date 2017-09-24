@@ -58,7 +58,7 @@ cfConfig {
 
 	//App Details
 	name = "cf-show-env"
-	hostName = "cf-show-env"
+	host = "cf-show-env"
 	filePath = "build/libs/cf-show-env-0.1.2-SNAPSHOT.jar"
 	path = ""
 	domain = "local.pcfdev.io"
@@ -83,7 +83,7 @@ cfConfig {
 
 [source]
 ----
-./gradlew cf-push -Pcf.name=Green -Pcf.hostName=demo-time-temp
+./gradlew cf-push -Pcf.name=Green -Pcf.host=demo-time-temp
 ----
 
 * There is one task to retrieve the details of an application (cf-get-app-detail).

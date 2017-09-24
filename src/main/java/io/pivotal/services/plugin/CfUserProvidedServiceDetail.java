@@ -1,5 +1,6 @@
 package io.pivotal.services.plugin;
 
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 import java.util.Map;
@@ -13,6 +14,8 @@ import java.util.Map;
 @Value.Immutable(copy = true)
 public abstract class CfUserProvidedServiceDetail {
     public abstract String instanceName();
-
     public abstract Map<String, String> credentials();
+
+    @Nullable
+    public abstract Integer completionTimeout();
 }

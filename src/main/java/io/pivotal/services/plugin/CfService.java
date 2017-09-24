@@ -7,6 +7,7 @@ public class CfService {
     private String name;
     private String plan;
     private String instanceName;
+    private Integer completionTimeout;
     private List<String> tags;
 
     public String getName() {
@@ -33,6 +34,14 @@ public class CfService {
         this.instanceName = instanceName;
     }
 
+    public Integer getCompletionTimeout() {
+        return completionTimeout;
+    }
+
+    public void setCompletionTimeout(Integer completionTimeout) {
+        this.completionTimeout = completionTimeout;
+    }
+    
     public List<String> getTags() {
         return tags;
     }
@@ -40,4 +49,5 @@ public class CfService {
     public void setTags(List<String> tags) {
         this.tags = tags;
     }
+    
 }

@@ -70,7 +70,7 @@ public class CfBlueGreenStage1DelegateTest {
 
         CfProperties captured = argumentCaptor.getValue();
         assertThat(captured.name()).isEqualTo("test-green");
-        assertThat(captured.hostName()).isEqualTo("route-green");
+        assertThat(captured.host()).isEqualTo("route-green");
         assertThat(captured.instances()).isEqualTo(10);
         assertThat(captured.diskQuota()).isEqualTo(500);
         assertThat(captured.memory()).isEqualTo(100);
@@ -100,7 +100,7 @@ public class CfBlueGreenStage1DelegateTest {
 
         CfProperties captured = argumentCaptor.getValue();
         assertThat(captured.name()).isEqualTo("test-green");
-        assertThat(captured.hostName()).isEqualTo("route-green");
+        assertThat(captured.host()).isEqualTo("route-green");
 
         assertThat(captured.instances()).isEqualTo(2);
         assertThat(captured.diskQuota()).isNull();
@@ -116,7 +116,7 @@ public class CfBlueGreenStage1DelegateTest {
             .space("space")
             .name("test")
             .instances(2)
-            .hostName("route")
+            .host("route")
             .build();
     }
 }

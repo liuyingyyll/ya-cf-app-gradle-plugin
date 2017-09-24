@@ -14,11 +14,11 @@ import java.util.List;
 @Value.Immutable(copy = true)
 public abstract class CfServiceDetail {
     public abstract String name();
-
     public abstract String plan();
-
     public abstract String instanceName();
-
+    
+    @Nullable
+    public abstract Integer completionTimeout();
     @Nullable
     public abstract List<String> tags();
 }

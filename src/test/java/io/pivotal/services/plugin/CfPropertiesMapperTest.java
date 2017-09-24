@@ -56,7 +56,7 @@ public class CfPropertiesMapperTest {
         assertThat(props.space()).isEqualTo("space-fromplugin");
         assertThat(props.ccUser()).isEqualTo("ccuser-fromplugin");
         assertThat(props.filePath()).isEqualTo("filepath-fromplugin");
-        assertThat(props.hostName()).isEqualTo("hostname-fromplugin");
+        assertThat(props.host()).isEqualTo("hostname-fromplugin");
         assertThat(props.domain()).isEqualTo("domain-fromplugin");
         assertThat(props.path()).isEqualTo("path-fromplugin");
         assertThat(props.state()).isEqualTo("state-fromplugin");
@@ -97,7 +97,7 @@ public class CfPropertiesMapperTest {
         setProjectProperty(PropertyNameConstants.CF_APPLICATION_HOST_NAME, "newhost");
         CfProperties props = this.cfPropertiesMapper.getProperties();
 
-        assertThat(props.hostName()).isEqualTo("newhost");
+        assertThat(props.host()).isEqualTo("newhost");
     }
 
     @Test
@@ -242,7 +242,6 @@ public class CfPropertiesMapperTest {
         assertThat(props.startupTimeout()).isEqualTo(5);
     }
 
-
     @Test
     public void testStartupTimeoutIsOverriddenViaProjectProperty() {
         setProjectProperty(PropertyNameConstants.CF_STARTUP_TIMEOUT, 7);
@@ -251,6 +250,90 @@ public class CfPropertiesMapperTest {
         assertThat(props.startupTimeout()).isEqualTo(7);
     }
 
+    @Test
+    public void testCfServiceDetailMapper() {
+        List<CfService> cfServices = new ArrayList<>();
+        CfService s1 = new CfService();
+        s1.setInstanceName("inst1");
+        s1.setName("svcname1");
+        s1.setPlan("svcplan");
+        s1.setCompletionTimeout(15);
+        cfServices.add(s1);
+
+        List<CfServiceDetail> cfServicesMapped = this.cfPropertiesMapper.mapCfServices(cfServices);
+        assertThat(cfServices).hasSize(1);
+
+        assertThat(cfServicesMapped)
+            .contains(ImmutableCfServiceDetail
+                .builder()
+                .instanceName("inst1")
+                .name("svcname1")
+                .plan("svcplan")
+                .tags(null)
+                .completionTimeout(15)
+                .build());
+    }
+
+    @Test
+    public void testCfServiceDetailDefaultConnectionTimeoutMapper() {
+        List<CfService> cfServices = new ArrayList<>();
+        CfService s1 = new CfService();
+        s1.setInstanceName("inst1");
+        s1.setName("svcname1");
+        s1.setPlan("svcplan");
+        cfServices.add(s1);
+
+        List<CfServiceDetail> cfServicesMapped = this.cfPropertiesMapper.mapCfServices(cfServices);
+        assertThat(cfServices).hasSize(1);
+
+        assertThat(cfServicesMapped)
+            .contains(ImmutableCfServiceDetail
+                .builder()
+                .instanceName("inst1")
+                .name("svcname1")
+                .plan("svcplan")
+                .tags(null)
+                .completionTimeout(10)
+                .build());
+    }
+    
+    @Test
+    public void testCfUspDetailMapper() {
+        List<CfUserProvidedService> cfUserServices = new ArrayList<>();
+        CfUserProvidedService us1 = new CfUserProvidedService();
+        us1.setInstanceName("user-inst1");
+        us1.setCredentials(Collections.emptyMap());
+        us1.setCompletionTimeout(21);
+        cfUserServices.add(us1);
+        
+        List<CfUserProvidedServiceDetail> mapped = this.cfPropertiesMapper.mapCfUserProvidedServices(cfUserServices);
+        assertThat(mapped).hasSize(1);
+        assertThat(mapped)
+            .contains(ImmutableCfUserProvidedServiceDetail
+                .builder()
+                .instanceName("user-inst1")
+                .completionTimeout(21)
+                .credentials(Collections.emptyMap()).build());
+    }
+
+    @Test
+    public void testCfUspDetailMapperWithDefaultTimeout() {
+        List<CfUserProvidedService> cfUserServices = new ArrayList<>();
+        CfUserProvidedService us1 = new CfUserProvidedService();
+        us1.setInstanceName("user-inst1");
+        us1.setCredentials(Collections.emptyMap());
+        cfUserServices.add(us1);
+
+        List<CfUserProvidedServiceDetail> mapped = this.cfPropertiesMapper.mapCfUserProvidedServices(cfUserServices);
+        assertThat(mapped).hasSize(1);
+        assertThat(mapped)
+            .contains(ImmutableCfUserProvidedServiceDetail
+                .builder()
+                .instanceName("user-inst1")
+                .completionTimeout(10)
+                .credentials(Collections.emptyMap()).build());
+    }
+    
 
     private void setProjectProperty(String propertyName, Object propertyValue) {
         when(this.project.property(propertyName)).thenReturn(propertyValue);
@@ -267,9 +350,9 @@ public class CfPropertiesMapperTest {
         ext.setBuildpack("buildpack-fromplugin");
         ext.setOrg("org-fromplugin");
         ext.setSpace("space-fromplugin");
-        ext.setHostName("route-fromplugin");
+        ext.setHost("route-fromplugin");
         ext.setFilePath("filepath-fromplugin");
-        ext.setHostName("hostname-fromplugin");
+        ext.setHost("hostname-fromplugin");
         ext.setDomain("domain-fromplugin");
         ext.setPath("path-fromplugin");
         ext.setState("state-fromplugin");
@@ -303,6 +386,7 @@ public class CfPropertiesMapperTest {
         s1.setInstanceName("inst1");
         s1.setName("svcname1");
         s1.setPlan("svcplan");
+        s1.setCompletionTimeout(15);
         cfServices.add(s1);
         ext.setCfServices(cfServices);
 
@@ -311,6 +395,7 @@ public class CfPropertiesMapperTest {
         CfUserProvidedService us1 = new CfUserProvidedService();
         us1.setInstanceName("user-inst1");
         us1.setCredentials(new HashMap<>());
+        us1.setCompletionTimeout(21);
         cfUserServices.add(us1);
         ext.setCfUserProvidedServices(cfUserServices);
         return ext;

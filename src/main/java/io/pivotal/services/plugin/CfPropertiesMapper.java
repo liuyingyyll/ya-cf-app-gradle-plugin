@@ -62,7 +62,7 @@ public class CfPropertiesMapper {
             .org(getOrg())
             .space(getSpace())
             .filePath(getFilePath())
-            .hostName(getAppHostName())
+            .host(getAppHostName())
             .domain(getAppDomain())
             .path(getCfPath())
             .state(this.getExtension().getState())
@@ -88,30 +88,43 @@ public class CfPropertiesMapper {
     }
 
     private List<CfServiceDetail> getCfServices() {
+        return mapCfServices(this.getExtension().getCfServices());
+    }
+
+    List<CfServiceDetail> mapCfServices(List<CfService> cfServices) {
         List<CfServiceDetail> serviceDetails = new ArrayList<>();
-        if (this.getExtension().getCfServices() != null) {
-            for (CfService cfService : this.getExtension().getCfServices()) {
+        if (cfServices != null) {
+            for (CfService cfService : cfServices) {
                 CfServiceDetail cfServiceDetail = ImmutableCfServiceDetail.builder()
                     .instanceName(cfService.getInstanceName())
                     .name(cfService.getName())
                     .plan(cfService.getPlan())
                     .tags(cfService.getTags())
+                    .completionTimeout((cfService.getCompletionTimeout() != null)
+                        ? cfService.getCompletionTimeout()
+                        : DefaultProperties.SERVICE_CREATION_COMPLETION_TIMEOUT)
                     .build();
 
                 serviceDetails.add(cfServiceDetail);
             }
         }
-
         return serviceDetails;
     }
 
     private List<CfUserProvidedServiceDetail> getCfUserProvidedServices() {
+        return mapCfUserProvidedServices(this.getExtension().getCfUserProvidedServices());
+    }
+
+    List<CfUserProvidedServiceDetail> mapCfUserProvidedServices(List<CfUserProvidedService> cfUserProvidedServices) {
         List<CfUserProvidedServiceDetail> serviceDetails = new ArrayList<>();
-        if (this.getExtension().getCfUserProvidedServices() != null) {
-            for (CfUserProvidedService service : this.getExtension().getCfUserProvidedServices()) {
+        if (cfUserProvidedServices != null) {
+            for (CfUserProvidedService service : cfUserProvidedServices) {
                 CfUserProvidedServiceDetail cfServiceDetail = ImmutableCfUserProvidedServiceDetail.builder()
                     .instanceName(service.getInstanceName())
                     .credentials(service.getCredentials())
+                    .completionTimeout((service.getCompletionTimeout() != null)
+                        ? service.getCompletionTimeout()
+                        : DefaultProperties.SERVICE_CREATION_COMPLETION_TIMEOUT)
                     .build();
                 serviceDetails.add(cfServiceDetail);
             }
@@ -141,7 +154,7 @@ public class CfPropertiesMapper {
 
     public String getAppHostName() {
         return getStringPropertyFromProject(PropertyNameConstants.CF_APPLICATION_HOST_NAME)
-            .orElse(this.getExtension().getHostName());
+            .orElse(this.getExtension().getHost());
     }
 
     public String getAppDomain() {

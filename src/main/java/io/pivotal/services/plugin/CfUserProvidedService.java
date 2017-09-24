@@ -6,6 +6,8 @@ public class CfUserProvidedService {
     private String instanceName;
     private Map<String, String> credentials;
 
+    private Integer completionTimeout;
+
     public String getInstanceName() {
         return instanceName;
     }
@@ -20,5 +22,13 @@ public class CfUserProvidedService {
 
     public void setCredentials(Map<String, String> credentials) {
         this.credentials = credentials;
+    }
+
+    public Integer getCompletionTimeout() {
+        return completionTimeout;
+    }
+
+    public void setCompletionTimeout(Integer completionTimeout) {
+        this.completionTimeout = completionTimeout;
     }
 }

@@ -27,4 +27,9 @@ public interface DefaultProperties {
 
     int STARTUP_TIMEOUT = 5;
 
+    /**
+     * Default time to wait for services to be created
+     */
+    int SERVICE_CREATION_COMPLETION_TIMEOUT = 10; 
+
 }

@@ -60,7 +60,7 @@ public class CfPushDelegate {
                         .memory(cfProperties.memory())
                         .timeout(cfProperties.timeout())
                         .domain(cfProperties.domain())
-                        .host(cfProperties.hostName())
+                        .host(cfProperties.host())
                         .routePath(cfProperties.path())
                         .noStart(true)
                         .build());

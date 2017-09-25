@@ -10,7 +10,7 @@ Be able to deploy, update, start/stop/restart application, attach/remove routes,
 
 === Using the Plugin
 
-Start by looking at a sample project using the plugin https://github.com/bijukunjummen/cf-show-env[here]
+Start by looking at a sample project using the plugin https://github.com/bijukunjummen/cf-gradle-plugin-demo[here]
 
 ==== Details
 
@@ -20,7 +20,7 @@ Start by looking at a sample project using the plugin https://github.com/bijukun
 ----
 buildscript {
 	ext {
-		cfAppVersion = '1.0.10-RC1'
+		cfAppVersion = '1.0.10'
 	}
 	repositories {
 		mavenCentral()

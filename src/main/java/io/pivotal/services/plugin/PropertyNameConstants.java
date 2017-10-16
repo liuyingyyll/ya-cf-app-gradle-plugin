@@ -25,4 +25,5 @@ public interface PropertyNameConstants {
     String CF_STAGING_TIMEOUT = "cf.stagingTimeout";
     String CF_STARTUP_TIMEOUT = "cf.startupTimeout";
     String CC_TOKEN = "cf.ccToken";
+    String CF_ENVIRONMENT = "cf.environment";
 }

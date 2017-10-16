@@ -34,6 +34,8 @@ public class CfPropertiesMapperTest {
     private Project project;
 
     private CfPluginExtension pluginExtension;
+    
+    private Map<String, Object> currentProjectProperties = new HashMap<>();
 
     @Before
     public void setUp() {
@@ -334,10 +336,26 @@ public class CfPropertiesMapperTest {
                 .credentials(Collections.emptyMap()).build());
     }
     
+    @Test
+    public void testAddEnvironmentValues() {
+        setProjectProperty("cf.environment.JAVA_OPTS", "newOpts");
+        CfProperties properties = this.cfPropertiesMapper.getProperties();
+        assertThat(properties.environment().get("JAVA_OPTS")).isEqualTo("newOpts");
+    }
+
+    @Test
+    public void testOverrideEnvironmentValues() {
+        setProjectProperty("cf.environment.env1", "env1NewValue");
+        CfProperties properties = this.cfPropertiesMapper.getProperties();
+        assertThat(properties.environment().get("env1")).isEqualTo("env1NewValue");
+    }
+    
 
     private void setProjectProperty(String propertyName, Object propertyValue) {
+        currentProjectProperties.put(propertyName, propertyValue);
         when(this.project.property(propertyName)).thenReturn(propertyValue);
         when(this.project.hasProperty(propertyName)).thenReturn(true);
+        when(this.project.getProperties()).thenReturn((Map)currentProjectProperties);
     }
 
 

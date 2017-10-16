@@ -18,9 +18,7 @@ package io.pivotal.services.plugin;
 
 import org.gradle.api.Project;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Responsible for mapping plugin extension provided via a block
@@ -73,7 +71,7 @@ public class CfPropertiesMapper {
             .detectedStartCommand(this.getExtension().getDetectedStartCommand())
             .diskQuota(this.getDiskQuota())
             .enableSsh(this.getExtension().getEnableSsh())
-            .environment(this.getExtension().getEnvironment())
+            .environment(getEnvironment())
             .timeout(this.getTimeout())
             .healthCheckType(this.getExtension().getHealthCheckType())
             .instances(this.getInstances())
@@ -240,6 +238,22 @@ public class CfPropertiesMapper {
             .orElse(this.getExtension().getStartupTimeout());
 
         return startupTimeout != null ? startupTimeout : DefaultProperties.STARTUP_TIMEOUT;
+    }
+
+    private Map<String, String> getEnvironment() {
+        Map<String, String> baseEnvironment = this.getExtension().getEnvironment();
+        Map<String, String> withProperties = baseEnvironment!=null?new HashMap<>(baseEnvironment):new HashMap<>();
+        
+        Map<String, ?> allProperties = this.project.getProperties();
+        for (String propName: allProperties.keySet()) {
+            String prefix = PropertyNameConstants.CF_ENVIRONMENT + ".";
+            if (propName.startsWith(prefix)) {
+                String newKey = propName.substring(prefix.length());
+                withProperties.put(newKey, getStringPropertyFromProject(propName).orElse(""));        
+            }
+        }
+        
+        return withProperties;
     }
 
     public Optional<String> getStringPropertyFromProject(String propertyName) {

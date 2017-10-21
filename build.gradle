@@ -1,11 +1,15 @@
 buildscript {
     repositories {
+        jcenter()
         maven {
             url "https://plugins.gradle.org/m2/"
         }
+        jcenter()
+        mavenCentral()
     }
     dependencies {
         classpath "com.gradle.publish:plugin-publish-plugin:0.9.7"
+        classpath "com.netflix.nebula:nebula-release-plugin:6.0.2"
     }
     ext {
         cfClientVersion = "2.16.0.RELEASE"
@@ -13,24 +17,23 @@ buildscript {
     }
 }
 
-version = "2.0.0-RC1"
+//version = "2.0.0-RC1"
 group = "com.github.pivotalservices"
 
 apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'signing'
 
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-}
+
+apply plugin: 'nebula.release'
+
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 repositories {
     mavenCentral()
+    jcenter()
     maven { url "https://repo.spring.io/snapshot" }
     maven { url "https://repo.spring.io/milestone" }
     maven { url "https://repo.spring.io/release" }

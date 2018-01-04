@@ -78,6 +78,12 @@ signing {
     sign configurations.archives
 }
 
+tasks.snapshot.finalizedBy tasks.uploadArchives
+
+tasks.candidate.finalizedBy tasks.uploadArchives
+
+tasks.final.finalizedBy tasks.uploadArchives
+
 uploadArchives {
     repositories {
         mavenDeployer {

@@ -12,3 +12,4 @@ build/
 classes/
 src/main/generated
 out/
+credentials.yml

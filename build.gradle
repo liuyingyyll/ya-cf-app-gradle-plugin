@@ -78,11 +78,20 @@ signing {
     sign configurations.archives
 }
 
-tasks.snapshot.finalizedBy tasks.uploadArchives
+tasks.snapshot.finalizedBy {
+    tasks.uploadArchives
+    tasks.publishPlugins
+}
 
-tasks.candidate.finalizedBy tasks.uploadArchives
+tasks.candidate.finalizedBy {
+    tasks.uploadArchives
+    tasks.publishPlugins
+}
 
-tasks.final.finalizedBy tasks.uploadArchives
+tasks.final.finalizedBy {
+    tasks.uploadArchives
+    tasks.publishPlugins
+}
 
 uploadArchives {
     repositories {

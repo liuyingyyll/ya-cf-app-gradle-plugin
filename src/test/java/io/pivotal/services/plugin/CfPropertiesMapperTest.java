@@ -34,7 +34,7 @@ public class CfPropertiesMapperTest {
     private Project project;
 
     private CfPluginExtension pluginExtension;
-    
+
     private Map<String, Object> currentProjectProperties = new HashMap<>();
 
     @Before
@@ -84,6 +84,12 @@ public class CfPropertiesMapperTest {
 
         assertThat(props.cfServices()).hasSize(1);
         assertThat(props.cfUserProvidedServices()).hasSize(1);
+
+        assertThat(props.cfProxySettings()).isNotNull();
+        assertThat(props.cfProxySettings().proxyHost()).isEqualTo("http://proxy.host");
+        assertThat(props.cfProxySettings().proxyPort()).isEqualTo(1234);
+        assertThat(props.cfProxySettings().proxyUser()).isEqualTo("proxy-user");
+        assertThat(props.cfProxySettings().proxyPassword()).isEqualTo("proxy-password");
     }
 
     @Test
@@ -298,7 +304,7 @@ public class CfPropertiesMapperTest {
                 .completionTimeout(10)
                 .build());
     }
-    
+
     @Test
     public void testCfUspDetailMapper() {
         List<CfUserProvidedService> cfUserServices = new ArrayList<>();
@@ -307,7 +313,7 @@ public class CfPropertiesMapperTest {
         us1.setCredentials(Collections.emptyMap());
         us1.setCompletionTimeout(21);
         cfUserServices.add(us1);
-        
+
         List<CfUserProvidedServiceDetail> mapped = this.cfPropertiesMapper.mapCfUserProvidedServices(cfUserServices);
         assertThat(mapped).hasSize(1);
         assertThat(mapped)
@@ -335,7 +341,7 @@ public class CfPropertiesMapperTest {
                 .completionTimeout(10)
                 .credentials(Collections.emptyMap()).build());
     }
-    
+
     @Test
     public void testAddEnvironmentValues() {
         setProjectProperty("cf.environment.JAVA_OPTS", "newOpts");
@@ -349,13 +355,45 @@ public class CfPropertiesMapperTest {
         CfProperties properties = this.cfPropertiesMapper.getProperties();
         assertThat(properties.environment().get("env1")).isEqualTo("env1NewValue");
     }
-    
+
+    @Test
+    public void testProxyHostIsOverriddenViaProjectProperty() {
+        setProjectProperty(PropertyNameConstants.CF_PROXY_HOST, "http://new-proxy.host");
+        CfProperties props = this.cfPropertiesMapper.getProperties();
+
+        assertThat(props.cfProxySettings().proxyHost()).isEqualTo("http://new-proxy.host");
+    }
+
+    @Test
+    public void testProxyPortIsOverriddenViaProjectProperty() {
+        setProjectProperty(PropertyNameConstants.CF_PROXY_PORT, 4321);
+        CfProperties props = this.cfPropertiesMapper.getProperties();
+
+        assertThat(props.cfProxySettings().proxyPort()).isEqualTo(4321);
+    }
+
+    @Test
+    public void testProxyUserIsOverriddenViaProjectProperty() {
+        setProjectProperty(PropertyNameConstants.CF_PROXY_USER, "new-proxy-user");
+        CfProperties props = this.cfPropertiesMapper.getProperties();
+
+        assertThat(props.cfProxySettings().proxyUser()).isEqualTo("new-proxy-user");
+    }
+
+    @Test
+    public void testProxyPasswordIsOverriddenViaProjectProperty() {
+        setProjectProperty(PropertyNameConstants.CF_PROXY_PASSWORD, "new-proxy-password");
+        CfProperties props = this.cfPropertiesMapper.getProperties();
+
+        assertThat(props.cfProxySettings().proxyPassword()).isEqualTo("new-proxy-password");
+    }
+
 
     private void setProjectProperty(String propertyName, Object propertyValue) {
         currentProjectProperties.put(propertyName, propertyValue);
         when(this.project.property(propertyName)).thenReturn(propertyValue);
         when(this.project.hasProperty(propertyName)).thenReturn(true);
-        when(this.project.getProperties()).thenReturn((Map)currentProjectProperties);
+        when(this.project.getProperties()).thenReturn((Map) currentProjectProperties);
     }
 
 
@@ -416,8 +454,14 @@ public class CfPropertiesMapperTest {
         us1.setCompletionTimeout(21);
         cfUserServices.add(us1);
         ext.setCfUserProvidedServices(cfUserServices);
+
+        CfProxySettings cfProxySettings = new CfProxySettings();
+        cfProxySettings.setProxyHost("http://proxy.host");
+        cfProxySettings.setProxyPort(1234);
+        cfProxySettings.setProxyUser("proxy-user");
+        cfProxySettings.setProxyPassword("proxy-password");
+        ext.setCfProxySettings(cfProxySettings);
+
         return ext;
     }
-
-
 }

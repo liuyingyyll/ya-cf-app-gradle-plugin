@@ -3,18 +3,22 @@ package io.pivotal.services.plugin.tasks;
 import io.pivotal.services.plugin.CfPluginExtension;
 import io.pivotal.services.plugin.CfProperties;
 import io.pivotal.services.plugin.CfPropertiesMapper;
+import io.pivotal.services.plugin.CfProxySettingsDetail;
 import io.pivotal.services.plugin.cf.StaticTokenProvider;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.DefaultCloudFoundryOperations;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.DefaultConnectionContext;
+import org.cloudfoundry.reactor.ProxyConfiguration;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.ReactorCloudFoundryClient;
 import org.cloudfoundry.reactor.tokenprovider.PasswordGrantTokenProvider;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
+
+import java.util.Optional;
 
 /**
  * Base class for all Concrete CF tasks
@@ -37,6 +41,7 @@ abstract class AbstractCfTask extends DefaultTask {
         ConnectionContext connectionContext = DefaultConnectionContext.builder()
             .apiHost(cfAppProperties.ccHost())
             .skipSslValidation(true)
+            .proxyConfiguration(tryGetProxyConfiguration(cfAppProperties))
             .build();
 
         TokenProvider tokenProvider = getTokenProvider(cfAppProperties);
@@ -53,6 +58,22 @@ abstract class AbstractCfTask extends DefaultTask {
             .build();
 
         return cfOperations;
+    }
+
+    protected Optional<ProxyConfiguration> tryGetProxyConfiguration(CfProperties cfAppProperties) {
+        final CfProxySettingsDetail proxySettings = cfAppProperties.cfProxySettings();
+        if (proxySettings == null) {
+            return Optional.empty();
+        }
+        if (proxySettings.proxyHost() == null || proxySettings.proxyPort() == null) {
+            throw new IllegalStateException("At least host and port for proxy settings must be provided");
+        }
+        return Optional.of(ProxyConfiguration.builder()
+            .host(proxySettings.proxyHost())
+            .port(proxySettings.proxyPort())
+            .username(Optional.ofNullable(proxySettings.proxyUser()))
+            .password(Optional.ofNullable(proxySettings.proxyPassword()))
+            .build());
     }
 
     protected TokenProvider getTokenProvider(CfProperties cfAppProperties) {

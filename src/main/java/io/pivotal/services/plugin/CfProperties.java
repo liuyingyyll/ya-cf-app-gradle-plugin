@@ -114,4 +114,7 @@ public abstract class CfProperties {
 
     @Nullable
     public abstract List<CfUserProvidedServiceDetail> cfUserProvidedServices();
+
+    @Nullable
+    public abstract CfProxySettingsDetail cfProxySettings();
 }

@@ -26,4 +26,8 @@ public interface PropertyNameConstants {
     String CF_STARTUP_TIMEOUT = "cf.startupTimeout";
     String CC_TOKEN = "cf.ccToken";
     String CF_ENVIRONMENT = "cf.environment";
+    String CF_PROXY_HOST = "cf.cfProxySettings.proxyHost";
+    String CF_PROXY_PORT = "cf.cfProxySettings.proxyPort";
+    String CF_PROXY_USER = "cf.cfProxySettings.proxyUser";
+    String CF_PROXY_PASSWORD = "cf.cfProxySettings.proxyPassword";
 }

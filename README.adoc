@@ -56,6 +56,14 @@ cfConfig {
 	org = "pcfdev-org"
 	space = "pcfdev-space"
 
+	//Proxy settings (optional)
+	cfProxySettings {
+		proxyHost = "proxy.host"
+		proxyPort = 1234
+		proxyUser = "user"
+		proxyPassword = "password"
+	}
+
 	//App Details
 	name = "cf-show-env"
 	host = "cf-show-env"
@@ -170,6 +178,28 @@ Services can be created and automatically bound to the app in the targeted org a
         credentials = ["jdbcUri": "someuri1"]
     }
 ----
+
+=== Usage behind a proxy
+
+If you need to use the plugin behind a proxy you can configure it like this:
+
+[source, java]
+----
+cfConfig {
+    ...
+    cfProxySettings {
+        proxyHost = "proxy.host"
+        proxyPort = 1234
+        proxyUser = "user"
+        proxyPassword = "password"
+    }
+}
+----
+
+Only `proxyHost` and `proxyPort` are mandatory, `proxyUser` and `proxyPassword` are optional and the need for
+them depends on your actual environment.
+
+You can override any of these values from the command line, the pattern is `cf.cfProxySettings.*`.
 
 === List of all Tasks
 .Tasks

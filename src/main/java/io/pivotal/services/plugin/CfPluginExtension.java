@@ -68,6 +68,7 @@ public class CfPluginExtension {
 
     private List<CfService> cfServices = new ArrayList<>();
     private List<CfUserProvidedService> cfUserProvidedServices = new ArrayList<>();
+    private CfProxySettings cfProxySettings;
 
     public void cfService(Closure closure) {
         CfService cfService = new CfService();
@@ -81,6 +82,11 @@ public class CfPluginExtension {
         this.project.configure(cfUserProvidedService, closure);
         this.cfUserProvidedServices.add(cfUserProvidedService);
         this.services.add(cfUserProvidedService.getInstanceName());
+    }
+
+    public void cfProxySettings(Closure closure) {
+        this.cfProxySettings = new CfProxySettings();
+        this.project.configure(cfProxySettings, closure);
     }
 
     public String getCcHost() {
@@ -331,6 +337,14 @@ public class CfPluginExtension {
         this.cfUserProvidedServices = cfUserProvidedServices;
     }
 
+    public CfProxySettings getCfProxySettings() {
+        return cfProxySettings;
+    }
+
+    public void setCfProxySettings(CfProxySettings cfProxySettings) {
+        this.cfProxySettings = cfProxySettings;
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("CfPluginExtension{");
@@ -365,6 +379,7 @@ public class CfPluginExtension {
         sb.append(", applicationDetail=").append(applicationDetail);
         sb.append(", cfServices=").append(cfServices);
         sb.append(", cfUserProvidedServices=").append(cfUserProvidedServices);
+        sb.append(", cfProxySettings=").append(cfProxySettings);
         sb.append('}');
         return sb.toString();
     }

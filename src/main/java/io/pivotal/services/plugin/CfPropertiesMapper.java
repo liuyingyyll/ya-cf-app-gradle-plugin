@@ -82,6 +82,7 @@ public class CfPropertiesMapper {
             .startupTimeout(this.getStartupTimeout())
             .cfServices(this.getCfServices())
             .cfUserProvidedServices(this.getCfUserProvidedServices())
+            .cfProxySettings(this.getCfProxySettings())
             .build();
     }
 
@@ -129,6 +130,23 @@ public class CfPropertiesMapper {
         }
 
         return serviceDetails;
+    }
+
+    private CfProxySettingsDetail getCfProxySettings() {
+        final CfProxySettings proxySettings = this.getExtension().getCfProxySettings();
+        if (proxySettings == null) {
+            return null;
+        }
+        return ImmutableCfProxySettingsDetail.builder()
+            .proxyHost(getStringPropertyFromProject(PropertyNameConstants.CF_PROXY_HOST)
+                .orElse(proxySettings.getProxyHost()))
+            .proxyPort(getIntegerPropertyFromProject(PropertyNameConstants.CF_PROXY_PORT)
+                .orElse(proxySettings.getProxyPort()))
+            .proxyUser(getStringPropertyFromProject(PropertyNameConstants.CF_PROXY_USER)
+                .orElse(proxySettings.getProxyUser()))
+            .proxyPassword(getStringPropertyFromProject(PropertyNameConstants.CF_PROXY_PASSWORD)
+                .orElse(proxySettings.getProxyPassword()))
+            .build();
     }
 
     CfPluginExtension getExtension() {
@@ -242,17 +260,17 @@ public class CfPropertiesMapper {
 
     private Map<String, String> getEnvironment() {
         Map<String, String> baseEnvironment = this.getExtension().getEnvironment();
-        Map<String, String> withProperties = baseEnvironment!=null?new HashMap<>(baseEnvironment):new HashMap<>();
-        
+        Map<String, String> withProperties = baseEnvironment != null ? new HashMap<>(baseEnvironment) : new HashMap<>();
+
         Map<String, ?> allProperties = this.project.getProperties();
-        for (String propName: allProperties.keySet()) {
+        for (String propName : allProperties.keySet()) {
             String prefix = PropertyNameConstants.CF_ENVIRONMENT + ".";
             if (propName.startsWith(prefix)) {
                 String newKey = propName.substring(prefix.length());
-                withProperties.put(newKey, getStringPropertyFromProject(propName).orElse(""));        
+                withProperties.put(newKey, getStringPropertyFromProject(propName).orElse(""));
             }
         }
-        
+
         return withProperties;
     }
 

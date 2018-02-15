@@ -31,7 +31,7 @@ public class CfAutoPilotDelegate {
         Mono<Optional<ApplicationDetail>> appDetailMono = detailsDelegate
             .getAppDetails(cfOperations, cfProperties);
 
-        Mono<Void> autopilotResult = appDetailMono.then(appDetailOpt -> {
+        Mono<Void> autopilotResult = appDetailMono.flatMap(appDetailOpt -> {
             if (appDetailOpt.isPresent()) {
                 ApplicationDetail appDetail = appDetailOpt.get();
                 CfProperties withExistingDetails = ImmutableCfProperties

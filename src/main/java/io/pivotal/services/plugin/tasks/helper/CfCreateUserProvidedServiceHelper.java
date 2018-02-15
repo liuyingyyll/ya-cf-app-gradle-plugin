@@ -28,7 +28,7 @@ public class CfCreateUserProvidedServiceHelper {
                 cfUserProvidedServiceDetail.instanceName());
 
         return serviceInstanceMono
-            .then(serviceInstanceOpt -> serviceInstanceOpt.map(serviceInstance -> {
+            .flatMap(serviceInstanceOpt -> serviceInstanceOpt.map(serviceInstance -> {
                 LOGGER.lifecycle(
                     "Existing service with name {} found. This service will not be re-created",
                     cfUserProvidedServiceDetail.instanceName());

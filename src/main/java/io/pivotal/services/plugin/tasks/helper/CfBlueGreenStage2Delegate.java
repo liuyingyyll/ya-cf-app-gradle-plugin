@@ -72,8 +72,8 @@ public class CfBlueGreenStage2Delegate {
         Mono<Optional<ApplicationDetail>> existingAppMono = appDetailsDelegate
             .getAppDetails(cfOperations, cfProperties);
 
-        Mono<Void> bgResult = Mono.when(backupAppMono, existingAppMono)
-            .then(function((backupApp, existingApp) -> {
+        Mono<Void> bgResult = Mono.zip(backupAppMono, existingAppMono)
+            .flatMap(function((backupApp, existingApp) -> {
                 LOGGER.lifecycle(
                     "Running Blue Green Deploy - after deploying a 'green' app. App '{}' with route '{}'",
                     cfProperties.name(), cfProperties.host());

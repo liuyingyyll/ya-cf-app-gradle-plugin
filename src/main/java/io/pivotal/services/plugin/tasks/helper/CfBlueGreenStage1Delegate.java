@@ -44,7 +44,7 @@ public class CfBlueGreenStage1Delegate {
                 .withHost(cfProperties.host() + "-green"));
         });
 
-        return cfPropertiesMono.then(
+        return cfPropertiesMono.flatMap(
             withNewNameAndRoute -> pushDelegate.push(cfOperations, withNewNameAndRoute));
     }
 

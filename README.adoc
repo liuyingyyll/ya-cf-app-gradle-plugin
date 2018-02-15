@@ -91,7 +91,7 @@ cfConfig {
 
 [source]
 ----
-./gradlew cf-push -Pcf.name=Green -Pcf.host=demo-time-temp
+./gradlew cf-push -Pcf.name=Green -Pcf.host=demo-time-temp -Pcf.environment.SPRING_PROFILES_ACTIVE="cloud,dev"
 ----
 
 * There is one task to retrieve the details of an application (cf-get-app-detail).

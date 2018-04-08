@@ -12,8 +12,8 @@ buildscript {
         classpath "com.netflix.nebula:nebula-release-plugin:6.0.2"
     }
     ext {
-        cfClientVersion = "3.5.0.RELEASE"
-        cfReactorTestVersion = "3.1.2.RELEASE"
+        cfClientVersion = "3.9.0.RELEASE"
+        cfReactorTestVersion = "3.1.5.RELEASE"
     }
 }
 

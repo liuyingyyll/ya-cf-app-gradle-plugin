@@ -4,17 +4,23 @@ import io.pivotal.services.plugin.CfProperties;
 import io.pivotal.services.plugin.ImmutableCfProperties;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.applications.ApplicationDetail;
+import org.cloudfoundry.operations.applications.ApplicationEnvironments;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 import reactor.core.publisher.Mono;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public class CfBlueGreenStage1Delegate {
 
     private CfPushDelegate pushDelegate = new CfPushDelegate();
     private CfAppDetailsDelegate appDetailsDelegate = new CfAppDetailsDelegate();
+    private CfAppEnvDelegate appEnvDelegate = new CfAppEnvDelegate();
 
     private static final Logger LOGGER = Logging
         .getLogger(CfBlueGreenStage1Delegate.class);
@@ -25,8 +31,12 @@ public class CfBlueGreenStage1Delegate {
         Mono<Optional<ApplicationDetail>> appDetailMono = appDetailsDelegate
             .getAppDetails(cfOperations, cfProperties);
 
-        Mono<CfProperties> cfPropertiesMono = appDetailMono.map((appDetailOpt) -> {
+        // Get App Env Vars
+        Mono<Optional<ApplicationEnvironments>> appEnvMono =
+            appEnvDelegate.getAppEnv(cfOperations, cfProperties);
 
+        Mono<ImmutableCfProperties> cfPropertiesMono = Mono.zip(appEnvMono, appDetailMono).map(function((appEnvOpt, appDetailOpt) -> {
+            Map<String, String> userEnvs = mapUserEnvironmentVars(cfProperties, appEnvOpt);
             LOGGER.lifecycle(
                 "Running Blue Green Deploy - deploying a 'green' app. App '{}' with route '{}'",
                 cfProperties.name(), cfProperties.host());
@@ -38,14 +48,34 @@ public class CfBlueGreenStage1Delegate {
                     .withHost(cfProperties.host() + "-green")
                     .withInstances(appDetail.getInstances())
                     .withMemory(appDetail.getMemoryLimit())
-                    .withDiskQuota(appDetail.getDiskQuota());
+                    .withDiskQuota(appDetail.getDiskQuota())
+                    .withEnvironment(userEnvs);
             }).orElse(ImmutableCfProperties.copyOf(cfProperties)
                 .withName(cfProperties.name() + "-green")
                 .withHost(cfProperties.host() + "-green"));
-        });
+
+        }));
 
         return cfPropertiesMono.flatMap(
             withNewNameAndRoute -> pushDelegate.push(cfOperations, withNewNameAndRoute));
+    }
+
+    private Map<String, String> mapUserEnvironmentVars(CfProperties cfProperties, Optional<ApplicationEnvironments> appEnvOpt) {
+        Map<String, String> userEnvs = new HashMap<>();
+        if(!appEnvOpt.isPresent()){
+            return userEnvs;
+        }
+
+        Optional<Map<String, Object>> userProvidedEnv = appEnvOpt.map(ApplicationEnvironments::getUserProvided);
+        for (String key :
+            userProvidedEnv.get().keySet()) {
+            // The values for this should always be a string but are given as an object
+            userEnvs.put(key, (String) userProvidedEnv.get().get(key));
+        }
+        if (cfProperties.environment() != null) {
+            userEnvs.putAll(cfProperties.environment());
+        }
+        return userEnvs;
     }
 
     private void printAppDetail(ApplicationDetail applicationDetail) {

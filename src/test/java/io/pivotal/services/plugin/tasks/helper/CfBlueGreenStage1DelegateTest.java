@@ -5,6 +5,7 @@ import io.pivotal.services.plugin.CfProperties;
 import io.pivotal.services.plugin.ImmutableCfProperties;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.applications.ApplicationDetail;
+import org.cloudfoundry.operations.applications.ApplicationEnvironments;
 import org.gradle.api.Project;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,6 +17,8 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,6 +33,9 @@ public class CfBlueGreenStage1DelegateTest {
 
     @Mock
     private CfAppDetailsDelegate appDetailsDelegate;
+
+    @Mock
+    private CfAppEnvDelegate appEnvDelegate;
 
     @InjectMocks
     private CfBlueGreenStage1Delegate blueGreenStage1Delegate;
@@ -56,6 +62,12 @@ public class CfBlueGreenStage1DelegateTest {
                 .id("id")
                 .build())));
 
+        Map<String, String> existingEnvironment = new HashMap<>();
+        existingEnvironment.put("userProp", "value");
+
+        when(appEnvDelegate.getAppEnv(any(CloudFoundryOperations.class), eq(cfAppProperties)))
+            .thenReturn(Mono.just(Optional.of(ApplicationEnvironments.builder().userProvided(existingEnvironment).build())));
+
         when(pushDelegate.push(any(CloudFoundryOperations.class), any(CfProperties.class)))
             .thenReturn(Mono.empty());
 
@@ -68,12 +80,16 @@ public class CfBlueGreenStage1DelegateTest {
 
         verify(this.pushDelegate).push(any(CloudFoundryOperations.class), argumentCaptor.capture());
 
+        Map<String, String> expectedEnvironment = getUserEnvironment();
+        expectedEnvironment.putAll(existingEnvironment);
+
         CfProperties captured = argumentCaptor.getValue();
         assertThat(captured.name()).isEqualTo("test-green");
         assertThat(captured.host()).isEqualTo("route-green");
         assertThat(captured.instances()).isEqualTo(10);
         assertThat(captured.diskQuota()).isEqualTo(500);
         assertThat(captured.memory()).isEqualTo(100);
+        assertThat(captured.environment()).isEqualTo(expectedEnvironment);
     }
 
 
@@ -84,6 +100,9 @@ public class CfBlueGreenStage1DelegateTest {
         CfProperties cfAppProperties = sampleApp();
 
         when(appDetailsDelegate.getAppDetails(any(CloudFoundryOperations.class), eq(cfAppProperties)))
+            .thenReturn(Mono.just(Optional.empty()));
+
+        when(appEnvDelegate.getAppEnv(any(CloudFoundryOperations.class), eq(cfAppProperties)))
             .thenReturn(Mono.just(Optional.empty()));
 
         when(pushDelegate.push(any(CloudFoundryOperations.class), any(CfProperties.class)))
@@ -105,9 +124,12 @@ public class CfBlueGreenStage1DelegateTest {
         assertThat(captured.instances()).isEqualTo(2);
         assertThat(captured.diskQuota()).isNull();
         assertThat(captured.memory()).isNull();
+        assertThat(captured.environment()).isEqualTo(getUserEnvironment());
+
     }
 
     private CfProperties sampleApp() {
+        HashMap<String, String> environment = getUserEnvironment();
         return ImmutableCfProperties.builder()
             .ccHost("cchost")
             .ccUser("ccuser")
@@ -117,6 +139,13 @@ public class CfBlueGreenStage1DelegateTest {
             .name("test")
             .instances(2)
             .host("route")
+            .environment(environment)
             .build();
+    }
+
+    private HashMap<String, String> getUserEnvironment() {
+        HashMap<String, String> environment = new HashMap<>();
+        environment.put("property", "value");
+        return environment;
     }
 }

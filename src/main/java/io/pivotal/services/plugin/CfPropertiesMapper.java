@@ -18,7 +18,11 @@ package io.pivotal.services.plugin;
 
 import org.gradle.api.Project;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Responsible for mapping plugin extension provided via a block
@@ -46,8 +50,17 @@ public class CfPropertiesMapper {
 
     private final Project project;
 
+    private final Map<String, String> systemEnv;
+
     public CfPropertiesMapper(Project project) {
         this.project = project;
+        this.systemEnv = System.getenv();
+    }
+
+    //For Tests
+    CfPropertiesMapper(Project project, Map<String, String> systemEnv) {
+        this.project = project;
+        this.systemEnv = systemEnv;
     }
 
     public CfProperties getProperties() {
@@ -189,13 +202,17 @@ public class CfPropertiesMapper {
     }
 
     public String getCcUser() {
-        return getStringPropertyFromProject(PropertyNameConstants.CC_USER)
-            .orElse(this.getExtension().getCcUser());
+        return getPropertyFromEnvironment(PropertyNameConstants.CC_USER_ENV)
+            .orElse(
+                this.getStringPropertyFromProject(PropertyNameConstants.CC_USER)
+                    .orElse(this.getExtension().getCcUser()));
+
     }
 
     public String getCcPassword() {
-        return getStringPropertyFromProject(PropertyNameConstants.CC_PASSWORD)
-            .orElse(this.getExtension().getCcPassword());
+        return getPropertyFromEnvironment(PropertyNameConstants.CC_PASSWORD_ENV)
+            .orElse(getStringPropertyFromProject(PropertyNameConstants.CC_PASSWORD)
+                .orElse(this.getExtension().getCcPassword()));
     }
 
     public String getCcToken() {
@@ -272,6 +289,13 @@ public class CfPropertiesMapper {
         }
 
         return withProperties;
+    }
+
+    public Optional<String> getPropertyFromEnvironment(String propertyName) {
+        if (this.systemEnv.containsKey(propertyName)) {
+            return Optional.of((String) this.systemEnv.get(propertyName));
+        }
+        return Optional.empty();
     }
 
     public Optional<String> getStringPropertyFromProject(String propertyName) {

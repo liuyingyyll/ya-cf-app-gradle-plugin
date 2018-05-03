@@ -94,6 +94,15 @@ cfConfig {
 ./gradlew cf-push -Pcf.name=Green -Pcf.host=demo-time-temp -Pcf.environment.SPRING_PROFILES_ACTIVE="cloud,dev"
 ----
 
+* User and Password can be overridden using environment variables:
+
+[source]
+----
+export CF_CCUSER=admin
+export CF_CCPASSWORD=admin
+./gradlew cf-push
+----
+
 * There is one task to retrieve the details of an application (cf-get-app-detail).
 You can use this task in the following way, say to retrieve the app url's in a gradle task:
 

@@ -12,7 +12,9 @@ public interface PropertyNameConstants {
     String CF_FILE_PATH = "cf.filePath";
     String CC_HOST = "cf.ccHost";
     String CC_USER = "cf.ccUser";
+    String CC_USER_ENV = "CF_CCUSER";
     String CC_PASSWORD = "cf.ccPassword";
+    String CC_PASSWORD_ENV = "CF_CCPASSWORD";
     String CF_ORG = "cf.org";
     String CF_SPACE = "cf.space";
     String CF_BUILDPACK = "cf.buildpack";

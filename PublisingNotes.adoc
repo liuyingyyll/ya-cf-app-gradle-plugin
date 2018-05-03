@@ -15,12 +15,11 @@ ossrhUsername=user
 ossrhPassword=password
 ----
 
-If all of the above is cleanly set, the artifact can be published using the command:
+If all of the above is cleanly set, the artifact can be published as a release candidate using the command:
 
 [source]
 ----
-./gradlew uploadArchives
-./gradlew publishPlugins # for gradle plugins site..
+./gradlew candidate
 ----
 
 It takes about 10 mins before the artifacts are visible via maven and 2 hours before it is searchable.

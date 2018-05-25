@@ -32,4 +32,5 @@ public interface PropertyNameConstants {
     String CF_PROXY_PORT = "cf.cfProxySettings.proxyPort";
     String CF_PROXY_USER = "cf.cfProxySettings.proxyUser";
     String CF_PROXY_PASSWORD = "cf.cfProxySettings.proxyPassword";
+    String CF_SERVICES = "cf.services";
 }

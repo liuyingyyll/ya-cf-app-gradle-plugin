@@ -146,6 +146,14 @@ public class CfPropertiesMapperTest {
     }
 
     @Test
+    public void testCcServicesAreOverriddenViaProjectProperty() {
+        setProjectProperty(PropertyNameConstants.CF_SERVICES, "newservice1,newservice2");
+        CfProperties props = this.cfPropertiesMapper.getProperties();
+
+        assertThat(props.services()).containsExactlyInAnyOrder("newservice1", "newservice2");
+    }
+
+    @Test
     public void testBuildpackIsOverriddenViaProjectProperty() {
         setProjectProperty(PropertyNameConstants.CF_BUILDPACK, "newbuildpack");
         CfProperties props = this.cfPropertiesMapper.getProperties();

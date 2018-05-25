@@ -17,6 +17,7 @@
 package io.pivotal.services.plugin;
 
 import org.gradle.api.Project;
+import org.gradle.internal.impldep.aQute.lib.strings.Strings;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -90,7 +91,7 @@ public class CfPropertiesMapper {
             .instances(this.getInstances())
             .memory(this.getMemory())
             .ports(this.getExtension().getPorts())
-            .services(this.getExtension().getServices())
+            .services(getServices())
             .stagingTimeout(this.getStagingTimeout())
             .startupTimeout(this.getStartupTimeout())
             .cfServices(this.getCfServices())
@@ -215,6 +216,11 @@ public class CfPropertiesMapper {
                 .orElse(this.getExtension().getCcPassword()));
     }
 
+    public List<String> getServices() {
+        return getListPropertyFromProject(PropertyNameConstants.CF_SERVICES)
+                .orElse(this.getExtension().getServices());
+    }
+
     public String getCcToken() {
         return getStringPropertyFromProject(PropertyNameConstants.CC_TOKEN)
             .orElse(this.getExtension().getCcToken());
@@ -305,6 +311,12 @@ public class CfPropertiesMapper {
         return Optional.empty();
     }
 
+    public Optional<List<String>> getListPropertyFromProject(String propertyName) {
+        if (this.project.hasProperty(propertyName)) {
+            return Optional.of(Strings.split((String) this.project.property(propertyName)));
+        }
+        return Optional.empty();
+    }
 
     /**
      * Get a property value from the Project properties.

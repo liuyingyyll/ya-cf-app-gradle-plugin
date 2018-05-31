@@ -17,9 +17,9 @@
 package io.pivotal.services.plugin;
 
 import org.gradle.api.Project;
-import org.gradle.internal.impldep.aQute.lib.strings.Strings;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -313,7 +313,8 @@ public class CfPropertiesMapper {
 
     public Optional<List<String>> getListPropertyFromProject(String propertyName) {
         if (this.project.hasProperty(propertyName)) {
-            return Optional.of(Strings.split((String) this.project.property(propertyName)));
+            String rawProperty = (String) this.project.property(propertyName);
+            return Optional.of((Arrays.asList(rawProperty.split(","))));
         }
         return Optional.empty();
     }

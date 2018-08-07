@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -400,7 +401,7 @@ public class CfPropertiesMapper {
         for(Supplier<Optional<T>> sup: optSup) {
             try {
                 return sup.get().get();
-            } catch(Exception ignored) {}
+            } catch(NoSuchElementException | NullPointerException ignored) {}
         }
         return null;
     }

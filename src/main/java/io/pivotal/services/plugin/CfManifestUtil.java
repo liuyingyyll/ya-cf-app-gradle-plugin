@@ -35,6 +35,8 @@ public class CfManifestUtil {
             builder.host(properties.host());
         if(properties.domain() != null)
             builder.domain(properties.domain());
+        if(properties.path() != null)
+            builder.routePath(properties.path());
         if(properties.healthCheckType() != null)
             builder.healthCheckType(ApplicationHealthCheck.from(properties.healthCheckType()));
         if(properties.routes() != null && !properties.routes().isEmpty())

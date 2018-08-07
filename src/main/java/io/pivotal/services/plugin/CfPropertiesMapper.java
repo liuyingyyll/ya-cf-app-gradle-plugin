@@ -342,7 +342,7 @@ public class CfPropertiesMapper {
 
     private Map<String, String> getEnvironment() {
         Map<String, String> withProperties = new HashMap<>();
-        Map<String, Object> manifestEnvironment = manifest.getEnvironmentVariables();
+        Map<String, Object> manifestEnvironment = manifest != null ? manifest.getEnvironmentVariables() : null;
         if (manifestEnvironment != null)
             manifestEnvironment.forEach((key, obj) -> withProperties.put(key, obj.toString()));
         Map<String, String> buildScriptEnvironment = this.getExtension().getEnvironment();

@@ -47,6 +47,9 @@ public abstract class CfProperties {
     public abstract String name();
 
     @Nullable
+    public abstract String manifestPath();
+
+    @Nullable
     public abstract String filePath();
 
     @Nullable
@@ -57,6 +60,9 @@ public abstract class CfProperties {
 
     @Nullable
     public abstract String path();
+
+    @Nullable
+    public abstract List<String> routes();
 
     @Nullable
     public abstract String state();

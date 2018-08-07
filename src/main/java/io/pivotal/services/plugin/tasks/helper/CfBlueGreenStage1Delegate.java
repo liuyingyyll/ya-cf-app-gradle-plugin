@@ -1,5 +1,6 @@
 package io.pivotal.services.plugin.tasks.helper;
 
+import io.pivotal.services.plugin.CfManifestUtil;
 import io.pivotal.services.plugin.CfProperties;
 import io.pivotal.services.plugin.ImmutableCfProperties;
 import org.cloudfoundry.operations.CloudFoundryOperations;
@@ -39,21 +40,23 @@ public class CfBlueGreenStage1Delegate {
             Map<String, String> userEnvs = mapUserEnvironmentVars(cfProperties, appEnvOpt);
             LOGGER.lifecycle(
                 "Running Blue Green Deploy - deploying a 'green' app. App '{}' with route '{}'",
-                cfProperties.name(), cfProperties.host());
+                cfProperties.name(),
+                cfProperties.host() != null ? cfProperties.host() + "-green" : CfManifestUtil.getTempRoute(cfProperties,"-green").get(0));
 
             return appDetailOpt.map(appDetail -> {
                 printAppDetail(appDetail);
                 return ImmutableCfProperties.copyOf(cfProperties)
                     .withName(cfProperties.name() + "-green")
-                    .withHost(cfProperties.host() + "-green")
+                    .withHost(cfProperties.host() != null ? cfProperties.host() + "-green" : null)
+                    .withRoutes(CfManifestUtil.getTempRoute(cfProperties,"-green"))
                     .withInstances(appDetail.getInstances())
                     .withMemory(appDetail.getMemoryLimit())
                     .withDiskQuota(appDetail.getDiskQuota())
                     .withEnvironment(userEnvs);
             }).orElse(ImmutableCfProperties.copyOf(cfProperties)
                 .withName(cfProperties.name() + "-green")
-                .withHost(cfProperties.host() + "-green"));
-
+                .withHost(cfProperties.host() != null ? cfProperties.host() + "-green" : null)
+                .withRoutes(CfManifestUtil.getTempRoute(cfProperties,"-green")));
         }));
 
         return cfPropertiesMono.flatMap(

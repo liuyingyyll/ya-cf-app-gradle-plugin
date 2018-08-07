@@ -1,5 +1,10 @@
 package io.pivotal.services.plugin.tasks.helper;
 
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
+
+import java.util.Optional;
+
+import io.pivotal.services.plugin.CfManifestUtil;
 import io.pivotal.services.plugin.CfProperties;
 import io.pivotal.services.plugin.ImmutableCfProperties;
 import org.cloudfoundry.operations.CloudFoundryOperations;
@@ -8,10 +13,6 @@ import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 import reactor.core.publisher.Mono;
-
-import java.util.Optional;
-
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 /**
  * route -&gt; app
@@ -61,7 +62,8 @@ public class CfBlueGreenStage2Delegate {
 
         CfProperties greenNameAndRoute = ImmutableCfProperties.copyOf(cfProperties)
             .withName(cfProperties.name() + "-green")
-            .withHost(cfProperties.host() + "-green");
+            .withHost(cfProperties.host() != null ? cfProperties.host() + "-green" : null)
+            .withRoutes(CfManifestUtil.getTempRoute(cfProperties,"-green"));
 
         CfProperties blueName = ImmutableCfProperties.copyOf(cfProperties)
             .withName(cfProperties.name() + "-blue");
@@ -76,7 +78,8 @@ public class CfBlueGreenStage2Delegate {
             .flatMap(function((backupApp, existingApp) -> {
                 LOGGER.lifecycle(
                     "Running Blue Green Deploy - after deploying a 'green' app. App '{}' with route '{}'",
-                    cfProperties.name(), cfProperties.host());
+                    cfProperties.name(),
+                    cfProperties.host() != null ? cfProperties.host() + "-green" : CfManifestUtil.getTempRoute(cfProperties,"-green").get(0));
 
                 return (backupApp.isPresent() ?
                     deleteAppDelegate.deleteApp(cfOperations, blueName) :

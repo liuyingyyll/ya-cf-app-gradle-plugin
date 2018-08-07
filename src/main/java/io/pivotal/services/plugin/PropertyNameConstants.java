@@ -7,8 +7,10 @@ package io.pivotal.services.plugin;
  */
 public interface PropertyNameConstants {
     String CF_APPLICATION_NAME = "cf.name";
+    String CF_APPLICATION_MANIFEST = "cf.manifest";
     String CF_APPLICATION_HOST_NAME = "cf.host";
     String CF_APPLICATION_DOMAIN = "cf.domain";
+    String CF_APPLICATION_ROUTES = "cf.routes";
     String CF_FILE_PATH = "cf.filePath";
     String CC_HOST = "cf.ccHost";
     String CC_USER = "cf.ccUser";

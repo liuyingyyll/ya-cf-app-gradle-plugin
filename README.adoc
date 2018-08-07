@@ -64,12 +64,13 @@ cfConfig {
 		proxyPassword = "password"
 	}
 
-	//App Details
+	//Manifest with defaults (only supports one application per manifest file)
+	manifestFile = "manifest.yml"
+
+	//App Details (will override manifest defaults)
 	name = "cf-show-env"
-	host = "cf-show-env"
 	filePath = "build/libs/cf-show-env-0.1.2-SNAPSHOT.jar"
-	path = ""
-	domain = "local.pcfdev.io"
+	routes = [ "cf-show-env.local.pcfdev.io", "another.domain.com" ]
 	instances = 2
 	memory = 512
 

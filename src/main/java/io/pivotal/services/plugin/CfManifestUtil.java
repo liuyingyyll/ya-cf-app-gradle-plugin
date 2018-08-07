@@ -25,7 +25,6 @@ public class CfManifestUtil {
             .instances(properties.instances())
             .memory(properties.memory())
             .name(properties.name())
-            .routePath(properties.path())
             .timeout(properties.timeout());
         if(properties.filePath() != null)
             builder.path(new File(properties.filePath()).toPath());

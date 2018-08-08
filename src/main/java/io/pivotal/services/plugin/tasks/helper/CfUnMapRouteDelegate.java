@@ -2,7 +2,6 @@ package io.pivotal.services.plugin.tasks.helper;
 
 import java.util.List;
 
-import io.pivotal.services.plugin.CfManifestUtil;
 import io.pivotal.services.plugin.CfProperties;
 import io.pivotal.services.plugin.CfRouteUtil;
 import org.cloudfoundry.operations.CloudFoundryOperations;

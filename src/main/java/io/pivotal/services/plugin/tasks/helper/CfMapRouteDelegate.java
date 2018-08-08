@@ -2,13 +2,11 @@ package io.pivotal.services.plugin.tasks.helper;
 
 import java.util.List;
 
-import io.pivotal.services.plugin.CfManifestUtil;
 import io.pivotal.services.plugin.CfProperties;
 import io.pivotal.services.plugin.CfRouteUtil;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.applications.DecomposedRoute;
 import org.cloudfoundry.operations.routes.MapRouteRequest;
-import org.cloudfoundry.operations.routes.UnmapRouteRequest;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 import reactor.core.publisher.Mono;

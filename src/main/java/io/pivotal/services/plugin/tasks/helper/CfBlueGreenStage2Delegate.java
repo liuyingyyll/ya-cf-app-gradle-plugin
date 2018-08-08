@@ -5,7 +5,6 @@ import static org.cloudfoundry.util.tuple.TupleUtils.function;
 import java.util.Collections;
 import java.util.Optional;
 
-import io.pivotal.services.plugin.CfManifestUtil;
 import io.pivotal.services.plugin.CfProperties;
 import io.pivotal.services.plugin.CfRouteUtil;
 import io.pivotal.services.plugin.ImmutableCfProperties;

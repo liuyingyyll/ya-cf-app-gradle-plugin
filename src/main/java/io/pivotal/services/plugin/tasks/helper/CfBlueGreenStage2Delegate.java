@@ -2,10 +2,12 @@ package io.pivotal.services.plugin.tasks.helper;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
+import java.util.Collections;
 import java.util.Optional;
 
 import io.pivotal.services.plugin.CfManifestUtil;
 import io.pivotal.services.plugin.CfProperties;
+import io.pivotal.services.plugin.CfRouteUtil;
 import io.pivotal.services.plugin.ImmutableCfProperties;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.applications.ApplicationDetail;
@@ -56,14 +58,18 @@ public class CfBlueGreenStage2Delegate {
 
     public Mono<Void> runStage2(Project project, CloudFoundryOperations cfOperations,
                                 CfProperties cfProperties) {
+        String greenNameString = cfProperties.name() + "-green";
+        String greenRouteString = CfRouteUtil.getTempRoute(cfOperations, cfProperties, "-green");
+
 
         CfProperties greenName = ImmutableCfProperties.copyOf(cfProperties)
-            .withName(cfProperties.name() + "-green");
+            .withName(greenNameString);
 
         CfProperties greenNameAndRoute = ImmutableCfProperties.copyOf(cfProperties)
-            .withName(cfProperties.name() + "-green")
-            .withHost(cfProperties.host() != null ? cfProperties.host() + "-green" : null)
-            .withRoutes(CfManifestUtil.getTempRoute(cfProperties,"-green"));
+            .withName(greenNameString)
+            .withHost(null)
+            .withDomain(null)
+            .withRoutes(Collections.singletonList(greenRouteString));
 
         CfProperties blueName = ImmutableCfProperties.copyOf(cfProperties)
             .withName(cfProperties.name() + "-blue");
@@ -79,7 +85,7 @@ public class CfBlueGreenStage2Delegate {
                 LOGGER.lifecycle(
                     "Running Blue Green Deploy - after deploying a 'green' app. App '{}' with route '{}'",
                     cfProperties.name(),
-                    cfProperties.host() != null ? cfProperties.host() + "-green" : CfManifestUtil.getTempRoute(cfProperties,"-green").get(0));
+                    greenRouteString);
 
                 return (backupApp.isPresent() ?
                     deleteAppDelegate.deleteApp(cfOperations, blueName) :

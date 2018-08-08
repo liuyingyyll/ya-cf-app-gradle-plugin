@@ -2,6 +2,7 @@ package io.pivotal.services.plugin.tasks.helper;
 
 import io.pivotal.services.plugin.CfManifestUtil;
 import io.pivotal.services.plugin.CfProperties;
+import io.pivotal.services.plugin.CfRouteUtil;
 import io.pivotal.services.plugin.ImmutableCfProperties;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.applications.ApplicationDetail;
@@ -11,6 +12,7 @@ import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -28,6 +30,8 @@ public class CfBlueGreenStage1Delegate {
 
     public Mono<Void> runStage1(Project project, CloudFoundryOperations cfOperations,
                                 CfProperties cfProperties) {
+        final String greenNameString = cfProperties.name() + "-green";
+        final String greenRouteString = CfRouteUtil.getTempRoute(cfOperations, cfProperties, "-green");
 
         Mono<Optional<ApplicationDetail>> appDetailMono = appDetailsDelegate
             .getAppDetails(cfOperations, cfProperties);
@@ -41,22 +45,24 @@ public class CfBlueGreenStage1Delegate {
             LOGGER.lifecycle(
                 "Running Blue Green Deploy - deploying a 'green' app. App '{}' with route '{}'",
                 cfProperties.name(),
-                cfProperties.host() != null ? cfProperties.host() + "-green" : CfManifestUtil.getTempRoute(cfProperties,"-green").get(0));
+                greenRouteString);
 
             return appDetailOpt.map(appDetail -> {
                 printAppDetail(appDetail);
                 return ImmutableCfProperties.copyOf(cfProperties)
-                    .withName(cfProperties.name() + "-green")
-                    .withHost(cfProperties.host() != null ? cfProperties.host() + "-green" : null)
-                    .withRoutes(CfManifestUtil.getTempRoute(cfProperties,"-green"))
+                    .withName(greenNameString)
+                    .withHost(null)
+                    .withDomain(null)
+                    .withRoutes(Collections.singletonList(greenRouteString))
                     .withInstances(appDetail.getInstances())
                     .withMemory(appDetail.getMemoryLimit())
                     .withDiskQuota(appDetail.getDiskQuota())
                     .withEnvironment(userEnvs);
             }).orElse(ImmutableCfProperties.copyOf(cfProperties)
-                .withName(cfProperties.name() + "-green")
-                .withHost(cfProperties.host() != null ? cfProperties.host() + "-green" : null)
-                .withRoutes(CfManifestUtil.getTempRoute(cfProperties,"-green")));
+                .withName(greenNameString)
+                .withHost(null)
+                .withDomain(null)
+                .withRoutes(Collections.singletonList(greenRouteString)));
         }));
 
         return cfPropertiesMono.flatMap(

@@ -4,6 +4,7 @@ import java.util.List;
 
 import io.pivotal.services.plugin.CfManifestUtil;
 import io.pivotal.services.plugin.CfProperties;
+import io.pivotal.services.plugin.CfRouteUtil;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.applications.DecomposedRoute;
 import org.cloudfoundry.operations.routes.UnmapRouteRequest;
@@ -23,33 +24,28 @@ public class CfUnMapRouteDelegate {
     public Mono<Void> unmapRoute(CloudFoundryOperations cfOperations, CfProperties cfProperties) {
         Mono<Void> resp = Mono.empty();
         if (cfProperties.routes() != null && !cfProperties.routes().isEmpty()) {
-            List<DecomposedRoute> routes = CfManifestUtil.decomposedRoutes(cfProperties.routes());
+            List<DecomposedRoute> routes = CfRouteUtil.decomposedRoutes(cfOperations,cfProperties.routes(),cfProperties.path());
             for(DecomposedRoute route: routes) {
-                resp = resp.then(cfOperations.routes()
-                    .unmap(UnmapRouteRequest
-                        .builder()
-                        .applicationName(cfProperties.name())
-                        .domain(route.getDomain())
-                        .host(route.getHost())
-                        .path(route.getPath())
-                        .build()).then().doOnSubscribe((s) -> {
-                        LOGGER.lifecycle("Unmapping hostname '{}' in domain '{}' with path '{}' of app '{}'", route.getHost(),
-                            route.getDomain(), route.getPath(), cfProperties.name());
-                    }));
+                resp = resp.then(unmapRoute(cfOperations, cfProperties.name(), route.getHost(), route.getDomain(), route.getPort(), route.getPath()));
             }
         } else {
-            resp = cfOperations.routes()
-                .unmap(UnmapRouteRequest
-                    .builder()
-                    .applicationName(cfProperties.name())
-                    .domain(cfProperties.domain())
-                    .host(cfProperties.host())
-                    .path(cfProperties.path())
-                    .build()).doOnSubscribe((s) -> {
-                    LOGGER.lifecycle("Unmapping hostname '{}' in domain '{}' with path '{}' of app '{}'", cfProperties.host(),
-                        cfProperties.domain(), cfProperties.path(), cfProperties.name());
-                });
+            resp = resp.then(unmapRoute(cfOperations, cfProperties.name(), cfProperties.domain(), cfProperties.host(), null, cfProperties.path()));
         }
         return resp;
+    }
+
+    private Mono<Void> unmapRoute(CloudFoundryOperations cfOperations, String appName, String host, String domain, Integer port, String path) {
+        return cfOperations.routes()
+            .unmap(UnmapRouteRequest
+                .builder()
+                .applicationName(appName)
+                .host(host)
+                .domain(domain)
+                .port(port)
+                .path(path)
+                .build()).doOnSubscribe((s) -> {
+                LOGGER.lifecycle("Unmapping hostname '{}' in domain '{}' with path '{}' of app '{}'", host,
+                    domain, path, appName);
+            });
     }
 }

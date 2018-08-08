@@ -1,6 +1,5 @@
 package io.pivotal.services.plugin;
 
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +20,7 @@ import reactor.core.publisher.Mono;
  * have to copy it.
  */
 public class CfRouteUtil {
-    private static Map<DefaultCloudFoundryOperations, List<DomainSummary>> routeCache = new HashMap<>();
+    private static Map<DefaultCloudFoundryOperations, List<DomainSummary>> domainCache = new HashMap<>();
 
     /**
      * Returns a list of decomposed routes
@@ -62,7 +61,7 @@ public class CfRouteUtil {
     private static List<DomainSummary> getDomainSummaries(CloudFoundryOperations cfOperations) {
         List<DomainSummary> domainSummaries = null;
         if(cfOperations instanceof  DefaultCloudFoundryOperations) {
-            domainSummaries = routeCache.get(cfOperations);
+            domainSummaries = domainCache.get(cfOperations);
         }
         if(domainSummaries == null) {
             domainSummaries = cfOperations.domains().list()
@@ -73,7 +72,7 @@ public class CfRouteUtil {
                     .build())
                 .collectList().block();
             if(cfOperations instanceof  DefaultCloudFoundryOperations) {
-                routeCache.put((DefaultCloudFoundryOperations) cfOperations, domainSummaries);
+                domainCache.put((DefaultCloudFoundryOperations) cfOperations, domainSummaries);
             }
         }
         return domainSummaries;

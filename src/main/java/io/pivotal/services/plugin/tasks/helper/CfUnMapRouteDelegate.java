@@ -1,7 +1,5 @@
 package io.pivotal.services.plugin.tasks.helper;
 
-import java.util.List;
-
 import io.pivotal.services.plugin.CfProperties;
 import io.pivotal.services.plugin.CfRouteUtil;
 import org.cloudfoundry.operations.CloudFoundryOperations;
@@ -10,6 +8,8 @@ import org.cloudfoundry.operations.routes.UnmapRouteRequest;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 /**
  * Helper responsible for unmapping a route
@@ -23,13 +23,14 @@ public class CfUnMapRouteDelegate {
 
     public Mono<Void> unmapRoute(CloudFoundryOperations cfOperations, CfProperties cfProperties) {
         Mono<Void> resp = Mono.empty();
+
         if (cfProperties.routes() != null && !cfProperties.routes().isEmpty()) {
-            List<DecomposedRoute> routes = CfRouteUtil.decomposedRoutes(cfOperations,cfProperties.routes(),cfProperties.path());
-            for(DecomposedRoute route: routes) {
+            List<DecomposedRoute> routes = CfRouteUtil.decomposedRoutes(cfOperations, cfProperties.routes(), cfProperties.path());
+            for (DecomposedRoute route : routes) {
                 resp = resp.then(unmapRoute(cfOperations, cfProperties.name(), route.getHost(), route.getDomain(), route.getPort(), route.getPath()));
             }
         } else {
-            resp = resp.then(unmapRoute(cfOperations, cfProperties.name(), cfProperties.domain(), cfProperties.host(), null, cfProperties.path()));
+            resp = resp.then(unmapRoute(cfOperations, cfProperties.name(), cfProperties.host(), cfProperties.domain(), null, cfProperties.path()));
         }
         return resp;
     }

@@ -219,14 +219,14 @@ public class CfPropertiesMapper {
     public String getAppHostName() {
         return firstNonEmptyOptional(() -> getStringPropertyFromProject(PropertyNameConstants.CF_APPLICATION_HOST_NAME),
             () -> Optional.ofNullable(this.getExtension().getHost()),
-            () -> fromManifest(m -> (m.getHosts() != null && m.getHosts().size() > 0) ? this.manifest.getHosts().get(0) : null)
+            () -> fromManifest(m -> (m.getHosts() != null && !m.getHosts().isEmpty()) ? this.manifest.getHosts().get(0) : null)
         );
     }
 
     public String getAppDomain() {
         return firstNonEmptyOptional(() -> getStringPropertyFromProject(PropertyNameConstants.CF_APPLICATION_DOMAIN),
             () -> Optional.ofNullable(this.getExtension().getDomain()),
-            () -> fromManifest(m -> (m.getDomains() != null && m.getDomains().size() > 0) ? m.getDomains().get(0) : null)
+            () -> fromManifest(m -> (m.getDomains() != null && !m.getDomains().isEmpty()) ? m.getDomains().get(0) : null)
         );
     }
 

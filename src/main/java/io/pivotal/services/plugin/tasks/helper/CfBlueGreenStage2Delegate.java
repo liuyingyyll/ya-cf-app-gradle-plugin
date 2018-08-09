@@ -1,10 +1,5 @@
 package io.pivotal.services.plugin.tasks.helper;
 
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
-
-import java.util.Collections;
-import java.util.Optional;
-
 import io.pivotal.services.plugin.CfProperties;
 import io.pivotal.services.plugin.CfRouteUtil;
 import io.pivotal.services.plugin.ImmutableCfProperties;
@@ -14,6 +9,11 @@ import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 import reactor.core.publisher.Mono;
+
+import java.util.Collections;
+import java.util.Optional;
+
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 /**
  * route -&gt; app
@@ -42,6 +42,8 @@ import reactor.core.publisher.Mono;
  * Step 6:
  * route       -&gt; app
  * -&gt; app-blue
+ *
+ * @author Biju Kunjummen
  * @author Gabriel Couto
  */
 public class CfBlueGreenStage2Delegate {
@@ -58,9 +60,11 @@ public class CfBlueGreenStage2Delegate {
 
     public Mono<Void> runStage2(Project project, CloudFoundryOperations cfOperations,
                                 CfProperties cfProperties) {
+        
+        //eagerly cache domain summaries
+        CfRouteUtil.getDomainSummaries(cfOperations);
         String greenNameString = cfProperties.name() + "-green";
         String greenRouteString = CfRouteUtil.getTempRoute(cfOperations, cfProperties, "-green");
-
 
         CfProperties greenName = ImmutableCfProperties.copyOf(cfProperties)
             .withName(greenNameString);
@@ -86,22 +90,24 @@ public class CfBlueGreenStage2Delegate {
                     "Running Blue Green Deploy - after deploying a 'green' app. App '{}' with route '{}'",
                     cfProperties.name(),
                     greenRouteString);
-
-                return (backupApp.isPresent() ?
-                    deleteAppDelegate.deleteApp(cfOperations, blueName) :
-                    Mono.empty()).then(mapRouteDelegate.mapRoute(cfOperations, greenName))
-                    .then(existingApp.isPresent() ?
-                        unMapRouteDelegate.unmapRoute(cfOperations, cfProperties) :
-                        Mono.empty())
-                    .then(unMapRouteDelegate.unmapRoute(cfOperations, greenNameAndRoute))
-                    .then(existingApp.isPresent() ?
-                        renameAppDelegate
-                            .renameApp(cfOperations, cfProperties, blueName) :
-                        Mono.empty()).then(renameAppDelegate
-                        .renameApp(cfOperations, greenName, cfProperties)).then(
-                        existingApp.isPresent() ?
-                            appStopDelegate.stopApp(cfOperations, blueName) :
-                            Mono.empty());
+                return
+                    (backupApp.isPresent() ?
+                        deleteAppDelegate.deleteApp(cfOperations, blueName) : Mono.empty())
+                        .then(mapRouteDelegate.mapRoute(cfOperations, greenName))
+                        .then(existingApp.isPresent() ?
+                            unMapRouteDelegate.unmapRoute(cfOperations, cfProperties) :
+                            Mono.empty())
+                        .then(unMapRouteDelegate.unmapRoute(cfOperations, greenNameAndRoute))
+                        .then(existingApp.isPresent() ?
+                            renameAppDelegate
+                                .renameApp(cfOperations, cfProperties, blueName) :
+                            Mono.empty())
+                        .then(renameAppDelegate
+                            .renameApp(cfOperations, greenName, cfProperties))
+                        .then(
+                            existingApp.isPresent() ?
+                                appStopDelegate.stopApp(cfOperations, blueName) :
+                                Mono.empty());
             }));
 
         return bgResult;

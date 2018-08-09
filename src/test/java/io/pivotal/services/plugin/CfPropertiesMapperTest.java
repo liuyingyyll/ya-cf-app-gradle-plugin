@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -460,5 +461,18 @@ public class CfPropertiesMapperTest {
         ext.setCfProxySettings(cfProxySettings);
 
         return ext;
+    }
+
+    @Test
+    public void testFirstSupplierNotNull() {
+        assertThat(CfPropertiesMapper.firstNonEmptyOptional(
+            () -> Optional.empty(),
+            () -> Optional.of("something")
+        )).isEqualTo("something");
+
+        assertThat(CfPropertiesMapper.firstNonEmptyOptional(
+            () -> Optional.<String>empty(),
+            () -> Optional.empty()
+        )).isNull();
     }
 }

@@ -16,21 +16,21 @@
 
 package io.pivotal.services.plugin;
 
+import org.cloudfoundry.operations.applications.ApplicationManifest;
+import org.cloudfoundry.operations.applications.ApplicationManifestUtils;
+import org.cloudfoundry.operations.applications.Route;
+import org.gradle.api.Project;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-
-import org.cloudfoundry.operations.applications.ApplicationManifest;
-import org.cloudfoundry.operations.applications.ApplicationManifestUtils;
-import org.cloudfoundry.operations.applications.Route;
-import org.gradle.api.Project;
 
 /**
  * Responsible for mapping plugin extension provided via a block
@@ -56,7 +56,6 @@ import org.gradle.api.Project;
  * @author Gabriel Couto
  */
 public class CfPropertiesMapper {
-    private static final Map<String, ApplicationManifest> manifestCache = new HashMap<>();
 
     private final Project project;
 
@@ -65,18 +64,20 @@ public class CfPropertiesMapper {
     private ApplicationManifest manifest;
 
     public CfPropertiesMapper(Project project) {
-        this.project = project;
-        this.systemEnv = System.getenv();
+        this(project, System.getenv());
     }
 
     //For Tests
     CfPropertiesMapper(Project project, Map<String, String> systemEnv) {
         this.project = project;
         this.systemEnv = systemEnv;
+        String manifestPath = getManifestPath();
+        if (manifestPath != null) {
+            manifest = ApplicationManifestUtils.read(new File(getManifestPath()).toPath()).get(0);
+        }
     }
 
     public CfProperties getProperties() {
-        refreshManifest();
         return ImmutableCfProperties.builder()
             .name(getCfApplicationName())
             .ccHost(getCcHost())
@@ -183,9 +184,9 @@ public class CfPropertiesMapper {
 
 
     public String getCfApplicationName() {
-        return firstNotNull(() -> getStringPropertyFromProject(PropertyNameConstants.CF_APPLICATION_NAME),
-            () -> Optional.of(this.getExtension().getName()),
-            () -> Optional.of(this.manifest.getName())
+        return firstNonEmptyOptional(() -> getStringPropertyFromProject(PropertyNameConstants.CF_APPLICATION_NAME),
+            () -> Optional.ofNullable(this.getExtension().getName()),
+            () -> fromManifest(m -> m.getName())
         );
     }
 
@@ -195,45 +196,52 @@ public class CfPropertiesMapper {
     }
 
     public String getManifestPath() {
-        return firstNotNull(
+        return firstNonEmptyOptional(
             () -> getStringPropertyFromProject(PropertyNameConstants.CF_APPLICATION_MANIFEST),
-            () -> Optional.of(this.getExtension().getManifestFile())
+            () -> Optional.ofNullable(this.getExtension() != null ? this.getExtension().getManifestFile() : null)
         );
     }
 
     public String getHealthCheckType() {
-        return firstNotNull(
-            () -> Optional.of(this.getExtension().getHealthCheckType()),
-            () -> Optional.of(this.manifest.getHealthCheckType().getValue())
+        return firstNonEmptyOptional(
+            () -> Optional.ofNullable(this.getExtension().getHealthCheckType()),
+            () -> fromManifest(m -> m.getHealthCheckType() != null ? m.getHealthCheckType().getValue() : null)
         );
     }
 
     public String getCommand() {
-        return firstNotNull(
-            () -> Optional.of(this.getExtension().getCommand()),
-            () -> Optional.of(this.manifest.getCommand())
+        return firstNonEmptyOptional(
+            () -> Optional.ofNullable(this.getExtension().getCommand()),
+            () -> fromManifest(m -> m.getCommand())
         );
     }
 
     public String getAppHostName() {
-        return firstNotNull(() -> getStringPropertyFromProject(PropertyNameConstants.CF_APPLICATION_HOST_NAME),
-            () -> Optional.of(this.getExtension().getHost()),
-            () -> Optional.of(this.manifest.getHosts().get(0))
+        return firstNonEmptyOptional(() -> getStringPropertyFromProject(PropertyNameConstants.CF_APPLICATION_HOST_NAME),
+            () -> Optional.ofNullable(this.getExtension().getHost()),
+            () -> fromManifest(m -> (m.getHosts() != null && m.getHosts().size() > 0) ? this.manifest.getHosts().get(0) : null)
         );
     }
 
     public String getAppDomain() {
-        return firstNotNull(() -> getStringPropertyFromProject(PropertyNameConstants.CF_APPLICATION_DOMAIN),
-            () -> Optional.of(this.getExtension().getDomain()),
-            () -> Optional.of(this.manifest.getDomains().get(0))
+        return firstNonEmptyOptional(() -> getStringPropertyFromProject(PropertyNameConstants.CF_APPLICATION_DOMAIN),
+            () -> Optional.ofNullable(this.getExtension().getDomain()),
+            () -> fromManifest(m -> (m.getDomains() != null && m.getDomains().size() > 0) ? m.getDomains().get(0) : null)
         );
     }
 
     public String getFilePath() {
-        return firstNotNull(() -> getStringPropertyFromProject(PropertyNameConstants.CF_FILE_PATH),
-            () -> Optional.of(this.getExtension().getFilePath()),
-            () -> Optional.of(this.manifest.getPath().toString())
+        return firstNonEmptyOptional(() -> getStringPropertyFromProject(PropertyNameConstants.CF_FILE_PATH),
+            () -> Optional.ofNullable(this.getExtension().getFilePath()),
+            () -> fromManifest(m -> m.getPath() != null ? m.getPath().toString() : null)
         );
+    }
+
+    private <T> Optional<T> fromManifest(Function<ApplicationManifest, T> manifestContentExtractor) {
+        if (this.manifest != null) {
+            return Optional.ofNullable(manifestContentExtractor.apply(this.manifest));
+        }
+        return Optional.empty();
     }
 
     public String getCcHost() {
@@ -256,9 +264,9 @@ public class CfPropertiesMapper {
     }
 
     public List<String> getServices() {
-        return firstNotNull(() -> getListPropertyFromProject(PropertyNameConstants.CF_SERVICES),
-            () -> Optional.of(this.getExtension().getServices()),
-            () -> Optional.of(this.manifest.getServices())
+        return firstNonEmptyOptional(() -> getListPropertyFromProject(PropertyNameConstants.CF_SERVICES),
+            () -> Optional.ofNullable(this.getExtension().getServices()),
+            () -> fromManifest(m -> m.getServices())
         );
     }
 
@@ -268,9 +276,9 @@ public class CfPropertiesMapper {
     }
 
     public String getBuildpack() {
-        return firstNotNull(() -> getStringPropertyFromProject(PropertyNameConstants.CF_BUILDPACK),
-            () -> Optional.of(this.getExtension().getBuildpack()),
-            () -> Optional.of(this.manifest.getBuildpack())
+        return firstNonEmptyOptional(() -> getStringPropertyFromProject(PropertyNameConstants.CF_BUILDPACK),
+            () -> Optional.ofNullable(this.getExtension().getBuildpack()),
+            () -> fromManifest(m -> m.getBuildpack())
         );
     }
 
@@ -285,44 +293,44 @@ public class CfPropertiesMapper {
     }
 
     public String getCfPath() {
-        return firstNotNull(() -> getStringPropertyFromProject(PropertyNameConstants.CF_PATH),
-            () -> Optional.of(this.getExtension().getPath()),
-            () -> Optional.of(this.manifest.getRoutePath())
+        return firstNonEmptyOptional(() -> getStringPropertyFromProject(PropertyNameConstants.CF_PATH),
+            () -> Optional.ofNullable(this.getExtension().getPath()),
+            () -> fromManifest(m -> m.getRoutePath())
         );
     }
 
     public List<String> getAppRoutes() {
-        return firstNotNull(() -> getListPropertyFromProject(PropertyNameConstants.CF_APPLICATION_ROUTES),
-            () -> Optional.of(this.getExtension().getRoutes()),
-            () -> Optional.of(this.manifest.getRoutes().stream().map(Route::getRoute).collect(Collectors.toList()))
-            );
+        return firstNonEmptyOptional(() -> getListPropertyFromProject(PropertyNameConstants.CF_APPLICATION_ROUTES),
+            () -> Optional.ofNullable(this.getExtension().getRoutes()),
+            () -> fromManifest(m -> m.getRoutes().stream().map(Route::getRoute).collect(Collectors.toList()))
+        );
     }
 
     public Integer getInstances() {
-        return firstNotNull(() -> getIntegerPropertyFromProject(PropertyNameConstants.CF_INSTANCES),
-            () -> Optional.of(this.getExtension().getInstances()),
-            () -> Optional.of(this.manifest.getInstances())
+        return firstNonEmptyOptional(() -> getIntegerPropertyFromProject(PropertyNameConstants.CF_INSTANCES),
+            () -> Optional.ofNullable(this.getExtension().getInstances()),
+            () -> fromManifest(m -> m.getInstances())
         );
     }
 
     public Integer getMemory() {
-        return firstNotNull(() -> getIntegerPropertyFromProject(PropertyNameConstants.CF_MEMORY),
-            () -> Optional.of(this.getExtension().getMemory()),
-            () -> Optional.of(this.manifest.getMemory())
+        return firstNonEmptyOptional(() -> getIntegerPropertyFromProject(PropertyNameConstants.CF_MEMORY),
+            () -> Optional.ofNullable(this.getExtension().getMemory()),
+            () -> fromManifest(m -> m.getMemory())
         );
     }
 
     public Integer getTimeout() {
-        return firstNotNull(() -> getIntegerPropertyFromProject(PropertyNameConstants.CF_HEALTH_CHECK_TIMEOUT),
-            () -> Optional.of(this.getExtension().getTimeout()),
-            () -> Optional.of(this.manifest.getTimeout())
+        return firstNonEmptyOptional(() -> getIntegerPropertyFromProject(PropertyNameConstants.CF_HEALTH_CHECK_TIMEOUT),
+            () -> Optional.ofNullable(this.getExtension().getTimeout()),
+            () -> fromManifest(m -> m.getTimeout())
         );
     }
 
     public Integer getDiskQuota() {
-        return firstNotNull(() -> getIntegerPropertyFromProject(PropertyNameConstants.CF_DISK_QUOTA),
-            () -> Optional.of(this.getExtension().getDiskQuota()),
-            () -> Optional.of(this.manifest.getDisk())
+        return firstNonEmptyOptional(() -> getIntegerPropertyFromProject(PropertyNameConstants.CF_DISK_QUOTA),
+            () -> Optional.ofNullable(this.getExtension().getDiskQuota()),
+            () -> fromManifest(m -> m.getDisk())
         );
     }
 
@@ -396,26 +404,12 @@ public class CfPropertiesMapper {
         return Optional.empty();
     }
 
-    @SafeVarargs
-    static <T> T firstNotNull(Supplier<Optional<T>>... optSup) {
-        for(Supplier<Optional<T>> sup: optSup) {
-            try {
-                return sup.get().get();
-            } catch(NoSuchElementException | NullPointerException ignored) {}
-        }
-        return null;
-    }
-
-    private void refreshManifest() {
-        String manifestPath = getManifestPath();
-        if (manifestPath != null) {
-            manifest = manifestCache.get(manifestPath);
-            if (manifest == null) {
-                manifest = ApplicationManifestUtils.read(new File(getManifestPath()).toPath()).get(0);
-                manifestCache.put(manifestPath, manifest);
-            }
-        } else {
-            manifest = null;
-        }
+    static <T> T firstNonEmptyOptional(Supplier<Optional<T>>... optSup) {
+        return Arrays.stream(optSup)
+            .map(Supplier::get)
+            .filter(opt -> opt.isPresent())
+            .map(Optional::get)
+            .findFirst()
+            .orElse(null);
     }
 }

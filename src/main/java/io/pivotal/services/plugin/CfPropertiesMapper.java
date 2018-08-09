@@ -56,6 +56,7 @@ import org.gradle.api.Project;
  * @author Gabriel Couto
  */
 public class CfPropertiesMapper {
+    private static final Map<String, ApplicationManifest> manifestCache = new HashMap<>();
 
     private final Project project;
 
@@ -75,9 +76,7 @@ public class CfPropertiesMapper {
     }
 
     public CfProperties getProperties() {
-        if(getManifestPath() != null) {
-            manifest = ApplicationManifestUtils.read(new File(getManifestPath()).toPath()).get(0);
-        }
+        refreshManifest();
         return ImmutableCfProperties.builder()
             .name(getCfApplicationName())
             .ccHost(getCcHost())
@@ -405,5 +404,18 @@ public class CfPropertiesMapper {
             } catch(NoSuchElementException | NullPointerException ignored) {}
         }
         return null;
+    }
+
+    private void refreshManifest() {
+        String manifestPath = getManifestPath();
+        if (manifestPath != null) {
+            manifest = manifestCache.get(manifestPath);
+            if (manifest == null) {
+                manifest = ApplicationManifestUtils.read(new File(getManifestPath()).toPath()).get(0);
+                manifestCache.put(manifestPath, manifest);
+            }
+        } else {
+            manifest = null;
+        }
     }
 }

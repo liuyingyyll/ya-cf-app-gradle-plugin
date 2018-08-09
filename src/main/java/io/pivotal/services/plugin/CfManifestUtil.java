@@ -8,6 +8,9 @@ import org.cloudfoundry.operations.applications.ApplicationManifest;
 import org.cloudfoundry.operations.applications.ApplicationManifestUtils;
 import org.cloudfoundry.operations.applications.Route;
 
+/**
+ * @author Gabriel Couto
+ */
 public class CfManifestUtil {
     public static ApplicationManifest convert(CfProperties properties) {
         ApplicationManifest.Builder builder = ApplicationManifest.builder();

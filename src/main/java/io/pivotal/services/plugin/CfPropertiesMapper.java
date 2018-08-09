@@ -53,6 +53,7 @@ import org.gradle.api.Project;
  * and providing a structure with the final values
  *
  * @author Biju Kunjummen
+ * @author Gabriel Couto
  */
 public class CfPropertiesMapper {
 

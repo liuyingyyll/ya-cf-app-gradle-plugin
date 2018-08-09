@@ -18,6 +18,9 @@ import java.util.Optional;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
+/**
+ * @author Gabriel Couto
+ */
 public class CfBlueGreenStage1Delegate {
 
     private CfPushDelegate pushDelegate = new CfPushDelegate();

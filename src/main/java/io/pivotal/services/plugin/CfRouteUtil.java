@@ -15,9 +15,7 @@ import org.cloudfoundry.operations.applications.DomainSummary;
 import reactor.core.publisher.Mono;
 
 /**
- * The idea is to mimic org.cloudfoundry.operations.applications.RouteUtil as it is our
- * sourche of truth on how to deal on route decomposition. But as it is protected, we
- * have to copy it.
+ * @author Gabriel Couto
  */
 public class CfRouteUtil {
     private static Map<DefaultCloudFoundryOperations, List<DomainSummary>> domainCache = new HashMap<>();

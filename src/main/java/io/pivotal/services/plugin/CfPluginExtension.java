@@ -22,6 +22,7 @@ import java.util.Map;
  * </pre>
  *
  * @author Biju Kunjummen
+ * @author Gabriel Couto
  */
 public class CfPluginExtension {
 

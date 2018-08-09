@@ -4,6 +4,7 @@ package io.pivotal.services.plugin;
  * Property name related constants
  *
  * @author Biju Kunjummen
+ * @author Gabriel Couto
  */
 public interface PropertyNameConstants {
     String CF_APPLICATION_NAME = "cf.name";

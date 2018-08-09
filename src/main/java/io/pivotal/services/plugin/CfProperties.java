@@ -26,6 +26,7 @@ import java.util.Map;
  * Holds the set of properties that will drive the various Gradle tasks
  *
  * @author Biju Kunjummen
+ * @author Gabriel Couto
  */
 @Value.Immutable(copy = true)
 public abstract class CfProperties {

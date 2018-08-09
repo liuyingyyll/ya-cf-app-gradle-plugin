@@ -22,6 +22,7 @@ import java.util.Map;
  * </pre>
  *
  * @author Biju Kunjummen
+ * @author Gabriel Couto
  */
 public class CfPluginExtension {
 
@@ -41,9 +42,11 @@ public class CfPluginExtension {
 
     private String name;
     private String filePath;
+    private String manifestFile;
     private String host;
     private String domain;
     private String path;
+    private List<String> routes = new ArrayList<>();
 
 
     private String state;
@@ -145,6 +148,14 @@ public class CfPluginExtension {
         this.name = name;
     }
 
+    public String getManifestFile() {
+        return manifestFile;
+    }
+
+    public void setManifestFile(String manifestFile) {
+        this.manifestFile = manifestFile;
+    }
+
     public String getFilePath() {
         return filePath;
     }
@@ -175,6 +186,14 @@ public class CfPluginExtension {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public List<String> getRoutes() {
+        return routes;
+    }
+
+    public void setRoutes(List<String> routes) {
+        this.routes = routes;
     }
 
     public String getState() {
@@ -355,10 +374,12 @@ public class CfPluginExtension {
         sb.append(", org='").append(org).append('\'');
         sb.append(", space='").append(space).append('\'');
         sb.append(", name='").append(name).append('\'');
+        sb.append(", manifest='").append(manifestFile).append('\'');
         sb.append(", filePath='").append(filePath).append('\'');
         sb.append(", host='").append(host).append('\'');
         sb.append(", domain='").append(domain).append('\'');
         sb.append(", path='").append(path).append('\'');
+        sb.append(", routes='").append(routes.toString()).append('\'');
         sb.append(", state='").append(state).append('\'');
         sb.append(", buildpack='").append(buildpack).append('\'');
         sb.append(", command='").append(command).append('\'');

@@ -6,6 +6,9 @@ import io.pivotal.services.plugin.ImmutableCfProperties;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.applications.ApplicationDetail;
 import org.cloudfoundry.operations.applications.ApplicationEnvironments;
+import org.cloudfoundry.operations.domains.Domain;
+import org.cloudfoundry.operations.domains.Domains;
+import org.cloudfoundry.operations.domains.Status;
 import org.gradle.api.Project;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,6 +16,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -26,6 +30,10 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
+/**
+ * @author Biju Kunjummen
+ * @author Gabriel Couto
+ */
 public class CfBlueGreenStage1DelegateTest {
 
     @Mock
@@ -49,6 +57,9 @@ public class CfBlueGreenStage1DelegateTest {
     public void testStage1ExistingApp() {
         Project project = mock(Project.class);
         CloudFoundryOperations cfOperations = mock(CloudFoundryOperations.class);
+        Domains mockDomains = mock(Domains.class);
+        when(mockDomains.list()).thenReturn(Flux.just(Domain.builder().id("id").name("test.com").status(Status.SHARED).build()));
+        when(cfOperations.domains()).thenReturn(mockDomains);
         CfProperties cfAppProperties = sampleApp();
 
         when(appDetailsDelegate.getAppDetails(any(CloudFoundryOperations.class), eq(cfAppProperties)))
@@ -85,7 +96,9 @@ public class CfBlueGreenStage1DelegateTest {
 
         CfProperties captured = argumentCaptor.getValue();
         assertThat(captured.name()).isEqualTo("test-green");
-        assertThat(captured.host()).isEqualTo("route-green");
+        assertThat(captured.host()).isEqualTo(null);
+        assertThat(captured.domain()).isEqualTo(null);
+        assertThat(captured.routes().get(0)).startsWith("route-green");
         assertThat(captured.instances()).isEqualTo(10);
         assertThat(captured.diskQuota()).isEqualTo(500);
         assertThat(captured.memory()).isEqualTo(100);
@@ -97,6 +110,10 @@ public class CfBlueGreenStage1DelegateTest {
     public void testStage1NoExistingApp() {
         Project project = mock(Project.class);
         CloudFoundryOperations cfOperations = mock(CloudFoundryOperations.class);
+        Domains mockDomains = mock(Domains.class);
+        when(mockDomains.list()).thenReturn(Flux.just(Domain.builder().id("id").name("test.com").status(Status.SHARED).build()));
+        when(cfOperations.domains()).thenReturn(mockDomains);
+
         CfProperties cfAppProperties = sampleApp();
 
         when(appDetailsDelegate.getAppDetails(any(CloudFoundryOperations.class), eq(cfAppProperties)))
@@ -119,7 +136,9 @@ public class CfBlueGreenStage1DelegateTest {
 
         CfProperties captured = argumentCaptor.getValue();
         assertThat(captured.name()).isEqualTo("test-green");
-        assertThat(captured.host()).isEqualTo("route-green");
+        assertThat(captured.host()).isEqualTo(null);
+        assertThat(captured.domain()).isEqualTo(null);
+        assertThat(captured.routes().get(0)).startsWith("route-green");
 
         assertThat(captured.instances()).isEqualTo(2);
         assertThat(captured.diskQuota()).isNull();

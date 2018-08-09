@@ -1,6 +1,7 @@
 package io.pivotal.services.plugin.tasks.helper;
 
 import io.pivotal.services.plugin.CfProperties;
+import io.pivotal.services.plugin.CfRouteUtil;
 import io.pivotal.services.plugin.ImmutableCfProperties;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.applications.ApplicationDetail;
@@ -10,12 +11,16 @@ import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
+/**
+ * @author Gabriel Couto
+ */
 public class CfBlueGreenStage1Delegate {
 
     private CfPushDelegate pushDelegate = new CfPushDelegate();
@@ -27,6 +32,11 @@ public class CfBlueGreenStage1Delegate {
 
     public Mono<Void> runStage1(Project project, CloudFoundryOperations cfOperations,
                                 CfProperties cfProperties) {
+        //eagerly cache domain summaries
+        CfRouteUtil.getDomainSummaries(cfOperations);
+        
+        final String greenNameString = cfProperties.name() + "-green";
+        final String greenRouteString = CfRouteUtil.getTempRoute(cfOperations, cfProperties, "-green");
 
         Mono<Optional<ApplicationDetail>> appDetailMono = appDetailsDelegate
             .getAppDetails(cfOperations, cfProperties);
@@ -39,21 +49,25 @@ public class CfBlueGreenStage1Delegate {
             Map<String, String> userEnvs = mapUserEnvironmentVars(cfProperties, appEnvOpt);
             LOGGER.lifecycle(
                 "Running Blue Green Deploy - deploying a 'green' app. App '{}' with route '{}'",
-                cfProperties.name(), cfProperties.host());
+                cfProperties.name(),
+                greenRouteString);
 
             return appDetailOpt.map(appDetail -> {
                 printAppDetail(appDetail);
                 return ImmutableCfProperties.copyOf(cfProperties)
-                    .withName(cfProperties.name() + "-green")
-                    .withHost(cfProperties.host() + "-green")
+                    .withName(greenNameString)
+                    .withHost(null)
+                    .withDomain(null)
+                    .withRoutes(Collections.singletonList(greenRouteString))
                     .withInstances(appDetail.getInstances())
                     .withMemory(appDetail.getMemoryLimit())
                     .withDiskQuota(appDetail.getDiskQuota())
                     .withEnvironment(userEnvs);
             }).orElse(ImmutableCfProperties.copyOf(cfProperties)
-                .withName(cfProperties.name() + "-green")
-                .withHost(cfProperties.host() + "-green"));
-
+                .withName(greenNameString)
+                .withHost(null)
+                .withDomain(null)
+                .withRoutes(Collections.singletonList(greenRouteString)));
         }));
 
         return cfPropertiesMono.flatMap(

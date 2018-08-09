@@ -16,14 +16,21 @@
 
 package io.pivotal.services.plugin;
 
+import org.cloudfoundry.operations.applications.ApplicationManifest;
+import org.cloudfoundry.operations.applications.ApplicationManifestUtils;
+import org.cloudfoundry.operations.applications.Route;
 import org.gradle.api.Project;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * Responsible for mapping plugin extension provided via a block
@@ -46,6 +53,7 @@ import java.util.Optional;
  * and providing a structure with the final values
  *
  * @author Biju Kunjummen
+ * @author Gabriel Couto
  */
 public class CfPropertiesMapper {
 
@@ -53,15 +61,20 @@ public class CfPropertiesMapper {
 
     private final Map<String, String> systemEnv;
 
+    private ApplicationManifest manifest;
+
     public CfPropertiesMapper(Project project) {
-        this.project = project;
-        this.systemEnv = System.getenv();
+        this(project, System.getenv());
     }
 
     //For Tests
     CfPropertiesMapper(Project project, Map<String, String> systemEnv) {
         this.project = project;
         this.systemEnv = systemEnv;
+        String manifestPath = getManifestPath();
+        if (manifestPath != null) {
+            manifest = ApplicationManifestUtils.read(new File(getManifestPath()).toPath()).get(0);
+        }
     }
 
     public CfProperties getProperties() {
@@ -73,10 +86,12 @@ public class CfPropertiesMapper {
             .ccToken(getCcToken())
             .org(getOrg())
             .space(getSpace())
+            .manifestPath(getManifestPath())
             .filePath(getFilePath())
             .host(getAppHostName())
             .domain(getAppDomain())
             .path(getCfPath())
+            .addAllRoutes(getAppRoutes())
             .state(this.getExtension().getState())
             .buildpack(this.getBuildpack())
             .command(this.getCommand())
@@ -87,7 +102,7 @@ public class CfPropertiesMapper {
             .enableSsh(this.getExtension().getEnableSsh())
             .environment(getEnvironment())
             .timeout(this.getTimeout())
-            .healthCheckType(this.getExtension().getHealthCheckType())
+            .healthCheckType(this.getHealthCheckType())
             .instances(this.getInstances())
             .memory(this.getMemory())
             .ports(this.getExtension().getPorts())
@@ -169,8 +184,10 @@ public class CfPropertiesMapper {
 
 
     public String getCfApplicationName() {
-        return getStringPropertyFromProject(PropertyNameConstants.CF_APPLICATION_NAME)
-            .orElse(this.getExtension().getName());
+        return firstNonEmptyOptional(() -> getStringPropertyFromProject(PropertyNameConstants.CF_APPLICATION_NAME),
+            () -> Optional.ofNullable(this.getExtension().getName()),
+            () -> fromManifest(m -> m.getName())
+        );
     }
 
     public String getNewName() {
@@ -178,23 +195,53 @@ public class CfPropertiesMapper {
             .orElse(null);
     }
 
+    public String getManifestPath() {
+        return firstNonEmptyOptional(
+            () -> getStringPropertyFromProject(PropertyNameConstants.CF_APPLICATION_MANIFEST),
+            () -> Optional.ofNullable(this.getExtension() != null ? this.getExtension().getManifestFile() : null)
+        );
+    }
+
+    public String getHealthCheckType() {
+        return firstNonEmptyOptional(
+            () -> Optional.ofNullable(this.getExtension().getHealthCheckType()),
+            () -> fromManifest(m -> m.getHealthCheckType() != null ? m.getHealthCheckType().getValue() : null)
+        );
+    }
+
     public String getCommand() {
-        return this.getExtension().getCommand();
+        return firstNonEmptyOptional(
+            () -> Optional.ofNullable(this.getExtension().getCommand()),
+            () -> fromManifest(m -> m.getCommand())
+        );
     }
 
     public String getAppHostName() {
-        return getStringPropertyFromProject(PropertyNameConstants.CF_APPLICATION_HOST_NAME)
-            .orElse(this.getExtension().getHost());
+        return firstNonEmptyOptional(() -> getStringPropertyFromProject(PropertyNameConstants.CF_APPLICATION_HOST_NAME),
+            () -> Optional.ofNullable(this.getExtension().getHost()),
+            () -> fromManifest(m -> (m.getHosts() != null && !m.getHosts().isEmpty()) ? this.manifest.getHosts().get(0) : null)
+        );
     }
 
     public String getAppDomain() {
-        return getStringPropertyFromProject(PropertyNameConstants.CF_APPLICATION_DOMAIN)
-            .orElse(this.getExtension().getDomain());
+        return firstNonEmptyOptional(() -> getStringPropertyFromProject(PropertyNameConstants.CF_APPLICATION_DOMAIN),
+            () -> Optional.ofNullable(this.getExtension().getDomain()),
+            () -> fromManifest(m -> (m.getDomains() != null && !m.getDomains().isEmpty()) ? m.getDomains().get(0) : null)
+        );
     }
 
     public String getFilePath() {
-        return getStringPropertyFromProject(PropertyNameConstants.CF_FILE_PATH)
-            .orElse(this.getExtension().getFilePath());
+        return firstNonEmptyOptional(() -> getStringPropertyFromProject(PropertyNameConstants.CF_FILE_PATH),
+            () -> Optional.ofNullable(this.getExtension().getFilePath()),
+            () -> fromManifest(m -> m.getPath() != null ? m.getPath().toString() : null)
+        );
+    }
+
+    private <T> Optional<T> fromManifest(Function<ApplicationManifest, T> manifestContentExtractor) {
+        if (this.manifest != null) {
+            return Optional.ofNullable(manifestContentExtractor.apply(this.manifest));
+        }
+        return Optional.empty();
     }
 
     public String getCcHost() {
@@ -217,8 +264,10 @@ public class CfPropertiesMapper {
     }
 
     public List<String> getServices() {
-        return getListPropertyFromProject(PropertyNameConstants.CF_SERVICES)
-                .orElse(this.getExtension().getServices());
+        return firstNonEmptyOptional(() -> getListPropertyFromProject(PropertyNameConstants.CF_SERVICES),
+            () -> Optional.ofNullable(this.getExtension().getServices()),
+            () -> fromManifest(m -> m.getServices())
+        );
     }
 
     public String getCcToken() {
@@ -227,8 +276,10 @@ public class CfPropertiesMapper {
     }
 
     public String getBuildpack() {
-        return getStringPropertyFromProject(PropertyNameConstants.CF_BUILDPACK)
-            .orElse(this.getExtension().getBuildpack());
+        return firstNonEmptyOptional(() -> getStringPropertyFromProject(PropertyNameConstants.CF_BUILDPACK),
+            () -> Optional.ofNullable(this.getExtension().getBuildpack()),
+            () -> fromManifest(m -> m.getBuildpack())
+        );
     }
 
     public String getOrg() {
@@ -242,29 +293,45 @@ public class CfPropertiesMapper {
     }
 
     public String getCfPath() {
-        return getStringPropertyFromProject(PropertyNameConstants.CF_PATH)
-            .orElse(this.getExtension().getPath());
+        return firstNonEmptyOptional(() -> getStringPropertyFromProject(PropertyNameConstants.CF_PATH),
+            () -> Optional.ofNullable(this.getExtension().getPath()),
+            () -> fromManifest(m -> m.getRoutePath())
+        );
+    }
+
+    public List<String> getAppRoutes() {
+        return firstNonEmptyOptional(() -> getListPropertyFromProject(PropertyNameConstants.CF_APPLICATION_ROUTES),
+            () -> Optional.ofNullable(this.getExtension().getRoutes()),
+            () -> fromManifest(m -> m.getRoutes().stream().map(Route::getRoute).collect(Collectors.toList()))
+        );
     }
 
     public Integer getInstances() {
-        return getIntegerPropertyFromProject(PropertyNameConstants.CF_INSTANCES)
-            .orElse(this.getExtension().getInstances());
+        return firstNonEmptyOptional(() -> getIntegerPropertyFromProject(PropertyNameConstants.CF_INSTANCES),
+            () -> Optional.ofNullable(this.getExtension().getInstances()),
+            () -> fromManifest(m -> m.getInstances())
+        );
     }
 
     public Integer getMemory() {
-        return getIntegerPropertyFromProject(PropertyNameConstants.CF_MEMORY)
-            .orElse(this.getExtension().getMemory());
+        return firstNonEmptyOptional(() -> getIntegerPropertyFromProject(PropertyNameConstants.CF_MEMORY),
+            () -> Optional.ofNullable(this.getExtension().getMemory()),
+            () -> fromManifest(m -> m.getMemory())
+        );
     }
 
     public Integer getTimeout() {
-        return getIntegerPropertyFromProject(PropertyNameConstants.CF_HEALTH_CHECK_TIMEOUT)
-            .orElse(this.getExtension().getTimeout());
+        return firstNonEmptyOptional(() -> getIntegerPropertyFromProject(PropertyNameConstants.CF_HEALTH_CHECK_TIMEOUT),
+            () -> Optional.ofNullable(this.getExtension().getTimeout()),
+            () -> fromManifest(m -> m.getTimeout())
+        );
     }
 
     public Integer getDiskQuota() {
-        return getIntegerPropertyFromProject(PropertyNameConstants.CF_DISK_QUOTA)
-            .orElse(this.getExtension().getDiskQuota());
-
+        return firstNonEmptyOptional(() -> getIntegerPropertyFromProject(PropertyNameConstants.CF_DISK_QUOTA),
+            () -> Optional.ofNullable(this.getExtension().getDiskQuota()),
+            () -> fromManifest(m -> m.getDisk())
+        );
     }
 
     public Integer getStagingTimeout() {
@@ -282,8 +349,13 @@ public class CfPropertiesMapper {
     }
 
     private Map<String, String> getEnvironment() {
-        Map<String, String> baseEnvironment = this.getExtension().getEnvironment();
-        Map<String, String> withProperties = baseEnvironment != null ? new HashMap<>(baseEnvironment) : new HashMap<>();
+        Map<String, String> withProperties = new HashMap<>();
+        Map<String, Object> manifestEnvironment = manifest != null ? manifest.getEnvironmentVariables() : null;
+        if (manifestEnvironment != null)
+            manifestEnvironment.forEach((key, obj) -> withProperties.put(key, obj.toString()));
+        Map<String, String> buildScriptEnvironment = this.getExtension().getEnvironment();
+        if (buildScriptEnvironment != null)
+            withProperties.putAll(buildScriptEnvironment);
 
         Map<String, ?> allProperties = this.project.getProperties();
         for (String propName : allProperties.keySet()) {
@@ -332,4 +404,12 @@ public class CfPropertiesMapper {
         return Optional.empty();
     }
 
+    static <T> T firstNonEmptyOptional(Supplier<Optional<T>>... optSup) {
+        return Arrays.stream(optSup)
+            .map(Supplier::get)
+            .filter(opt -> opt.isPresent())
+            .map(Optional::get)
+            .findFirst()
+            .orElse(null);
+    }
 }

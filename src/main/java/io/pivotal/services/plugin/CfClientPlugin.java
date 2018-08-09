@@ -1,6 +1,20 @@
 package io.pivotal.services.plugin;
 
-import io.pivotal.services.plugin.tasks.*;
+import io.pivotal.services.plugin.tasks.CfAppDetailsTask;
+import io.pivotal.services.plugin.tasks.CfAppRestartTask;
+import io.pivotal.services.plugin.tasks.CfAppStartTask;
+import io.pivotal.services.plugin.tasks.CfAppStopTask;
+import io.pivotal.services.plugin.tasks.CfAutoPilotTask;
+import io.pivotal.services.plugin.tasks.CfBlueGreenStage1Task;
+import io.pivotal.services.plugin.tasks.CfBlueGreenStage2Task;
+import io.pivotal.services.plugin.tasks.CfCreateServicesTask;
+import io.pivotal.services.plugin.tasks.CfDeleteAppTask;
+import io.pivotal.services.plugin.tasks.CfDeleteRouteTask;
+import io.pivotal.services.plugin.tasks.CfMapRouteTask;
+import io.pivotal.services.plugin.tasks.CfPushTask;
+import io.pivotal.services.plugin.tasks.CfRenameAppTask;
+import io.pivotal.services.plugin.tasks.CfRestageTask;
+import io.pivotal.services.plugin.tasks.CfUnMapRouteTask;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 

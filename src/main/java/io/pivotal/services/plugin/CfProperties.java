@@ -26,6 +26,7 @@ import java.util.Map;
  * Holds the set of properties that will drive the various Gradle tasks
  *
  * @author Biju Kunjummen
+ * @author Gabriel Couto
  */
 @Value.Immutable(copy = true)
 public abstract class CfProperties {
@@ -47,6 +48,9 @@ public abstract class CfProperties {
     public abstract String name();
 
     @Nullable
+    public abstract String manifestPath();
+
+    @Nullable
     public abstract String filePath();
 
     @Nullable
@@ -57,6 +61,9 @@ public abstract class CfProperties {
 
     @Nullable
     public abstract String path();
+
+    @Nullable
+    public abstract List<String> routes();
 
     @Nullable
     public abstract String state();

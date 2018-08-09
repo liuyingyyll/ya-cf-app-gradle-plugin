@@ -20,7 +20,7 @@ Start by looking at a sample project using the plugin https://github.com/bijukun
 ----
 buildscript {
 	ext {
-		cfAppVersion = '2.1.0'
+		cfAppVersion = '2.3.0-rc.2'
 	}
 	repositories {
 		mavenCentral()
@@ -39,7 +39,7 @@ OR Via the new Gradle plugins mechanism:
 [source]
 ----
 plugins {
-	id "com.github.pivotalservices.cf-app" version "2.1.0"
+	id "com.github.pivotalservices.cf-app" version "2.3.0-rc.2"
 }
 ----
 

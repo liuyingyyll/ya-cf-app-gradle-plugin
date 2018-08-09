@@ -6,6 +6,9 @@ import io.pivotal.services.plugin.ImmutableCfProperties;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.applications.ApplicationDetail;
 import org.cloudfoundry.operations.applications.ApplicationEnvironments;
+import org.cloudfoundry.operations.domains.Domain;
+import org.cloudfoundry.operations.domains.Domains;
+import org.cloudfoundry.operations.domains.Status;
 import org.gradle.api.Project;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,6 +16,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -27,6 +31,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
 /**
+ * @author Biju Kunjummen
  * @author Gabriel Couto
  */
 public class CfBlueGreenStage1DelegateTest {
@@ -52,6 +57,9 @@ public class CfBlueGreenStage1DelegateTest {
     public void testStage1ExistingApp() {
         Project project = mock(Project.class);
         CloudFoundryOperations cfOperations = mock(CloudFoundryOperations.class);
+        Domains mockDomains = mock(Domains.class);
+        when(mockDomains.list()).thenReturn(Flux.just(Domain.builder().id("id").name("test.com").status(Status.SHARED).build()));
+        when(cfOperations.domains()).thenReturn(mockDomains);
         CfProperties cfAppProperties = sampleApp();
 
         when(appDetailsDelegate.getAppDetails(any(CloudFoundryOperations.class), eq(cfAppProperties)))
@@ -102,6 +110,10 @@ public class CfBlueGreenStage1DelegateTest {
     public void testStage1NoExistingApp() {
         Project project = mock(Project.class);
         CloudFoundryOperations cfOperations = mock(CloudFoundryOperations.class);
+        Domains mockDomains = mock(Domains.class);
+        when(mockDomains.list()).thenReturn(Flux.just(Domain.builder().id("id").name("test.com").status(Status.SHARED).build()));
+        when(cfOperations.domains()).thenReturn(mockDomains);
+
         CfProperties cfAppProperties = sampleApp();
 
         when(appDetailsDelegate.getAppDetails(any(CloudFoundryOperations.class), eq(cfAppProperties)))

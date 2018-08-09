@@ -63,6 +63,7 @@ public class CfBlueGreenStage2Delegate {
         
         //eagerly cache domain summaries
         CfRouteUtil.getDomainSummaries(cfOperations);
+        
         String greenNameString = cfProperties.name() + "-green";
         String greenRouteString = CfRouteUtil.getTempRoute(cfOperations, cfProperties, "-green");
 

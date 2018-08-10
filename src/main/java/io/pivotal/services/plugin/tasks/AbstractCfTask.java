@@ -23,6 +23,7 @@ import java.util.Optional;
 
 /**
  * Base class for all Concrete CF tasks
+ * @author Gabriel Couto (@gmcouto)
  */
 abstract class AbstractCfTask extends DefaultTask {
 

@@ -4,6 +4,7 @@ import io.pivotal.services.plugin.CfPluginExtension;
 import io.pivotal.services.plugin.CfProperties;
 import io.pivotal.services.plugin.CfPropertiesMapper;
 import io.pivotal.services.plugin.CfProxySettingsDetail;
+import io.pivotal.services.plugin.CfRouteUtil;
 import io.pivotal.services.plugin.cf.StaticTokenProvider;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.operations.CloudFoundryOperations;
@@ -22,6 +23,7 @@ import java.util.Optional;
 
 /**
  * Base class for all Concrete CF tasks
+ * @author Gabriel Couto (@gmcouto)
  */
 abstract class AbstractCfTask extends DefaultTask {
 
@@ -51,12 +53,13 @@ abstract class AbstractCfTask extends DefaultTask {
             .tokenProvider(tokenProvider)
             .build();
 
-        CloudFoundryOperations cfOperations = DefaultCloudFoundryOperations.builder()
+        DefaultCloudFoundryOperations cfOperations = DefaultCloudFoundryOperations.builder()
             .cloudFoundryClient(cfClient)
             .organization(cfAppProperties.org())
             .space(cfAppProperties.space())
             .build();
 
+        populateDomainCache(cfOperations);
         return cfOperations;
     }
 
@@ -98,6 +101,10 @@ abstract class AbstractCfTask extends DefaultTask {
 
     protected CfProperties getCfProperties() {
         return this.cfPropertiesMapper.getProperties();
+    }
+
+    private void populateDomainCache(DefaultCloudFoundryOperations cfOperations) {
+        CfRouteUtil.cacheDomainSummaries(cfOperations);
     }
 
     @Override

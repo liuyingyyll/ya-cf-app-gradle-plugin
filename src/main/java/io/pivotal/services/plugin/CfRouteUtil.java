@@ -1,21 +1,24 @@
 package io.pivotal.services.plugin;
 
-import org.cloudfoundry.operations.CloudFoundryOperations;
-import org.cloudfoundry.operations.applications.DecomposedRoute;
-import org.cloudfoundry.operations.applications.DomainSummary;
-
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import org.cloudfoundry.operations.CloudFoundryOperations;
+import org.cloudfoundry.operations.DefaultCloudFoundryOperations;
+import org.cloudfoundry.operations.applications.DecomposedRoute;
+import org.cloudfoundry.operations.applications.DomainSummary;
+import reactor.core.publisher.Mono;
 
 /**
  * @author Gabriel Couto
  */
 public class CfRouteUtil {
-    private static AtomicReference<List<DomainSummary>> domainCache = new AtomicReference<>();
+    private static Map<DefaultCloudFoundryOperations, List<DomainSummary>> domainCache = new HashMap<>();
 
     /**
      * Returns a list of decomposed routes
@@ -26,7 +29,7 @@ public class CfRouteUtil {
      * @return the decomposed routes
      */
     public static List<DecomposedRoute> decomposedRoutes(CloudFoundryOperations cfOperations, List<String> routes, String routePath) {
-        final List<DomainSummary> finalDomainSummaries = getDomainSummaries(cfOperations);
+        final List<DomainSummary> finalDomainSummaries = getCachedDomainSummaries(cfOperations);
         return routes.stream().map(route ->
             decomposeRoute(finalDomainSummaries, route, routePath)
         ).collect(Collectors.toList());
@@ -44,7 +47,7 @@ public class CfRouteUtil {
     public static String getTempRoute(CloudFoundryOperations cfOperations, CfProperties cfProperties, String suffix) {
         if (cfProperties.routes() == null || cfProperties.routes().isEmpty())
             return getTempRoute(cfProperties.host(), cfProperties.domain(), null, cfProperties.path(), suffix);
-        DecomposedRoute route = decomposeRoute(getDomainSummaries(cfOperations), cfProperties.routes().get(0), cfProperties.path());
+        DecomposedRoute route = decomposeRoute(getCachedDomainSummaries(cfOperations), cfProperties.routes().get(0), cfProperties.path());
         return getTempRoute(route.getHost(), route.getDomain(), route.getPort(), route.getPath(), suffix);
     }
 
@@ -55,20 +58,27 @@ public class CfRouteUtil {
             + (path != null ? "/" + path : "");
     }
 
-    public static List<DomainSummary> getDomainSummaries(CloudFoundryOperations cfOperations) {
-        List<DomainSummary> domainSummaries = domainCache.get();
-
-        if (domainSummaries == null) {
-            domainSummaries = cfOperations.domains().list()
-                .map(domain -> DomainSummary.builder()
-                    .id(domain.getId())
-                    .name(domain.getName())
-                    .type(domain.getType())
-                    .build())
-                .collectList().block();
-            domainCache.set(domainSummaries);
+    public static List<DomainSummary> getCachedDomainSummaries(CloudFoundryOperations cfOperations) {
+        if(cfOperations instanceof  DefaultCloudFoundryOperations) {
+            return domainCache.get(cfOperations);
         }
-        return domainSummaries;
+        throw new IllegalArgumentException(cfOperations.getClass().getName() + " does not support caching yet.");
+    }
+
+    public static void cacheDomainSummaries(DefaultCloudFoundryOperations cfOperations) {
+        if (!domainCache.containsKey(cfOperations)) {
+            domainCache.put(cfOperations, fetchDomainSummaries(cfOperations).block());
+        }
+    }
+
+    public static Mono<List<DomainSummary>> fetchDomainSummaries(CloudFoundryOperations cfOperations) {
+        return cfOperations.domains().list()
+            .map(domain -> DomainSummary.builder()
+                .id(domain.getId())
+                .name(domain.getName())
+                .type(domain.getType())
+                .build())
+            .collectList();
     }
 
     /**

@@ -61,9 +61,6 @@ public class CfBlueGreenStage2Delegate {
     public Mono<Void> runStage2(Project project, CloudFoundryOperations cfOperations,
                                 CfProperties cfProperties) {
         
-        //eagerly cache domain summaries
-        CfRouteUtil.getDomainSummaries(cfOperations);
-        
         String greenNameString = cfProperties.name() + "-green";
         String greenRouteString = CfRouteUtil.getTempRoute(cfOperations, cfProperties, "-green");
 

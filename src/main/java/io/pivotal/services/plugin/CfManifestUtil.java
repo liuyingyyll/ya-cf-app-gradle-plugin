@@ -29,7 +29,7 @@ public class CfManifestUtil {
         if(properties.filePath() != null)
             builder.path(new File(properties.filePath()).toPath());
         if(properties.services() != null && !properties.services().isEmpty())
-            builder.addAllServices(properties.services());
+            builder.services(properties.services());
         if(properties.host() != null)
             builder.host(properties.host());
         if(properties.domain() != null)

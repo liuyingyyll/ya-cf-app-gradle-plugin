@@ -24,6 +24,7 @@ import org.gradle.api.Project;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,13 +72,10 @@ public class CfPropertiesMapper {
     CfPropertiesMapper(Project project, Map<String, String> systemEnv) {
         this.project = project;
         this.systemEnv = systemEnv;
-        String manifestPath = getManifestPath();
-        if (manifestPath != null) {
-            manifest = ApplicationManifestUtils.read(new File(getManifestPath()).toPath()).get(0);
-        }
     }
 
     public CfProperties getProperties() {
+        refreshManifest();
         return ImmutableCfProperties.builder()
             .name(getCfApplicationName())
             .ccHost(getCcHost())
@@ -113,6 +111,11 @@ public class CfPropertiesMapper {
             .cfUserProvidedServices(this.getCfUserProvidedServices())
             .cfProxySettings(this.getCfProxySettings())
             .build();
+    }
+
+    private void refreshManifest() {
+        String manifestPath = getManifestPath();
+        manifest =  manifestPath != null ? ApplicationManifestUtils.read(new File(manifestPath).toPath()).get(0) : null;
     }
 
     private List<CfServiceDetail> getCfServices() {
@@ -265,8 +268,9 @@ public class CfPropertiesMapper {
 
     public List<String> getServices() {
         return firstNonEmptyOptional(() -> getListPropertyFromProject(PropertyNameConstants.CF_SERVICES),
-            () -> Optional.ofNullable(this.getExtension().getServices()),
-            () -> fromManifest(m -> m.getServices())
+            () -> Optional.ofNullable(this.getExtension().getServices().isEmpty() ? null : this.getExtension().getServices()),
+            () -> fromManifest(m -> m.getServices()),
+            () -> Optional.ofNullable(Collections.emptyList())
         );
     }
 
@@ -301,8 +305,9 @@ public class CfPropertiesMapper {
 
     public List<String> getAppRoutes() {
         return firstNonEmptyOptional(() -> getListPropertyFromProject(PropertyNameConstants.CF_APPLICATION_ROUTES),
-            () -> Optional.ofNullable(this.getExtension().getRoutes()),
-            () -> fromManifest(m -> m.getRoutes().stream().map(Route::getRoute).collect(Collectors.toList()))
+            () -> Optional.ofNullable(this.getExtension().getRoutes().isEmpty() ? null : this.getExtension().getRoutes()),
+            () -> fromManifest(m -> m.getRoutes().stream().map(Route::getRoute).collect(Collectors.toList())),
+            () -> Optional.ofNullable(Collections.emptyList())
         );
     }
 

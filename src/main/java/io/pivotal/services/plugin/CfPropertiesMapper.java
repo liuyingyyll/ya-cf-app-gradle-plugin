@@ -71,13 +71,10 @@ public class CfPropertiesMapper {
     CfPropertiesMapper(Project project, Map<String, String> systemEnv) {
         this.project = project;
         this.systemEnv = systemEnv;
-        String manifestPath = getManifestPath();
-        if (manifestPath != null) {
-            manifest = ApplicationManifestUtils.read(new File(getManifestPath()).toPath()).get(0);
-        }
     }
 
     public CfProperties getProperties() {
+        refreshManifest();
         return ImmutableCfProperties.builder()
             .name(getCfApplicationName())
             .ccHost(getCcHost())
@@ -113,6 +110,11 @@ public class CfPropertiesMapper {
             .cfUserProvidedServices(this.getCfUserProvidedServices())
             .cfProxySettings(this.getCfProxySettings())
             .build();
+    }
+
+    private void refreshManifest() {
+        String manifestPath = getManifestPath();
+        manifest =  manifestPath != null ? ApplicationManifestUtils.read(new File(manifestPath).toPath()).get(0) : null;
     }
 
     private List<CfServiceDetail> getCfServices() {

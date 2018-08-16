@@ -10,6 +10,7 @@ import java.util.Map;
  * Details of a service instance
  *
  * @author Biju Kunjummen
+ * @author Gabriel Couto (@gmcouto)
  */
 
 @Value.Immutable(copy = true)
@@ -22,7 +23,7 @@ public abstract class CfServiceDetail {
     public abstract Integer completionTimeout();
     @Nullable
     public abstract List<String> tags();
-
     @Nullable
-    public abstract Map<String, ? extends Object> parameters();
+    public abstract Map<String, Object> parameters();
+
 }

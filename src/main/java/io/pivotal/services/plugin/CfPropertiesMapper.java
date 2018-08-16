@@ -130,6 +130,7 @@ public class CfPropertiesMapper {
                     .instanceName(cfService.getInstanceName())
                     .name(cfService.getName())
                     .plan(cfService.getPlan())
+                    .parameters(cfService.getParameters())
                     .tags(cfService.getTags())
                     .completionTimeout((cfService.getCompletionTimeout() != null)
                         ? cfService.getCompletionTimeout()

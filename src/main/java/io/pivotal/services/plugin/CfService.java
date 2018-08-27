@@ -2,6 +2,7 @@ package io.pivotal.services.plugin;
 
 
 import java.util.List;
+import java.util.Map;
 
 public class CfService {
     private String name;
@@ -9,6 +10,7 @@ public class CfService {
     private String instanceName;
     private Integer completionTimeout;
     private List<String> tags;
+    private Map<String, ? extends Object> parameters;
 
     public String getName() {
         return name;
@@ -49,5 +51,12 @@ public class CfService {
     public void setTags(List<String> tags) {
         this.tags = tags;
     }
-    
+
+    public Map<String, ? extends Object> getParameters() {
+        return parameters;
+    }
+
+    public void setParameters(Map<String, ? extends Object> parameters) {
+        this.parameters = parameters;
+    }
 }

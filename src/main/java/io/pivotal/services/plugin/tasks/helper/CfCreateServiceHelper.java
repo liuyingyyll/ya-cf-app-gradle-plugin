@@ -43,6 +43,7 @@ public class CfCreateServiceHelper {
                         .serviceInstanceName(cfServiceDetail.instanceName())
                         .serviceName(cfServiceDetail.name())
                         .planName(cfServiceDetail.plan())
+                        .parameters(cfServiceDetail.parameters())
                         .tags(cfServiceDetail.tags())
                         .build())
                     .then(servicesDetailHelper.getServiceInstanceDetail(cfOperations, cfServiceDetail.instanceName()))

@@ -182,6 +182,15 @@ Services can be created and automatically bound to the app in the targeted org a
         instanceName = "test-rabbitmq"
         tags = ["tag1", "tag2"]
     }
+
+    cfService {
+            name = "nfs"
+            plan = "existing"
+            instanceName = "test-nfs"
+            parameters = [
+                "share": "existing.nas.com/fileshare/test_nas"
+            ]
+        }
     
     cfUserProvidedService {
         instanceName = "mydb1"

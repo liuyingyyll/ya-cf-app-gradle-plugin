@@ -59,8 +59,7 @@ public class CfBlueGreenStage1Delegate {
                     .withRoutes(Collections.singletonList(greenRouteString))
                     .withInstances(appDetail.getInstances())
                     .withMemory(appDetail.getMemoryLimit())
-                    .withDiskQuota(appDetail.getDiskQuota())
-                    .withEnvironment(userEnvs);
+                    .withDiskQuota(appDetail.getDiskQuota());
             }).orElse(ImmutableCfProperties.copyOf(cfProperties)
                 .withName(greenNameString)
                 .withHost(null)

@@ -92,7 +92,6 @@ public class CfBlueGreenStage1DelegateTest {
         verify(this.pushDelegate).push(any(CloudFoundryOperations.class), argumentCaptor.capture());
 
         Map<String, String> expectedEnvironment = getUserEnvironment();
-        expectedEnvironment.putAll(existingEnvironment);
 
         CfProperties captured = argumentCaptor.getValue();
         assertThat(captured.name()).isEqualTo("test-green");

@@ -12,8 +12,6 @@ import org.gradle.api.logging.Logging;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
@@ -44,7 +42,6 @@ public class CfBlueGreenStage1Delegate {
             appEnvDelegate.getAppEnv(cfOperations, cfProperties);
 
         Mono<ImmutableCfProperties> cfPropertiesMono = Mono.zip(appEnvMono, appDetailMono).map(function((appEnvOpt, appDetailOpt) -> {
-            Map<String, String> userEnvs = mapUserEnvironmentVars(cfProperties, appEnvOpt);
             LOGGER.lifecycle(
                 "Running Blue Green Deploy - deploying a 'green' app. App '{}' with route '{}'",
                 cfProperties.name(),
@@ -59,8 +56,7 @@ public class CfBlueGreenStage1Delegate {
                     .withRoutes(Collections.singletonList(greenRouteString))
                     .withInstances(appDetail.getInstances())
                     .withMemory(appDetail.getMemoryLimit())
-                    .withDiskQuota(appDetail.getDiskQuota())
-                    .withEnvironment(userEnvs);
+                    .withDiskQuota(appDetail.getDiskQuota());
             }).orElse(ImmutableCfProperties.copyOf(cfProperties)
                 .withName(greenNameString)
                 .withHost(null)
@@ -71,24 +67,7 @@ public class CfBlueGreenStage1Delegate {
         return cfPropertiesMono.flatMap(
             withNewNameAndRoute -> pushDelegate.push(cfOperations, withNewNameAndRoute));
     }
-
-    private Map<String, String> mapUserEnvironmentVars(CfProperties cfProperties, Optional<ApplicationEnvironments> appEnvOpt) {
-        Map<String, String> userEnvs = new HashMap<>();
-        if(!appEnvOpt.isPresent()){
-            return userEnvs;
-        }
-
-        Optional<Map<String, Object>> userProvidedEnv = appEnvOpt.map(ApplicationEnvironments::getUserProvided);
-        for (String key :
-            userProvidedEnv.get().keySet()) {
-            // The values for this should always be a string but are given as an object
-            userEnvs.put(key, (String) userProvidedEnv.get().get(key));
-        }
-        if (cfProperties.environment() != null) {
-            userEnvs.putAll(cfProperties.environment());
-        }
-        return userEnvs;
-    }
+    
 
     private void printAppDetail(ApplicationDetail applicationDetail) {
         LOGGER.lifecycle("Application Name: {}", applicationDetail.getName());

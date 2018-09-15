@@ -25,10 +25,10 @@ public class CfUnMapRouteDelegate {
     public Flux<Void> unmapRoute(CloudFoundryOperations cfOperations, CfProperties cfProperties) {
 
         if (cfProperties.routes() != null && !cfProperties.routes().isEmpty()) {
-            Mono<List<DecomposedRoute>> routesMono = CfRouteUtil.decomposedRoutes(cfOperations,cfProperties.routes(),cfProperties.path());
-            Flux<DecomposedRoute> routesFlux = routesMono.flatMapIterable(decomposedRoutes -> decomposedRoutes);
+            Mono<List<DecomposedRoute>> decomposedRoutes = CfRouteUtil.decomposedRoutes(cfOperations, cfProperties.routes(), cfProperties.path());
 
-            Flux<Void> unmapRoutesFlux = routesFlux
+            Flux<Void> unmapRoutesFlux = decomposedRoutes
+                .flatMapMany(Flux::fromIterable)
                 .flatMap(route ->
                     unmapRoute(cfOperations, cfProperties.name(), route.getHost(), route.getDomain(), route.getPort(), route.getPath()));
 

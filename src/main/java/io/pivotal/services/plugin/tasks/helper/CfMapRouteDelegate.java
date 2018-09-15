@@ -23,14 +23,14 @@ public class CfMapRouteDelegate {
     private static final Logger LOGGER = Logging.getLogger(CfMapRouteDelegate.class);
 
     public Flux<Integer> mapRoute(CloudFoundryOperations cfOperations,
-                               CfProperties cfProperties) {
+                                  CfProperties cfProperties) {
         if (cfProperties.routes() != null && !cfProperties.routes().isEmpty()) {
-            Mono<List<DecomposedRoute>> routesMono = CfRouteUtil.decomposedRoutes(cfOperations,cfProperties.routes(),cfProperties.path());
-            Flux<DecomposedRoute> routesFlux = routesMono.flatMapIterable(decomposedRoutes -> decomposedRoutes);
+            Mono<List<DecomposedRoute>> decomposedRoutes = CfRouteUtil.decomposedRoutes(cfOperations, cfProperties.routes(), cfProperties.path());
 
-            return routesFlux
+            return decomposedRoutes
+                .flatMapMany(Flux::fromIterable)
                 .flatMap(route ->
-                        mapRoute(cfOperations, cfProperties.name(), route.getHost(), route.getDomain(), route.getPort(), route.getPath()));
+                    mapRoute(cfOperations, cfProperties.name(), route.getHost(), route.getDomain(), route.getPort(), route.getPath()));
 
         } else {
             return mapRoute(cfOperations, cfProperties.name(), cfProperties.host(), cfProperties.domain(), null, cfProperties.path()).flux();

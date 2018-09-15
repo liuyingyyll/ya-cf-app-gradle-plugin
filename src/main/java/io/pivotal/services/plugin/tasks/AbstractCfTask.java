@@ -59,7 +59,6 @@ abstract class AbstractCfTask extends DefaultTask {
             .space(cfAppProperties.space())
             .build();
 
-        populateDomainCache(cfOperations);
         return cfOperations;
     }
 
@@ -101,10 +100,6 @@ abstract class AbstractCfTask extends DefaultTask {
 
     protected CfProperties getCfProperties() {
         return this.cfPropertiesMapper.getProperties();
-    }
-
-    private void populateDomainCache(DefaultCloudFoundryOperations cfOperations) {
-        CfRouteUtil.cacheDomainSummaries(cfOperations);
     }
 
     @Override

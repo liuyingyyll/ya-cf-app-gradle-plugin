@@ -1,24 +1,22 @@
 package io.pivotal.services.plugin;
 
+import org.cloudfoundry.operations.CloudFoundryOperations;
+import org.cloudfoundry.operations.applications.DecomposedRoute;
+import org.cloudfoundry.operations.applications.DomainSummary;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.cloudfoundry.operations.CloudFoundryOperations;
-import org.cloudfoundry.operations.DefaultCloudFoundryOperations;
-import org.cloudfoundry.operations.applications.DecomposedRoute;
-import org.cloudfoundry.operations.applications.DomainSummary;
-import reactor.core.publisher.Mono;
-
 /**
  * @author Gabriel Couto
+ * @author Biju Kunjummen
  */
 public class CfRouteUtil {
-    private static Map<DefaultCloudFoundryOperations, List<DomainSummary>> domainCache = new HashMap<>();
 
     /**
      * Returns a list of decomposed routes
@@ -28,11 +26,14 @@ public class CfRouteUtil {
      * @param routePath    the application path to be included in the routes
      * @return the decomposed routes
      */
-    public static List<DecomposedRoute> decomposedRoutes(CloudFoundryOperations cfOperations, List<String> routes, String routePath) {
-        final List<DomainSummary> finalDomainSummaries = getCachedDomainSummaries(cfOperations);
-        return routes.stream().map(route ->
-            decomposeRoute(finalDomainSummaries, route, routePath)
+    public static Mono<List<DecomposedRoute>> decomposedRoutes(CloudFoundryOperations cfOperations, List<String> routes, String routePath) {
+        final Mono<List<DomainSummary>> domainSummariesMono = fetchDomainSummaries(cfOperations);
+        
+        List<Mono<DecomposedRoute>> decomposedRoutes = routes.stream().map(route ->
+            domainSummariesMono.flatMap(domainSummaries -> decomposeRoute(domainSummaries, route, routePath))
         ).collect(Collectors.toList());
+
+        return Flux.merge(decomposedRoutes).collectList();
     }
 
     /**
@@ -44,32 +45,21 @@ public class CfRouteUtil {
      * @param suffix       the suffix to add in the host
      * @return the calculated route
      */
-    public static String getTempRoute(CloudFoundryOperations cfOperations, CfProperties cfProperties, String suffix) {
+    public static Mono<String> getTempRoute(CloudFoundryOperations cfOperations, CfProperties cfProperties, String suffix) {
         if (cfProperties.routes() == null || cfProperties.routes().isEmpty())
             return getTempRoute(cfProperties.host(), cfProperties.domain(), null, cfProperties.path(), suffix);
-        DecomposedRoute route = decomposeRoute(getCachedDomainSummaries(cfOperations), cfProperties.routes().get(0), cfProperties.path());
-        return getTempRoute(route.getHost(), route.getDomain(), route.getPort(), route.getPath(), suffix);
+        Mono<DecomposedRoute> routeMono = fetchDomainSummaries(cfOperations).flatMap(domainSummaries -> decomposeRoute(domainSummaries, cfProperties.routes().get(0), cfProperties.path()));
+        return routeMono.flatMap(route -> getTempRoute(route.getHost(), route.getDomain(), route.getPort(), route.getPath(), suffix));
     }
 
-    private static String getTempRoute(String host, String domain, Integer port, String path, String suffix) {
-        return (host != null ? host + suffix + "." : suffix + ".")
+    private static Mono<String> getTempRoute(String host, String domain, Integer port, String path, String suffix) {
+        return Mono.just((host != null ? host + suffix + "." : suffix + ".")
             + domain
             + (port != null ? ":" + port : "")
-            + (path != null ? "/" + path : "");
+            + (path != null ? "/" + path : ""));
     }
 
-    public static List<DomainSummary> getCachedDomainSummaries(CloudFoundryOperations cfOperations) {
-        if(cfOperations instanceof  DefaultCloudFoundryOperations) {
-            return domainCache.get(cfOperations);
-        }
-        throw new IllegalArgumentException(cfOperations.getClass().getName() + " does not support caching yet.");
-    }
 
-    public static void cacheDomainSummaries(DefaultCloudFoundryOperations cfOperations) {
-        if (!domainCache.containsKey(cfOperations)) {
-            domainCache.put(cfOperations, fetchDomainSummaries(cfOperations).block());
-        }
-    }
 
     public static Mono<List<DomainSummary>> fetchDomainSummaries(CloudFoundryOperations cfOperations) {
         return cfOperations.domains().list()
@@ -84,7 +74,7 @@ public class CfRouteUtil {
     /**
      * Copy of org.cloudfoundry.operations.applications.RouteUtil.decomposeRoute
      */
-    private static DecomposedRoute decomposeRoute(List<DomainSummary> availableDomains, String route, String routePath) {
+    private static Mono<DecomposedRoute> decomposeRoute(List<DomainSummary> availableDomains, String route, String routePath) {
         String domain = null;
         String host = null;
         String path = null;
@@ -126,12 +116,12 @@ public class CfRouteUtil {
             throw new IllegalArgumentException(String.format("The route %s is invalid: Host/path cannot be set with port", route));
         }
 
-        return DecomposedRoute.builder()
+        return Mono.just(DecomposedRoute.builder()
             .domain(domain)
             .host(host)
             .path(path)
             .port(port)
-            .build();
+            .build());
     }
 
     private static Integer getPort(String route) {

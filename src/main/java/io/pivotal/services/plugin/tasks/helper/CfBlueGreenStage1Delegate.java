@@ -17,6 +17,7 @@ import java.util.Optional;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 /**
+ * @author Biju Kunjummen
  * @author Gabriel Couto
  */
 public class CfBlueGreenStage1Delegate {
@@ -32,7 +33,7 @@ public class CfBlueGreenStage1Delegate {
                                 CfProperties cfProperties) {
         
         final String greenNameString = cfProperties.name() + "-green";
-        final String greenRouteString = CfRouteUtil.getTempRoute(cfOperations, cfProperties, "-green");
+        final Mono<String> greenRouteStringMono = CfRouteUtil.getTempRoute(cfOperations, cfProperties, "-green");
 
         Mono<Optional<ApplicationDetail>> appDetailMono = appDetailsDelegate
             .getAppDetails(cfOperations, cfProperties);
@@ -41,7 +42,7 @@ public class CfBlueGreenStage1Delegate {
         Mono<Optional<ApplicationEnvironments>> appEnvMono =
             appEnvDelegate.getAppEnv(cfOperations, cfProperties);
 
-        Mono<ImmutableCfProperties> cfPropertiesMono = Mono.zip(appEnvMono, appDetailMono).map(function((appEnvOpt, appDetailOpt) -> {
+        Mono<ImmutableCfProperties> cfPropertiesMono = Mono.zip(appEnvMono, appDetailMono, greenRouteStringMono).map(function((appEnvOpt, appDetailOpt, greenRouteString) -> {
             LOGGER.lifecycle(
                 "Running Blue Green Deploy - deploying a 'green' app. App '{}' with route '{}'",
                 cfProperties.name(),

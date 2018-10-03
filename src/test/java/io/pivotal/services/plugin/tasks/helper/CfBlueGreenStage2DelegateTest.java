@@ -67,8 +67,8 @@ public class CfBlueGreenStage2DelegateTest {
         when(detailsTaskDelegate.getAppDetails(any(CloudFoundryOperations.class), any(CfProperties.class)))
             .thenReturn(Mono.just(Optional.empty()));
 
-        when(this.mapRouteDelegate.mapRoute(any(CloudFoundryOperations.class), any(CfProperties.class))).thenReturn(Mono.empty());
-        when(this.unMapRouteDelegate.unmapRoute(any(CloudFoundryOperations.class), any(CfProperties.class))).thenReturn(Mono.empty());
+        when(this.mapRouteDelegate.mapRoute(any(CloudFoundryOperations.class), any(CfProperties.class))).thenReturn(Flux.empty());
+        when(this.unMapRouteDelegate.unmapRoute(any(CloudFoundryOperations.class), any(CfProperties.class))).thenReturn(Flux.empty());
         when(this.renameAppTaskDelegate.renameApp(any(CloudFoundryOperations.class), any(CfProperties.class), any(CfProperties.class))).thenReturn(Mono.empty());
         when(this.deleteAppTaskDelegate.deleteApp(any(CloudFoundryOperations.class), any(CfProperties.class))).thenReturn(Mono.empty());
         when(this.stopDelegate.stopApp(any(CloudFoundryOperations.class), any(CfProperties.class))).thenReturn(Mono.empty());
@@ -104,8 +104,8 @@ public class CfBlueGreenStage2DelegateTest {
         when(detailsTaskDelegate.getAppDetails(any(CloudFoundryOperations.class), any(CfProperties.class)))
             .thenReturn(Mono.just(Optional.of(sampleApplicationDetail())));
 
-        when(this.mapRouteDelegate.mapRoute(any(CloudFoundryOperations.class), any(CfProperties.class))).thenReturn(Mono.empty());
-        when(this.unMapRouteDelegate.unmapRoute(any(CloudFoundryOperations.class), any(CfProperties.class))).thenReturn(Mono.empty());
+        when(this.mapRouteDelegate.mapRoute(any(CloudFoundryOperations.class), any(CfProperties.class))).thenReturn(Flux.empty());
+        when(this.unMapRouteDelegate.unmapRoute(any(CloudFoundryOperations.class), any(CfProperties.class))).thenReturn(Flux.empty());
         when(this.renameAppTaskDelegate.renameApp(any(CloudFoundryOperations.class), any(CfProperties.class), any(CfProperties.class))).thenReturn(Mono.empty());
         when(this.deleteAppTaskDelegate.deleteApp(any(CloudFoundryOperations.class), any(CfProperties.class))).thenReturn(Mono.empty());
         when(this.stopDelegate.stopApp(any(CloudFoundryOperations.class), any(CfProperties.class))).thenReturn(Mono.empty());

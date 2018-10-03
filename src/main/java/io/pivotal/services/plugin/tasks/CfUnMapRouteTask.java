@@ -4,6 +4,7 @@ import io.pivotal.services.plugin.CfProperties;
 import io.pivotal.services.plugin.tasks.helper.CfUnMapRouteDelegate;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.gradle.api.tasks.TaskAction;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
@@ -23,10 +24,9 @@ public class CfUnMapRouteTask extends AbstractCfTask {
         CloudFoundryOperations cfOperations = getCfOperations();
         CfProperties cfProperties = getCfProperties();
 
-        Mono<Void> resp = this.unMapRouteTaskDelegate.unmapRoute(cfOperations, cfProperties);
+        Flux<Void> resp = this.unMapRouteTaskDelegate.unmapRoute(cfOperations, cfProperties);
 
-        resp.block(Duration.ofMillis(defaultWaitTimeout));
-
+        resp.collectList().block(Duration.ofMillis(defaultWaitTimeout));
     }
 
     @Override

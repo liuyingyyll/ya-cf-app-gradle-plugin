@@ -62,16 +62,16 @@ public class CfBlueGreenStage2Delegate {
                                 CfProperties cfProperties) {
         
         String greenNameString = cfProperties.name() + "-green";
-        String greenRouteString = CfRouteUtil.getTempRoute(cfOperations, cfProperties, "-green");
+        Mono<String> greenRouteMono = CfRouteUtil.getTempRoute(cfOperations, cfProperties, "-green");
 
         CfProperties greenName = ImmutableCfProperties.copyOf(cfProperties)
             .withName(greenNameString);
 
-        CfProperties greenNameAndRoute = ImmutableCfProperties.copyOf(cfProperties)
+        Mono<CfProperties> greenNameAndRouteMono = greenRouteMono.map(greenRoute -> ImmutableCfProperties.copyOf(cfProperties)
             .withName(greenNameString)
             .withHost(null)
             .withDomain(null)
-            .withRoutes(Collections.singletonList(greenRouteString));
+            .withRoutes(Collections.singletonList(greenRoute)));
 
         CfProperties blueName = ImmutableCfProperties.copyOf(cfProperties)
             .withName(cfProperties.name() + "-blue");
@@ -82,8 +82,8 @@ public class CfBlueGreenStage2Delegate {
         Mono<Optional<ApplicationDetail>> existingAppMono = appDetailsDelegate
             .getAppDetails(cfOperations, cfProperties);
 
-        Mono<Void> bgResult = Mono.zip(backupAppMono, existingAppMono)
-            .flatMap(function((backupApp, existingApp) -> {
+        Mono<Void> bgResult = Mono.zip(backupAppMono, existingAppMono, greenNameAndRouteMono, greenRouteMono)
+            .flatMap(function((backupApp, existingApp, greenNameAndRoute, greenRouteString) -> {
                 LOGGER.lifecycle(
                     "Running Blue Green Deploy - after deploying a 'green' app. App '{}' with route '{}'",
                     cfProperties.name(),
@@ -91,11 +91,11 @@ public class CfBlueGreenStage2Delegate {
                 return
                     (backupApp.isPresent() ?
                         deleteAppDelegate.deleteApp(cfOperations, blueName) : Mono.empty())
-                        .then(mapRouteDelegate.mapRoute(cfOperations, greenName))
-                        .then(existingApp.isPresent() ?
+                        .thenMany(mapRouteDelegate.mapRoute(cfOperations, greenName))
+                        .thenMany(existingApp.isPresent() ?
                             unMapRouteDelegate.unmapRoute(cfOperations, cfProperties) :
                             Mono.empty())
-                        .then(unMapRouteDelegate.unmapRoute(cfOperations, greenNameAndRoute))
+                        .thenMany(unMapRouteDelegate.unmapRoute(cfOperations, greenNameAndRoute))
                         .then(existingApp.isPresent() ?
                             renameAppDelegate
                                 .renameApp(cfOperations, cfProperties, blueName) :

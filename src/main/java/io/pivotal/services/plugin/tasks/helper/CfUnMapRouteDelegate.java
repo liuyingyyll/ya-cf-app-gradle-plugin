@@ -7,6 +7,7 @@ import org.cloudfoundry.operations.applications.DecomposedRoute;
 import org.cloudfoundry.operations.routes.UnmapRouteRequest;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -21,18 +22,21 @@ public class CfUnMapRouteDelegate {
 
     private static final Logger LOGGER = Logging.getLogger(CfUnMapRouteDelegate.class);
 
-    public Mono<Void> unmapRoute(CloudFoundryOperations cfOperations, CfProperties cfProperties) {
-        Mono<Void> resp = Mono.empty();
+    public Flux<Void> unmapRoute(CloudFoundryOperations cfOperations, CfProperties cfProperties) {
 
         if (cfProperties.routes() != null && !cfProperties.routes().isEmpty()) {
-            List<DecomposedRoute> routes = CfRouteUtil.decomposedRoutes(cfOperations, cfProperties.routes(), cfProperties.path());
-            for (DecomposedRoute route : routes) {
-                resp = resp.then(unmapRoute(cfOperations, cfProperties.name(), route.getHost(), route.getDomain(), route.getPort(), route.getPath()));
-            }
+            Mono<List<DecomposedRoute>> decomposedRoutes = CfRouteUtil.decomposedRoutes(cfOperations, cfProperties.routes(), cfProperties.path());
+
+            Flux<Void> unmapRoutesFlux = decomposedRoutes
+                .flatMapMany(Flux::fromIterable)
+                .flatMap(route ->
+                    unmapRoute(cfOperations, cfProperties.name(), route.getHost(), route.getDomain(), route.getPort(), route.getPath()));
+
+            return unmapRoutesFlux;
+            
         } else {
-            resp = resp.then(unmapRoute(cfOperations, cfProperties.name(), cfProperties.host(), cfProperties.domain(), null, cfProperties.path()));
+            return unmapRoute(cfOperations, cfProperties.name(), cfProperties.host(), cfProperties.domain(), null, cfProperties.path()).flux();
         }
-        return resp;
     }
 
     private Mono<Void> unmapRoute(CloudFoundryOperations cfOperations, String appName, String host, String domain, Integer port, String path) {

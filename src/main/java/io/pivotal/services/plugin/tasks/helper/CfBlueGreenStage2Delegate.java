@@ -62,7 +62,7 @@ public class CfBlueGreenStage2Delegate {
                                 CfProperties cfProperties) {
         
         String greenNameString = cfProperties.name() + "-green";
-        Mono<String> greenRouteMono = CfRouteUtil.getTempRoute(cfOperations, cfProperties, "-green");
+        Mono<String> greenRouteMono = CfRouteUtil.getTempRoute(cfOperations, cfProperties, "green");
 
         CfProperties greenName = ImmutableCfProperties.copyOf(cfProperties)
             .withName(greenNameString);

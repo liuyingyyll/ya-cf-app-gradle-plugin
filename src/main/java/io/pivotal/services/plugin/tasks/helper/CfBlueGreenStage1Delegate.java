@@ -33,7 +33,7 @@ public class CfBlueGreenStage1Delegate {
                                 CfProperties cfProperties) {
         
         final String greenNameString = cfProperties.name() + "-green";
-        final Mono<String> greenRouteStringMono = CfRouteUtil.getTempRoute(cfOperations, cfProperties, "-green");
+        final Mono<String> greenRouteStringMono = CfRouteUtil.getTempRoute(cfOperations, cfProperties, "green");
 
         Mono<Optional<ApplicationDetail>> appDetailMono = appDetailsDelegate
             .getAppDetails(cfOperations, cfProperties);

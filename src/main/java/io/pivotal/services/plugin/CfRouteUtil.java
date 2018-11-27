@@ -53,7 +53,7 @@ public class CfRouteUtil {
     }
 
     private static Mono<String> getTempRoute(String host, String domain, Integer port, String path, String suffix) {
-        return Mono.just((host != null ? host + suffix + "." : suffix + ".")
+        return Mono.just((host != null ? host + "-" + suffix + "." : suffix + ".")
             + domain
             + (port != null ? ":" + port : "")
             + (path != null ? "/" + path : ""));

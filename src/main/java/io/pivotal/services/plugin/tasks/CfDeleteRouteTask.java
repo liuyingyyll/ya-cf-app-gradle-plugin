@@ -15,7 +15,7 @@ import java.time.Duration;
  */
 public class CfDeleteRouteTask extends AbstractCfTask {
 
-    private CfDeleteRouteDelegate deleteRouteDelegate;
+    private CfDeleteRouteDelegate deleteRouteDelegate =  new CfDeleteRouteDelegate();
 
     @TaskAction
     public void deleteRoute() {

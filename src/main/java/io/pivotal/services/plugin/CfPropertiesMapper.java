@@ -405,7 +405,7 @@ public class CfPropertiesMapper {
      */
     public Optional<Integer> getIntegerPropertyFromProject(String propertyName) {
         if (this.project.hasProperty(propertyName)) {
-            return Optional.of((Integer) this.project.property(propertyName));
+            return Optional.of(Integer.parseInt(this.project.property(propertyName)));
         }
         return Optional.empty();
     }
